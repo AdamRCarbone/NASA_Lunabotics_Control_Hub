@@ -1,0 +1,28 @@
+<Styles
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:lvc="using:LiveChartsCore.SkiaSharpView.Avalonia"
+    xmlns:styles="using:Nasa_RFC_Power_Budget_Program.style">
+
+    <Design.PreviewWith>
+        <Border Padding="20">
+            <!--  Add Controls for Previewer Here  -->
+        </Border>
+    </Design.PreviewWith>
+
+    <Style Selector="Border.OutlineBorder">
+        <Setter Property="BorderBrush" Value="{DynamicResource PrimaryColor}" />
+        <Setter Property="BorderThickness" Value="2" />
+        <Setter Property="Padding" Value="5" />
+        <Setter Property="Margin" Value="5" />
+        <Setter Property="CornerRadius" Value="24" />
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="VerticalAlignment" Value="Stretch" />
+    </Style>
+
+    <Style Selector="TextBlock.DataText">
+        <Setter Property="FontSize" Value="24" />
+        <Setter Property="Foreground" Value="White" />
+    </Style>
+    <!--  Add Styles Here  -->
+</Styles>

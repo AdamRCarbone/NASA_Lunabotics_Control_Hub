@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.12.35707.178 d17.12
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NASA_Lunabotics_Control_Hub", "NASA_Lunabotics_Control_Hub\NASA_Lunabotics_Control_Hub.csproj", "{9755C4B5-76C5-4F51-AC4A-AC7F12B356DE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NASA_Lunabotics_Control_Hub.Browser", "NASA_Lunabotics_Control_Hub.Browser\NASA_Lunabotics_Control_Hub.Browser.csproj", "{675BB6DB-FF73-4FDE-90D8-0ADBD0DE0884}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NASA_Lunabotics_Control_Hub.Desktop", "NASA_Lunabotics_Control_Hub.Desktop\NASA_Lunabotics_Control_Hub.Desktop.csproj", "{43B2E73D-DF27-4277-AC6C-A56506DC69B4}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9755C4B5-76C5-4F51-AC4A-AC7F12B356DE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9755C4B5-76C5-4F51-AC4A-AC7F12B356DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9755C4B5-76C5-4F51-AC4A-AC7F12B356DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9755C4B5-76C5-4F51-AC4A-AC7F12B356DE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{675BB6DB-FF73-4FDE-90D8-0ADBD0DE0884}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{675BB6DB-FF73-4FDE-90D8-0ADBD0DE0884}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{675BB6DB-FF73-4FDE-90D8-0ADBD0DE0884}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{675BB6DB-FF73-4FDE-90D8-0ADBD0DE0884}.Release|Any CPU.Build.0 = Release|Any CPU
+		{43B2E73D-DF27-4277-AC6C-A56506DC69B4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{43B2E73D-DF27-4277-AC6C-A56506DC69B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{43B2E73D-DF27-4277-AC6C-A56506DC69B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{43B2E73D-DF27-4277-AC6C-A56506DC69B4}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
