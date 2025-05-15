@@ -20,25 +20,24 @@ namespace NASA_Lunabotics_Control_Hub.ViewModels
 
     public class JoystickViewModel : INotifyPropertyChanged
     {
-        private UDP_Client _udpClient;
-        private MainViewModel _mainViewModel;
-        private int SCALAR_POS = 99;
+        private readonly UDP_Client _udpClient;
+        private readonly MainViewModel _mainViewModel;
+        private const int SCALAR_POS = 99;
 
         public JoystickViewModel(MainViewModel mainViewModel)
         {
+            _mainViewModel = mainViewModel ?? throw new ArgumentNullException(nameof(mainViewModel));
             _udpClient = new UDP_Client();
-            _udpClient.SetModel(this); // Set the JoystickViewModel in UDP_Client
-            _mainViewModel = mainViewModel;
-
-            // Subscribe to MainViewModel's PropertyChanged event
+            _udpClient.SetModel(this);
+            _sendString = "+00+00+00+00"; // Initialize to prevent null
+            BucketControlState = 1; // Default to neutral
             _mainViewModel.PropertyChanged += MainViewModel_PropertyChanged;
         }
 
         private void MainViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == nameof(MainViewModel.JoystickPosition))
+            if (e?.PropertyName == nameof(MainViewModel.JoystickPosition))
             {
-                // Update coordinates based on JoystickPosition (assuming joystickId = 1 for simplicity)
                 UpdateFromPosition(_mainViewModel.JoystickPosition, joystickId: 1);
             }
         }
@@ -47,8 +46,10 @@ namespace NASA_Lunabotics_Control_Hub.ViewModels
         private int _yCoord_1;
         private int _xCoord_2;
         private int _yCoord_2;
-
+        private int _bucketControlState;
         private string _sendString;
+        private string _byteString;
+
         public string SendString
         {
             get => _sendString;
@@ -58,6 +59,20 @@ namespace NASA_Lunabotics_Control_Hub.ViewModels
                 {
                     _sendString = value;
                     OnPropertyChanged();
+                }
+            }
+        }
+
+        public string ByteString
+        {
+            get => _byteString;
+            set
+            {
+                if (_byteString != value)
+                {
+                    _byteString = value;
+                    OnPropertyChanged();
+                    _udpClient.SendByteStringAsync(_byteString);
                 }
             }
         }
@@ -72,7 +87,6 @@ namespace NASA_Lunabotics_Control_Hub.ViewModels
                     _xCoord_1 = value;
                     OnPropertyChanged();
                     Update_SendString();
-                    _udpClient.SendPacketsForTesting();
                 }
             }
         }
@@ -87,7 +101,7 @@ namespace NASA_Lunabotics_Control_Hub.ViewModels
                     _yCoord_1 = value;
                     OnPropertyChanged();
                     Update_SendString();
-                    _udpClient.SendPacketsForTesting();
+                    ByteString = UDP_Client.ConvertJoystickString(SendString, BucketControlState);
                 }
             }
         }
@@ -102,7 +116,6 @@ namespace NASA_Lunabotics_Control_Hub.ViewModels
                     _xCoord_2 = value;
                     OnPropertyChanged();
                     Update_SendString();
-                    _udpClient.SendPacketsForTesting();
                 }
             }
         }
@@ -117,7 +130,21 @@ namespace NASA_Lunabotics_Control_Hub.ViewModels
                     _yCoord_2 = value;
                     OnPropertyChanged();
                     Update_SendString();
-                    _udpClient.SendPacketsForTesting();
+                    ByteString = UDP_Client.ConvertJoystickString(SendString, BucketControlState);
+                }
+            }
+        }
+
+        public int BucketControlState
+        {
+            get => _bucketControlState;
+            set
+            {
+                if (_bucketControlState != value)
+                {
+                    _bucketControlState = value;
+                    OnPropertyChanged();
+                    ByteString = UDP_Client.ConvertJoystickString(SendString, BucketControlState);
                 }
             }
         }

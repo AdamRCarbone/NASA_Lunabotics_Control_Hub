@@ -1,0 +1,21 @@
+<UserControl
+    x:Class="NASA_Lunabotics_Control_Hub.Controls.VerticalSliderControl"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Border
+        x:Name="BoundBorder"
+        HorizontalAlignment="Center"
+        VerticalAlignment="Center"
+        Background="{Binding BoundBackground}"
+        BorderBrush="{Binding BoundBorderBrush}"
+        BorderThickness="{Binding BoundBorderThickness}"
+        CornerRadius="10">
+        <Rectangle
+            x:Name="Knob"
+            Width="{Binding KnobSize}"
+            Height="{Binding KnobSize}"
+            Fill="{Binding KnobFill}"
+            Stroke="{Binding KnobStroke}"
+            StrokeThickness="{Binding KnobBorderSize}" />
+    </Border>
+</UserControl>

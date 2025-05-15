@@ -180,7 +180,7 @@
                                 <TextBlock
                                     Classes="DataText"
                                     FontWeight="Bold"
-                                    Text="{Binding SendString}" />
+                                    Text="{Binding ByteString}" />
                             </StackPanel>
                         </Grid>
 
