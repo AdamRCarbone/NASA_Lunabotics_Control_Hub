@@ -182,6 +182,48 @@
         <Setter Property="BorderBrush" Value="#404040"/>
     </Style>
 
+    <Style Selector="Border.sensor-card.active">
+        <Setter Property="BorderBrush" Value="#C5D86D"/>
+        <Setter Property="BorderThickness" Value="2"/>
+    </Style>
+
+    <Style Selector="Border.sensor-card.active:pointerover">
+        <Setter Property="BorderBrush" Value="#C5D86D"/>
+        <Setter Property="Background" Value="#252525"/>
+    </Style>
+
+    <!-- Camera Status Card Styles -->
+    <Style Selector="Border.camera-status">
+        <Setter Property="Background" Value="#1A1A1A"/>
+        <Setter Property="CornerRadius" Value="6"/>
+        <Setter Property="BorderBrush" Value="#333333"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Transitions">
+            <Transitions>
+                <BrushTransition Property="BorderBrush" Duration="0:0:0.2"/>
+                <BrushTransition Property="Background" Duration="0:0:0.2"/>
+                <ThicknessTransition Property="BorderThickness" Duration="0:0:0.2"/>
+            </Transitions>
+        </Setter>
+    </Style>
+
+    <Style Selector="Border.camera-status:pointerover">
+        <Setter Property="Background" Value="#252525"/>
+        <Setter Property="BorderBrush" Value="#505050"/>
+    </Style>
+
+    <Style Selector="Border.camera-status.active">
+        <Setter Property="BorderBrush" Value="#C5D86D"/>
+        <Setter Property="BorderThickness" Value="2"/>
+        <Setter Property="Background" Value="#1A1F16"/>
+    </Style>
+
+    <Style Selector="Border.camera-status.active:pointerover">
+        <Setter Property="Background" Value="#252D22"/>
+        <Setter Property="BorderBrush" Value="#C5D86D"/>
+    </Style>
+
     <!-- Key Cap Style -->
     <Style Selector="Border.key-cap">
         <Setter Property="Background" Value="#2D2D2D"/>

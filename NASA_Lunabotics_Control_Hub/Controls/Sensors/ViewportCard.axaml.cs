@@ -8,9 +8,6 @@ namespace NASA_Lunabotics_Control_Hub.Controls.Sensors;
 
 public partial class ViewportCard : UserControl
 {
-    public static readonly StyledProperty<string> IconProperty =
-        AvaloniaProperty.Register<ViewportCard, string>(nameof(Icon));
-
     public static readonly StyledProperty<string> LabelProperty =
         AvaloniaProperty.Register<ViewportCard, string>(nameof(Label));
 
@@ -26,12 +23,6 @@ public partial class ViewportCard : UserControl
         UpdateVisualState();
     }
 
-    public string Icon
-    {
-        get => GetValue(IconProperty);
-        set => SetValue(IconProperty, value);
-    }
-
     public string Label
     {
         get => GetValue(LabelProperty);
@@ -41,7 +32,7 @@ public partial class ViewportCard : UserControl
     public bool IsActive
     {
         get => GetValue(IsActiveProperty);
-        set
+        private set
         {
             SetValue(IsActiveProperty, value);
             UpdateVisualState();
@@ -75,9 +66,6 @@ public partial class ViewportCard : UserControl
 
     private void Border_PointerPressed(object? sender, PointerPressedEventArgs e)
     {
-        // Set this card active and notify the ViewModel
-        IsActive = true;
-
         var dataContext = this.DataContext;
         if (dataContext is MainViewModel vm)
         {

@@ -8,6 +8,7 @@
              xmlns:cameras="clr-namespace:NASA_Lunabotics_Control_Hub.Controls.Cameras"
              xmlns:sensors="clr-namespace:NASA_Lunabotics_Control_Hub.Controls.Sensors"
              xmlns:ctrl="clr-namespace:NASA_Lunabotics_Control_Hub.Controls.Controls"
+             xmlns:converters="clr-namespace:NASA_Lunabotics_Control_Hub.Converters"
              mc:Ignorable="d" d:DesignWidth="1920" d:DesignHeight="1080"
              x:DataType="vm:MainViewModel">
     <Design.DataContext><vm:MainViewModel /></Design.DataContext>
@@ -128,23 +129,23 @@
                 <StackPanel Margin="16" Spacing="10">
                     <!-- 3D Map Widget -->
                     <TextBlock Text="3D Map" Classes="section-header"/>
-                    <sensors:ViewportCard Icon="🗺️" Label="3D Map" ViewportId="map" Margin="0,0,0,4"/>
+                    <sensors:ViewportCard Label="3D Map" ViewportId="map" IsActive="{Binding ActiveViewport, Converter={StaticResource ViewportIdToIsActive}, ConverterParameter=map}" Margin="0,0,0,4"/>
 
                     <TextBlock Text="Near Cameras" Classes="section-header" Margin="0,4,0,0"/>
                     <StackPanel Spacing="3">
-                        <cameras:CameraStatusCard CameraName="Depth Camera" CameraType="Depth" IsActive="False" StatusText="No Data" ViewportId="depth_cam"/>
-                        <cameras:CameraStatusCard CameraName="Left Side" CameraType="RGB" StatusText="No Data" ViewportId="left_side"/>
-                        <cameras:CameraStatusCard CameraName="Left Front" CameraType="RGB" StatusText="No Data" ViewportId="left_front"/>
-                        <cameras:CameraStatusCard CameraName="Right Side" CameraType="RGB" StatusText="No Data" ViewportId="right_side"/>
-                        <cameras:CameraStatusCard CameraName="Right Front" CameraType="RGB" StatusText="No Data" ViewportId="right_front"/>
-                        <cameras:CameraStatusCard CameraName="Back Rear" CameraType="RGB" StatusText="No Data" ViewportId="back_rear"/>
+                        <cameras:CameraStatusCard CameraName="Depth Camera" CameraType="Depth" StatusText="No Data" ViewportId="depth_cam" IsActive="{Binding ActiveViewport, Converter={StaticResource ViewportIdToIsActive}, ConverterParameter=depth_cam}"/>
+                        <cameras:CameraStatusCard CameraName="Left Side" CameraType="RGB" StatusText="No Data" ViewportId="left_side" IsActive="{Binding ActiveViewport, Converter={StaticResource ViewportIdToIsActive}, ConverterParameter=left_side}"/>
+                        <cameras:CameraStatusCard CameraName="Left Front" CameraType="RGB" StatusText="No Data" ViewportId="left_front" IsActive="{Binding ActiveViewport, Converter={StaticResource ViewportIdToIsActive}, ConverterParameter=left_front}"/>
+                        <cameras:CameraStatusCard CameraName="Right Side" CameraType="RGB" StatusText="No Data" ViewportId="right_side" IsActive="{Binding ActiveViewport, Converter={StaticResource ViewportIdToIsActive}, ConverterParameter=right_side}"/>
+                        <cameras:CameraStatusCard CameraName="Right Front" CameraType="RGB" StatusText="No Data" ViewportId="right_front" IsActive="{Binding ActiveViewport, Converter={StaticResource ViewportIdToIsActive}, ConverterParameter=right_front}"/>
+                        <cameras:CameraStatusCard CameraName="Back Rear" CameraType="RGB" StatusText="No Data" ViewportId="back_rear" IsActive="{Binding ActiveViewport, Converter={StaticResource ViewportIdToIsActive}, ConverterParameter=back_rear}"/>
                     </StackPanel>
                     <TextBlock Text="Far Cameras (April Tags)" Classes="section-header"/>
                     <StackPanel Spacing="3">
-                        <cameras:CameraStatusCard CameraName="Front" CameraType="AprilTag" StatusText="No Tag" ViewportId="far_front"/>
-                        <cameras:CameraStatusCard CameraName="Right" CameraType="AprilTag" StatusText="No Tag" ViewportId="far_right"/>
-                        <cameras:CameraStatusCard CameraName="Back" CameraType="AprilTag" StatusText="No Tag" ViewportId="far_back"/>
-                        <cameras:CameraStatusCard CameraName="Left" CameraType="AprilTag" StatusText="No Tag" ViewportId="far_left"/>
+                        <cameras:CameraStatusCard CameraName="Front" CameraType="AprilTag" StatusText="No Tag" ViewportId="far_front" IsActive="{Binding ActiveViewport, Converter={StaticResource ViewportIdToIsActive}, ConverterParameter=far_front}"/>
+                        <cameras:CameraStatusCard CameraName="Right" CameraType="AprilTag" StatusText="No Tag" ViewportId="far_right" IsActive="{Binding ActiveViewport, Converter={StaticResource ViewportIdToIsActive}, ConverterParameter=far_right}"/>
+                        <cameras:CameraStatusCard CameraName="Back" CameraType="AprilTag" StatusText="No Tag" ViewportId="far_back" IsActive="{Binding ActiveViewport, Converter={StaticResource ViewportIdToIsActive}, ConverterParameter=far_back}"/>
+                        <cameras:CameraStatusCard CameraName="Left" CameraType="AprilTag" StatusText="No Tag" ViewportId="far_left" IsActive="{Binding ActiveViewport, Converter={StaticResource ViewportIdToIsActive}, ConverterParameter=far_left}"/>
                     </StackPanel>
                 </StackPanel>
             </Border>

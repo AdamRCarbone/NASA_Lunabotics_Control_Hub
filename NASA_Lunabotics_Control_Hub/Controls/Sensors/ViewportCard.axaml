@@ -2,19 +2,22 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:converters="clr-namespace:NASA_Lunabotics_Control_Hub.Converters"
              x:Class="NASA_Lunabotics_Control_Hub.Controls.Sensors.ViewportCard"
              mc:Ignorable="d" d:DesignWidth="140" d:DesignHeight="90">
 
-    <Border Classes="sensor-card" Padding="10" Margin="2"
+    <UserControl.Resources>
+        <converters:ViewportIdToIsActiveConverter x:Key="ViewportIdToIsActive"/>
+    </UserControl.Resources>
+
+    <Border x:Name="RootBorder" Classes="sensor-card" Classes.active="{Binding IsActive, RelativeSource={RelativeSource AncestorType=UserControl}}" Padding="12" Margin="2"
             PointerPressed="Border_PointerPressed">
-        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="6">
-            <TextBlock Text="{Binding Icon, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                       FontSize="24" HorizontalAlignment="Center"/>
+        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
             <TextBlock Text="{Binding Label, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                       Foreground="#C0C0C0" FontSize="10" FontWeight="Bold"
+                       Foreground="#C0C0C0" FontSize="11" FontWeight="Bold"
                        HorizontalAlignment="Center" TextAlignment="Center"/>
-            <Border x:Name="ActiveIndicator" Width="6" Height="6" CornerRadius="3"
-                    Background="#606060" HorizontalAlignment="Center"/>
+            <Border x:Name="ActiveIndicator" Width="8" Height="8" CornerRadius="4"
+                    Background="#606060" HorizontalAlignment="Center" Margin="0,6,0,0"/>
         </StackPanel>
     </Border>
 </UserControl>

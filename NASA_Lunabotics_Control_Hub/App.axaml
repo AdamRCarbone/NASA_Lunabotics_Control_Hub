@@ -9,6 +9,7 @@
         <Color x:Key="AccentColor">#C5D86D</Color>
         <Color x:Key="SuccessColor">#4ade80</Color>
         <converters:ModeStateToBrushConverter x:Key="ModeStateToBrush"/>
+        <converters:ViewportIdToIsActiveConverter x:Key="ViewportIdToIsActive"/>
     </Application.Resources>
 
     <Application.Styles>
