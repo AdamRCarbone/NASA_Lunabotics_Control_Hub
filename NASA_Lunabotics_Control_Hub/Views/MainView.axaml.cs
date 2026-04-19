@@ -64,7 +64,7 @@ namespace NASA_Lunabotics_Control_Hub.Views
 
             // Update UI to show Confirmed state (green LED)
             _mainViewModel.SetModeState(modeName, NASA_Lunabotics_Control_Hub.ViewModels.ModeState.Confirmed);
-            _mainViewModel.CurrentMode = modeName;
+            _mainViewModel.SetCurrentMode(modeName);
 
             Console.WriteLine($"[MainView] UI updated: {modeName} = Confirmed");
         }
@@ -72,7 +72,7 @@ namespace NASA_Lunabotics_Control_Hub.Views
         private void OnConnectionChanged(bool isConnected)
         {
             Console.WriteLine($"[MainView] Connection changed: {isConnected}");
-            _mainViewModel.IsConnected = isConnected;
+            _mainViewModel.SetConnected(isConnected);
         }
 
         private void OnHeartbeatReceived()
