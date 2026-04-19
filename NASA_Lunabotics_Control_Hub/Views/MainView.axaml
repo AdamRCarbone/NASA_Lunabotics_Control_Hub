@@ -26,28 +26,19 @@
                     <Border Background="#00643C" Padding="12,10" CornerRadius="7"><TextBlock Text="OCTANE" Foreground="Black" FontSize="16" FontWeight="Bold" FontFamily="Arial Rounded MT Bold"/></Border>
                     <!-- Connection status with heartbeat pulse ring -->
 <Border Name="ConnectionBorder" Background="#1A1F16" BorderBrush="#333333" BorderThickness="1.5" Padding="12,10" CornerRadius="7" VerticalAlignment="Center">
-    <!-- Outer ring for heartbeat pulse -->
-    <Border Name="HeartbeatRing"
-            BorderBrush="Orange"
-            BorderThickness="3"
-            CornerRadius="9"
-            Opacity="0"
-            Margin="-3,-3,-3,-3">
-        <Border.OpacityMask>
-            <VisualBrush>
-                <VisualBrush.Visual>
-                    <Border Background="Black" CornerRadius="9" />
-                </VisualBrush.Visual>
-            </VisualBrush>
-        </Border.OpacityMask>
-        <Animation Duration="0:0:0.5" AutoReverse="False" FillBehavior="HoldEnd">
-            <DoubleAnimation Property="Opacity" ToValue="0" BeginTime="0:0:0.5" />
-        </Animation>
-    </Border>
-    <StackPanel Orientation="Horizontal" Spacing="8">
-        <Border Width="10" Height="10" CornerRadius="5" Background="{Binding ConnectionColor}"/>
-        <TextBlock Text="{Binding ConnectionStatusText}" Foreground="{Binding ConnectionColor}" FontSize="13" FontWeight="Bold" FontFamily="Arial Rounded MT Bold" VerticalAlignment="Center"/>
-    </StackPanel>
+    <Grid>
+        <!-- Outer ring for heartbeat pulse (simplified, no animation in XAML) -->
+        <Border Name="HeartbeatRing"
+                BorderBrush="Orange"
+                BorderThickness="3"
+                CornerRadius="9"
+                Opacity="0"
+                Margin="-3,-3,-3,-3"/>
+        <StackPanel Orientation="Horizontal" Spacing="8">
+            <Border Width="10" Height="10" CornerRadius="5" Background="{Binding ConnectionColor}"/>
+            <TextBlock Text="{Binding ConnectionStatusText}" Foreground="{Binding ConnectionColor}" FontSize="13" FontWeight="Bold" FontFamily="Arial Rounded MT Bold" VerticalAlignment="Center"/>
+        </StackPanel>
+    </Grid>
 </Border>
                 </StackPanel>
 

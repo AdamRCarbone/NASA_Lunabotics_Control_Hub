@@ -191,7 +191,7 @@ namespace NASA_Lunabotics_Control_Hub.Components
                         return new DecodedMessage
                         {
                             Type = "command",
-                            Mode = (char)payload[0],
+                            Mode = payload[0],
                             EStop = payload[1] == '1'
                         };
                     }
@@ -215,7 +215,7 @@ namespace NASA_Lunabotics_Control_Hub.Components
                         {
                             Type = "fault",
                             Severity = payload[0],
-                            FaultChar = (byte)payload[1]
+                            FaultChar = (char)payload[1]
                         };
                     }
                     break;
