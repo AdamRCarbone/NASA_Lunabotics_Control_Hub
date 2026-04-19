@@ -27,7 +27,7 @@ namespace NASA_Lunabotics_Control_Hub.ViewModels
     public bool IsConnected
     {
         get => _isConnected;
-        private set => this.RaiseAndSetIfChanged(ref _isConnected, value);
+        public set => this.RaiseAndSetIfChanged(ref _isConnected, value);
     }
 
     public string ConnectionStatusText => IsConnected ? "CONNECTED" : "OFFLINE";
@@ -52,7 +52,7 @@ namespace NASA_Lunabotics_Control_Hub.ViewModels
         public string CurrentMode
         {
             get => _currentMode;
-            private set => this.RaiseAndSetIfChanged(ref _currentMode, value);
+            public set => this.RaiseAndSetIfChanged(ref _currentMode, value);
         }
 
         public ModeState StandbyStatus
