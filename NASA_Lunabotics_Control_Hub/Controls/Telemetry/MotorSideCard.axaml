@@ -4,35 +4,123 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:telemetry="clr-namespace:NASA_Lunabotics_Control_Hub.Controls.Telemetry"
              x:Class="NASA_Lunabotics_Control_Hub.Controls.Telemetry.MotorSideCard"
-             mc:Ignorable="d" d:DesignWidth="160" d:DesignHeight="180">
+             mc:Ignorable="d" d:DesignWidth="280" d:DesignHeight="100">
 
     <Border Classes="card-secondary" Padding="12" Margin="4">
         <StackPanel>
             <TextBlock Text="{Binding SideName, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                       Foreground="#00643C" FontSize="11" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,10"/>
+                       Foreground="#00643C" FontSize="11" FontWeight="Bold" Margin="0,0,0,8"/>
 
-            <telemetry:WheelTelemetryCard WheelName="{Binding W1Name, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                          AngularVelocity="{Binding W1AngularVel, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                          Position="{Binding W1Position, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                          Torque="{Binding W1Torque, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                          Current="{Binding W1Current, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                          Voltage="{Binding W1Voltage, RelativeSource={RelativeSource AncestorType=UserControl}}"/>
+            <!-- Wheel 1 Row -->
+            <Grid Margin="0,0,0,6">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="30"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="{Binding W1Name, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                           Foreground="#00643C" FontSize="10" FontWeight="Bold" VerticalAlignment="Center"/>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                    <StackPanel>
+                        <TextBlock Text="Vel" Foreground="#606060" FontSize="7"/>
+                        <TextBlock Text="{Binding W1AngularVel, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                   Foreground="#C5D86D" FontSize="9" FontFamily="Consolas"/>
+                    </StackPanel>
+                    <StackPanel>
+                        <TextBlock Text="Pos" Foreground="#606060" FontSize="7"/>
+                        <TextBlock Text="{Binding W1Position, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                   Foreground="White" FontSize="9" FontFamily="Consolas"/>
+                    </StackPanel>
+                    <StackPanel>
+                        <TextBlock Text="Tq" Foreground="#606060" FontSize="7"/>
+                        <TextBlock Text="{Binding W1Torque, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                   Foreground="White" FontSize="9" FontFamily="Consolas"/>
+                    </StackPanel>
+                    <StackPanel>
+                        <TextBlock Text="Cur" Foreground="#606060" FontSize="7"/>
+                        <TextBlock Text="{Binding W1Current, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                   Foreground="#C5D86D" FontSize="9" FontFamily="Consolas"/>
+                    </StackPanel>
+                    <StackPanel>
+                        <TextBlock Text="Volt" Foreground="#606060" FontSize="7"/>
+                        <TextBlock Text="{Binding W1Voltage, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                   Foreground="#C5D86D" FontSize="9" FontFamily="Consolas"/>
+                    </StackPanel>
+                </StackPanel>
+            </Grid>
 
-            <telemetry:WheelTelemetryCard WheelName="{Binding W2Name, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                          AngularVelocity="{Binding W2AngularVel, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                          Position="{Binding W2Position, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                          Torque="{Binding W2Torque, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                          Current="{Binding W2Current, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                          Voltage="{Binding W2Voltage, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                          Margin="0,4,0,0"/>
+            <!-- Wheel 2 Row -->
+            <Grid Margin="0,0,0,6">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="30"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="{Binding W2Name, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                           Foreground="#00643C" FontSize="10" FontWeight="Bold" VerticalAlignment="Center"/>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                    <StackPanel>
+                        <TextBlock Text="Vel" Foreground="#606060" FontSize="7"/>
+                        <TextBlock Text="{Binding W2AngularVel, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                   Foreground="#C5D86D" FontSize="9" FontFamily="Consolas"/>
+                    </StackPanel>
+                    <StackPanel>
+                        <TextBlock Text="Pos" Foreground="#606060" FontSize="7"/>
+                        <TextBlock Text="{Binding W2Position, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                   Foreground="White" FontSize="9" FontFamily="Consolas"/>
+                    </StackPanel>
+                    <StackPanel>
+                        <TextBlock Text="Tq" Foreground="#606060" FontSize="7"/>
+                        <TextBlock Text="{Binding W2Torque, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                   Foreground="White" FontSize="9" FontFamily="Consolas"/>
+                    </StackPanel>
+                    <StackPanel>
+                        <TextBlock Text="Cur" Foreground="#606060" FontSize="7"/>
+                        <TextBlock Text="{Binding W2Current, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                   Foreground="#C5D86D" FontSize="9" FontFamily="Consolas"/>
+                    </StackPanel>
+                    <StackPanel>
+                        <TextBlock Text="Volt" Foreground="#606060" FontSize="7"/>
+                        <TextBlock Text="{Binding W2Voltage, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                   Foreground="#C5D86D" FontSize="9" FontFamily="Consolas"/>
+                    </StackPanel>
+                </StackPanel>
+            </Grid>
 
-            <telemetry:WheelTelemetryCard WheelName="{Binding W3Name, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                          AngularVelocity="{Binding W3AngularVel, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                          Position="{Binding W3Position, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                          Torque="{Binding W3Torque, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                          Current="{Binding W3Current, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                          Voltage="{Binding W3Voltage, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                          Margin="0,4,0,0"/>
+            <!-- Wheel 3 Row -->
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="30"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="{Binding W3Name, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                           Foreground="#00643C" FontSize="10" FontWeight="Bold" VerticalAlignment="Center"/>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                    <StackPanel>
+                        <TextBlock Text="Vel" Foreground="#606060" FontSize="7"/>
+                        <TextBlock Text="{Binding W3AngularVel, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                   Foreground="#C5D86D" FontSize="9" FontFamily="Consolas"/>
+                    </StackPanel>
+                    <StackPanel>
+                        <TextBlock Text="Pos" Foreground="#606060" FontSize="7"/>
+                        <TextBlock Text="{Binding W3Position, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                   Foreground="White" FontSize="9" FontFamily="Consolas"/>
+                    </StackPanel>
+                    <StackPanel>
+                        <TextBlock Text="Tq" Foreground="#606060" FontSize="7"/>
+                        <TextBlock Text="{Binding W3Torque, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                   Foreground="White" FontSize="9" FontFamily="Consolas"/>
+                    </StackPanel>
+                    <StackPanel>
+                        <TextBlock Text="Cur" Foreground="#606060" FontSize="7"/>
+                        <TextBlock Text="{Binding W3Current, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                   Foreground="#C5D86D" FontSize="9" FontFamily="Consolas"/>
+                    </StackPanel>
+                    <StackPanel>
+                        <TextBlock Text="Volt" Foreground="#606060" FontSize="7"/>
+                        <TextBlock Text="{Binding W3Voltage, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                   Foreground="#C5D86D" FontSize="9" FontFamily="Consolas"/>
+                    </StackPanel>
+                </StackPanel>
+            </Grid>
         </StackPanel>
     </Border>
 </UserControl>
