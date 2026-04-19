@@ -36,23 +36,23 @@
 
         <!-- Left panel: Logo, Connection Status, Network Selector -->
         <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
-          <Border Background="#00643C" Padding="8,6" CornerRadius="7">
+          <Border Background="#00643C" Padding="6,4" CornerRadius="7">
             <TextBlock Text="OCTANE" Foreground="Black" FontSize="16" FontWeight="Bold"
                        FontFamily="Arial Rounded MT Bold" />
           </Border>
 
           <!-- Connection status with heartbeat pulse ring -->
           <Border Name="ConnectionBorder" Background="#1A1F16" BorderBrush="#333333"
-                  BorderThickness="1.5" Padding="8,6" CornerRadius="7" VerticalAlignment="Center">
+                  BorderThickness="1" Padding="6,4" CornerRadius="7" VerticalAlignment="Center">
             <Grid>
               <!-- Outer ring for heartbeat pulse (simplified, no animation in XAML) -->
               <Border Name="HeartbeatRing" BorderBrush="Orange" BorderThickness="3"
                       CornerRadius="9" Opacity="0" Margin="-3,-3,-3,-3" />
-              <StackPanel Orientation="Horizontal" Spacing="5">
+              <StackPanel Orientation="Horizontal" Spacing="4">
                 <Border Width="10" Height="10" CornerRadius="5"
                         Background="{Binding ConnectionColor}" />
                 <TextBlock Text="{Binding ConnectionStatusText}"
-                           Foreground="{Binding ConnectionColor}" FontSize="11"
+                           Foreground="{Binding ConnectionColor}" FontSize="10"
                            FontWeight="Bold" FontFamily="Arial Rounded MT Bold"
                            VerticalAlignment="Center" />
               </StackPanel>
@@ -60,13 +60,13 @@
           </Border>
 
           <!-- Network selector - same style as connection status -->
-          <Border Background="#1A1F16" BorderBrush="#333333" BorderThickness="1.5"
-                  Padding="8,6" CornerRadius="7" VerticalAlignment="Center">
-            <StackPanel Orientation="Horizontal" Spacing="5">
-              <TextBlock Text="Network:" Foreground="#808080" FontSize="11"
+          <Border Background="#1A1F16" BorderBrush="#333333" BorderThickness="1"
+                  Padding="6,4" CornerRadius="7" VerticalAlignment="Center">
+            <StackPanel Orientation="Horizontal" Spacing="4">
+              <TextBlock Text="Network:" Foreground="#808080" FontSize="10"
                          FontWeight="Bold" FontFamily="Arial Rounded MT Bold"
                          VerticalAlignment="Center" />
-              <ComboBox Name="NetworkSelector" Width="160" Height="20"
+              <ComboBox Name="NetworkSelector" Width="140" Height="18"
                         SelectionChanged="OnNetworkSelected"
                         Background="#2D2D2D" BorderBrush="#333333" />
             </StackPanel>
@@ -305,9 +305,9 @@
                                    W3AngularVel="--" W3Position="--" W3Torque="--"
                                    W3Current="--" W3Voltage="--" />
           <Border Grid.Column="2" Background="#0D1F16" BorderBrush="#00643C"
-                  BorderThickness="1.5" CornerRadius="8" Padding="16,12"
+                  BorderThickness="1" CornerRadius="8" Padding="16,12"
                   VerticalAlignment="Center">
-            <TextBlock Text="Latency: -- ms" Foreground="#606060" FontSize="11"
+            <TextBlock Text="Latency: -- ms" Foreground="#606060" FontSize="10"
                        FontWeight="Bold" FontFamily="Consolas" />
           </Border>
           <telemetry:MotorSideCard Grid.Column="4" SideName="RIGHT" W1Name="W4"
@@ -337,7 +337,7 @@
           <telemetry:DataCard Grid.Column="4" Label="Yaw" Value="--" SubValue="--"
                               Unit="°" />
           <Border Grid.Column="6" Background="#0D1F16" BorderBrush="#DC2626"
-                  BorderThickness="1.5" Padding="14,10" CornerRadius="8">
+                  BorderThickness="1" Padding="14,10" CornerRadius="8">
             <TextBlock Text="NO DATA" Foreground="#606060" FontSize="12"
                        FontWeight="Bold" />
           </Border>

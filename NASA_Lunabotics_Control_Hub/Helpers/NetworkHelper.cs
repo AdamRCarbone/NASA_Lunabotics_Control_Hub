@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net.NetworkInformation;
 using System.Runtime.InteropServices;
@@ -9,43 +10,94 @@ namespace NASA_Lunabotics_Control_Hub.Helpers
 {
     /// <summary>
     /// Helper class to get network interface information including WiFi SSIDs
+    /// Uses multiple methods to retrieve SSID reliably
     /// </summary>
     public static class NetworkHelper
     {
-        // Use NetworkInterface.Name directly - it often contains the SSID on Windows
-        // or fall back to the friendly name
+        /// <summary>
+        /// Try to get SSID using netsh command (most reliable on Windows)
+        /// </summary>
+        private static string GetSSIDFromNetsh(string interfaceName)
+        {
+            try
+            {
+                var startInfo = new ProcessStartInfo
+                {
+                    FileName = "netsh",
+                    Arguments = $"wlan show interfaces name=\"{interfaceName}\"",
+                    RedirectStandardOutput = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                };
+
+                using (var process = Process.Start(startInfo))
+                {
+                    string output = process.StandardOutput.ReadToEnd();
+                    process.WaitForExit();
+
+                    // Parse SSID from output
+                    foreach (var line in output.Split('\n'))
+                    {
+                        if (line.Contains("SSID") || line.Contains("BSSID"))
+                        {
+                            // Extract the SSID value
+                            var parts = line.Split(':');
+                            if (parts.Length > 1)
+                            {
+                                string ssid = parts[1].Trim();
+                                // Skip BSSID lines, we want SSID
+                                if (!line.Contains("BSSID") && !string.IsNullOrEmpty(ssid))
+                                {
+                                    return ssid;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[NetworkHelper] netsh failed: {ex.Message}");
+            }
+
+            return null;
+        }
 
         /// <summary>
         /// Get a display-friendly name for the network interface
-        /// For WiFi, try to extract or find the SSID
+        /// Tries multiple methods to get the SSID for WiFi
         /// </summary>
         public static string GetInterfaceDisplayName(NetworkInterface nic)
         {
             if (nic.NetworkInterfaceType == NetworkInterfaceType.Wireless80211)
             {
-                // On Windows, the Name property often IS the SSID for connected WiFi
-                // or contains helpful info like "Wi-Fi"
-                string name = nic.Name;
-
-                // If the name looks like an adapter name (contains "Wireless", "Adapter", etc),
-                // try to get more info
-                if (name.Contains("Wireless", StringComparison.OrdinalIgnoreCase) ||
-                    name.Contains("Adapter", StringComparison.OrdinalIgnoreCase))
+                // Method 1: Try netsh (most reliable)
+                string ssid = GetSSIDFromNetsh(nic.Name);
+                if (!string.IsNullOrEmpty(ssid))
                 {
-                    // Use the OperationalStatus description or fallback to a generic name
-                    // The SSID info is typically not easily accessible without admin privileges
-                    return name;
+                    Console.WriteLine($"[NetworkHelper] Found SSID via netsh: {ssid}");
+                    return ssid;
                 }
 
-                // Otherwise, the name might already be the SSID (e.g., "MyWiFiNetwork")
-                return name;
+                // Method 2: Check if Name is already the SSID
+                // On some systems, nic.Name contains the network name
+                if (!nic.Name.Contains("Wireless") && !nic.Name.Contains("Adapter") &&
+                    nic.Name.Length < 32 && !nic.Name.Contains("Connection"))
+                {
+                    Console.WriteLine($"[NetworkHelper] Using adapter name as SSID: {nic.Name}");
+                    return nic.Name;
+                }
+
+                // Method 3: Fallback to generic WiFi name
+                Console.WriteLine($"[NetworkHelper] Could not get SSID, using 'WiFi'");
+                return "WiFi";
             }
 
             return nic.Name;
         }
 
         /// <summary>
-        /// Get formatted network interface list
+        /// Get formatted network interface list with SSIDs for WiFi
         /// </summary>
         public static List<(string DisplayName, string InterfaceName)> GetNetworkInterfaces()
         {
@@ -79,9 +131,9 @@ namespace NASA_Lunabotics_Control_Hub.Helpers
                 string displayName;
                 if (nic.NetworkInterfaceType == NetworkInterfaceType.Wireless80211)
                 {
-                    string nicName = GetInterfaceDisplayName(nic);
-                    displayName = $"{nicName} ({ip})";
-                    Console.WriteLine($"[NetworkHelper] WiFi {nic.Name} -> Display: {nicName}");
+                    string wifiName = GetInterfaceDisplayName(nic);
+                    displayName = $"{wifiName} ({ip})";
+                    Console.WriteLine($"[NetworkHelper] WiFi {nic.Name} -> Display: {wifiName}");
                 }
                 else
                 {
