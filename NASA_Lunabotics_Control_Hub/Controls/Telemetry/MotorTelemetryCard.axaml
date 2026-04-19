@@ -1,0 +1,50 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             x:Class="NASA_Lunabotics_Control_Hub.Controls.Telemetry.MotorTelemetryCard"
+             mc:Ignorable="d" d:DesignWidth="200" d:DesignHeight="150">
+
+    <Border Classes="card-secondary" Padding="12">
+        <StackPanel>
+            <TextBlock Text="{Binding SideName, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                       Foreground="#00643C" FontSize="11" FontWeight="Bold" Margin="0,0,0,8"/>
+
+            <StackPanel Spacing="4">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="40"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="50"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{Binding W1Name, RelativeSource={RelativeSource AncestorType=UserControl}}" Foreground="#A0A0A0" FontSize="9"/>
+                    <TextBlock Grid.Column="2" Text="{Binding W1RPM, RelativeSource={RelativeSource AncestorType=UserControl}}" Foreground="White" FontSize="10" FontFamily="Consolas"/>
+                </Grid>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="40"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="50"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{Binding W2Name, RelativeSource={RelativeSource AncestorType=UserControl}}" Foreground="#A0A0A0" FontSize="9"/>
+                    <TextBlock Grid.Column="2" Text="{Binding W2RPM, RelativeSource={RelativeSource AncestorType=UserControl}}" Foreground="White" FontSize="10" FontFamily="Consolas"/>
+                </Grid>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="40"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="50"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{Binding W3Name, RelativeSource={RelativeSource AncestorType=UserControl}}" Foreground="#A0A0A0" FontSize="9"/>
+                    <TextBlock Grid.Column="2" Text="{Binding W3RPM, RelativeSource={RelativeSource AncestorType=UserControl}}" Foreground="White" FontSize="10" FontFamily="Consolas"/>
+                </Grid>
+            </StackPanel>
+
+            <StackPanel Margin="0,8,0,0">
+                <TextBlock Text="CURRENT (A)" Foreground="#606060" FontSize="8"/>
+                <TextBlock Text="{Binding CurrentValues, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                           Foreground="#C5D86D" FontSize="9" FontFamily="Consolas"/>
+            </StackPanel>
+        </StackPanel>
+    </Border>
+</UserControl>

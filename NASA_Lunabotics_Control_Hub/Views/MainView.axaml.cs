@@ -19,27 +19,6 @@ namespace NASA_Lunabotics_Control_Hub.Views
 
             DataContext = _joystickViewModel;
 
-            Joystick1.PropertyChanged += (s, e) =>
-            {
-                if (e.Property == JoystickControl.PositionProperty)
-                {
-                    Debug.WriteLine($"Joystick_1 Position Changed: {Joystick1.Position}");
-
-                    _joystickViewModel.UpdateFromPosition(Joystick1.Position, 1);
-
-                    _mainViewModel.JoystickPosition = Joystick1.Position;
-                }
-            };
-
-            Joystick2.PropertyChanged += (s, e) =>
-            {
-                if (e.Property == JoystickControl.PositionProperty)
-                {
-                    Debug.WriteLine($"Joystick_2 Position Changed: {Joystick2.Position}");
-
-                    _joystickViewModel.UpdateFromPosition(Joystick2.Position, 2);
-                }
-            };
         }
     }
 }

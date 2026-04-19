@@ -1,0 +1,32 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             x:Class="NASA_Lunabotics_Control_Hub.Controls.Cameras.CameraStatusCard"
+             mc:Ignorable="d" d:DesignWidth="300" d:DesignHeight="60">
+
+    <Border Classes="{Binding StatusClass, RelativeSource={RelativeSource AncestorType=UserControl}}">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="0">
+                <TextBlock Text="{Binding CameraName, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                           Foreground="{Binding TextColor, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                           FontSize="12" FontWeight="Bold"/>
+                <TextBlock Text="{Binding CameraDescription, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                           Foreground="#606060" FontSize="8"/>
+            </StackPanel>
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6">
+                <Border Background="{Binding StatusBackground, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                        Padding="8,3" CornerRadius="3">
+                    <TextBlock Text="{Binding StatusText, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                               Foreground="{Binding StatusTextColor, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                               FontSize="9" FontWeight="Bold"/>
+                </Border>
+                <Border Classes="status-indicator-dot {Binding IndicatorClass, RelativeSource={RelativeSource AncestorType=UserControl}}"/>
+            </StackPanel>
+        </Grid>
+    </Border>
+</UserControl>

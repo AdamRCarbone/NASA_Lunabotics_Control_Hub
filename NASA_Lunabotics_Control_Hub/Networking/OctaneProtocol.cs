@@ -110,7 +110,7 @@ namespace NASA_Lunabotics_Control_Hub.Networking
 
             // Verify CRC
             var crc = data[offset + expectedTotal - 1];
-            var computedCrc = ComputeCrc8(data, offset, expectedTotal - 1);
+            var computedCrc = ComputeCrc8(data, expectedTotal - 1);
             if (crc != computedCrc) return null;
 
             // Extract payload

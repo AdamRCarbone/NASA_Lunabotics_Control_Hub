@@ -1,0 +1,18 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             x:Class="NASA_Lunabotics_Control_Hub.Controls.Telemetry.DataCard"
+             mc:Ignorable="d" d:DesignWidth="120" d:DesignHeight="80">
+
+    <Border Classes="card-telemetry">
+        <StackPanel>
+            <TextBlock Text="{Binding Label, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                       Classes="data-label"/>
+            <TextBlock Text="{Binding Value, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                       Classes="data-value-accent"/>
+            <TextBlock Text="{Binding SubValue, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                       Classes="data-label"/>
+        </StackPanel>
+    </Border>
+</UserControl>
