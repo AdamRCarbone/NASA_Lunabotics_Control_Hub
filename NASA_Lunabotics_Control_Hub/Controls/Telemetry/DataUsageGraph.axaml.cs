@@ -43,6 +43,12 @@ namespace NASA_Lunabotics_Control_Hub.Controls.Telemetry
             _downloadRateText = this.Find<TextBlock>("DownloadRateText")!;
             _totalUploadText = this.Find<TextBlock>("TotalUploadText")!;
             _totalDownloadText = this.Find<TextBlock>("TotalDownloadText")!;
+            var resetUploadBtn = this.Find<Button>("ResetUploadBtn");
+            var resetDownloadBtn = this.Find<Button>("ResetDownloadBtn");
+            if (resetUploadBtn != null)
+                resetUploadBtn.Click += (s, e) => { _totalUpload = 0; UpdateAllDisplays(); };
+            if (resetDownloadBtn != null)
+                resetDownloadBtn.Click += (s, e) => { _totalDownload = 0; UpdateAllDisplays(); };
 
             // Initialize history with zeros
             for (int i = 0; i < HistorySize; i++)
@@ -145,6 +151,14 @@ namespace NASA_Lunabotics_Control_Hub.Controls.Telemetry
             _networkHistory.Add(newNetwork);
 
             DrawChart();
+        }
+
+        private void UpdateAllDisplays()
+        {
+            _uploadRateText.Text = $"{_currentUploadRate:F1} KB/s";
+            _downloadRateText.Text = $"{_currentDownloadRate:F1} KB/s";
+            _totalUploadText.Text = $"{_totalUpload:F2} KB";
+            _totalDownloadText.Text = $"{_totalDownload:F2} KB";
         }
 
         private void DrawChart()

@@ -37,24 +37,10 @@
         <!-- Left panel: Logo, Connection Status, Network Selector -->
         <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
           <!-- OCTANE Logo - styled as a badge -->
-          <Border Background="Transparent" Padding="0" CornerRadius="4"
-                  BorderBrush="#00643C" BorderThickness="2">
-            <Border.Clip>
-              <RectangleGeometry Rect="0,0,1,1">
-                <RectangleGeometry.Transform>
-                  <SkewTransform AngleY="-10"/>
-                </RectangleGeometry.Transform>
-              </RectangleGeometry>
-            </Border.Clip>
-            <Border.Background>
-              <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
-                <GradientStop Color="#008f56" Offset="0"/>
-                <GradientStop Color="#00643c" Offset="1"/>
-              </LinearGradientBrush>
-            </Border.Background>
-            <TextBlock Text="OCTANE" Foreground="White" FontSize="14" FontWeight="Bold"
-                       FontFamily="Arial Rounded MT Bold" TextAlignment="Center"
-                       Padding="12,3,12,4" FontStyle="Italic"/>
+          <Border Background="#00643C" CornerRadius="3" Padding="10,4">
+            <TextBlock Text="OCTANE" Foreground="White" FontSize="13" FontWeight="Bold"
+                       FontFamily="Arial Rounded MT Bold" FontStyle="Italic"
+                       TextAlignment="Center"/>
           </Border>
 
           <!-- Connection status with heartbeat pulse ring -->

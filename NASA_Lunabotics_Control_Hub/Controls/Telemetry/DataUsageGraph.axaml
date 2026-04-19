@@ -6,8 +6,18 @@
              x:Class="NASA_Lunabotics_Control_Hub.Controls.Telemetry.DataUsageGraph">
   <Border Background="#1A1A1A" BorderBrush="#333333" BorderThickness="1" CornerRadius="6" Padding="12">
     <StackPanel Spacing="8">
-      <!-- Header -->
-      <TextBlock Text="NETWORK TRAFFIC" Foreground="#606060" FontSize="10" FontWeight="Bold" FontFamily="Consolas"/>
+      <!-- Header with reset buttons -->
+      <Grid>
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="*"/>
+          <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+        <TextBlock Grid.Column="0" Text="NETWORK TRAFFIC" Foreground="#606060" FontSize="10" FontWeight="Bold" FontFamily="Consolas"/>
+        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="3">
+          <Button x:Name="ResetUploadBtn" Width="20" Height="18" FontSize="9" Content="↑" Background="#1B4D3E" Foreground="#4ADE80" BorderThickness="0" CornerRadius="2"/>
+          <Button x:Name="ResetDownloadBtn" Width="20" Height="18" FontSize="9" Content="↓" Background="#1E3A5F" Foreground="#60A5FA" BorderThickness="0" CornerRadius="2"/>
+        </StackPanel>
+      </Grid>
 
       <!-- Legend -->
       <StackPanel Orientation="Horizontal" Spacing="12">
@@ -20,8 +30,8 @@
       <!-- Live Chart with Y-axis -->
       <Grid Height="100">
         <Grid.ColumnDefinitions>
-          <ColumnDefinition Width="35"/> <!-- Y-axis labels -->
-          <ColumnDefinition Width="*"/>  <!-- Chart area -->
+          <ColumnDefinition Width="35"/>
+          <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
         <!-- Y-axis labels -->
@@ -53,7 +63,7 @@
         <!-- Upload -->
         <Border Grid.Column="0" Background="#1B4D3E" Padding="6" CornerRadius="3">
           <StackPanel>
-            <TextBlock Text="↑ UPLOAD" Foreground="#4ADE80" FontSize="8" FontWeight="Bold"/>
+            <TextBlock Text="UPLOAD" Foreground="#4ADE80" FontSize="8" FontWeight="Bold"/>
             <TextBlock x:Name="UploadRateText" Text="0.0 KB/s" Foreground="#A7F3D0" FontSize="10" FontFamily="Consolas"/>
           </StackPanel>
         </Border>
@@ -61,13 +71,13 @@
         <!-- Download -->
         <Border Grid.Column="2" Background="#1E3A5F" Padding="6" CornerRadius="3">
           <StackPanel>
-            <TextBlock Text="↓ DOWNLOAD" Foreground="#60A5FA" FontSize="8" FontWeight="Bold"/>
+            <TextBlock Text="DOWNLOAD" Foreground="#60A5FA" FontSize="8" FontWeight="Bold"/>
             <TextBlock x:Name="DownloadRateText" Text="0.0 KB/s" Foreground="#BFDBFE" FontSize="10" FontFamily="Consolas"/>
           </StackPanel>
         </Border>
       </Grid>
 
-      <!-- Total Usage -->
+      <!-- Total Usage with Reset buttons -->
       <Grid Margin="0,2,0,0">
         <Grid.ColumnDefinitions>
           <ColumnDefinition Width="*"/>
