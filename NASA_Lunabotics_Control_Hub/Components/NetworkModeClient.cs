@@ -116,13 +116,16 @@ namespace NASA_Lunabotics_Control_Hub.Components
         /// </summary>
         private void UdpReceiveLoop()
         {
-            byte[] buffer = new byte[4096];
-
             while (!_cancelSource.Token.IsCancellationRequested && _udpClient != null)
             {
                 try
                 {
-                    var result = _udpClient.Receive();
+                    // Receive UDP packet (blocking call)
+                    var task = _udpClient.ReceiveAsync();
+                    if (!task.Wait(100)) // 100ms timeout
+                        continue;
+
+                    var result = task.Result;
                     byte[] data = result.Buffer;
 
                     // Validate heartbeat frame: [MAGIC][STATE][SEQ_HI][SEQ_LO][CRC] = 5 bytes
@@ -134,28 +137,21 @@ namespace NASA_Lunabotics_Control_Hub.Components
                         {
                             // Valid heartbeat received
                             byte state = data[1];
-                            string stateStr = state switch
-                            {
-                                (byte)'0' => "STANDBY",
-                                (byte)'1' => "MANUAL",
-                                (byte)'2' => "AUTONOMOUS",
-                                (byte)'3' => "FAULT",
-                                _ => "UNKNOWN"
-                            };
 
                             LastHeartbeat = DateTime.UtcNow;
 
                             // Trigger heartbeat event on UI thread
                             Dispatcher.UIThread.Post(() => HeartbeatReceived?.Invoke());
-
-                            // Log state from heartbeat (optional, for debugging)
-                            // Console.WriteLine($"[Heartbeat] State: {stateStr}");
                         }
                     }
                 }
                 catch (ObjectDisposedException)
                 {
                     break; // UDP client closed
+                }
+                catch (Exception ex) when (ex is TimeoutException || ex is AggregateException)
+                {
+                    // Timeout or other expected exception, continue loop
                 }
                 catch (Exception ex)
                 {
