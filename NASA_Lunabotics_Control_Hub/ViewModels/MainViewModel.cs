@@ -47,7 +47,6 @@ namespace NASA_Lunabotics_Control_Hub.ViewModels
             get => _joystickPosition;
             set => this.RaiseAndSetIfChanged(ref _joystickPosition, value);
         }
-        public string CurrentMode
         public string CurrentMode { get; private set; }
         public ModeState StandbyStatus
         {
