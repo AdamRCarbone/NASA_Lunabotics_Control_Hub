@@ -31,6 +31,7 @@ namespace NASA_Lunabotics_Control_Hub.Views
             // Subscribe to state changes from network client
             _networkClient.StateChanged += OnRosStateReceived;
         _networkClient.ConnectionChanged += OnConnectionChanged;
+        _networkClient.HeartbeatReceived += OnHeartbeatReceived;
 
             DataContext = _mainViewModel;
 
@@ -72,6 +73,21 @@ namespace NASA_Lunabotics_Control_Hub.Views
         {
             Console.WriteLine($"[MainView] Connection changed: {isConnected}");
             _mainViewModel.IsConnected = isConnected;
+        }
+
+        private void OnHeartbeatReceived()
+        {
+            // Trigger heartbeat pulse animation
+            var heartbeatRing = this.FindControl<Border>("HeartbeatRing");
+            if (heartbeatRing != null)
+            {
+                heartbeatRing.Opacity = 1;
+                // Fade out after 0.5s using a simple timer
+                var timer = new System.Threading.Timer(_ =>
+                {
+                    Dispatcher.UIThread.Post(() => heartbeatRing.Opacity = 0);
+                }, null, 500, System.Threading.Timeout.Infinite);
+            }
         }
 
         private void KeyUpdateTimer_Tick(object? sender, EventArgs e)
