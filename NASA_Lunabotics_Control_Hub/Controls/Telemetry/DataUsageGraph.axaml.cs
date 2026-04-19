@@ -23,6 +23,12 @@ namespace NASA_Lunabotics_Control_Hub.Controls.Telemetry
         private double _currentUploadRate = 0;
         private double _currentDownloadRate = 0;
 
+        // UI elements for displaying values
+        private TextBlock _uploadRateText;
+        private TextBlock _downloadRateText;
+        private TextBlock _totalUploadText;
+        private TextBlock _totalDownloadText;
+
         // Network interface monitoring
         private string? _selectedInterfaceName;
         private long _lastBytesSent = 0;
@@ -33,6 +39,10 @@ namespace NASA_Lunabotics_Control_Hub.Controls.Telemetry
             InitializeComponent();
 
             _chartCanvas = this.Find<Canvas>("ChartCanvas")!;
+            _uploadRateText = this.Find<TextBlock>("UploadRateText")!;
+            _downloadRateText = this.Find<TextBlock>("DownloadRateText")!;
+            _totalUploadText = this.Find<TextBlock>("TotalUploadText")!;
+            _totalDownloadText = this.Find<TextBlock>("TotalDownloadText")!;
 
             // Initialize history with zeros
             for (int i = 0; i < HistorySize; i++)
@@ -117,8 +127,14 @@ namespace NASA_Lunabotics_Control_Hub.Controls.Telemetry
             _totalUpload += bytesSentThisInterval / 1024.0;
             _totalDownload += bytesReceivedThisInterval / 1024.0;
 
+            // Update the text displays
+            _uploadRateText.Text = $"{_currentUploadRate:F1} KB/s";
+            _downloadRateText.Text = $"{_currentDownloadRate:F1} KB/s";
+            _totalUploadText.Text = $"{_totalUpload:F2} KB";
+            _totalDownloadText.Text = $"{_totalDownload:F2} KB";
+
             // Split upload into GUI commands (higher frequency) and background telemetry
-            // Assume ~20% of upload is GUI commands, ~80% is background/other
+            // Assume ~30% of upload is GUI commands, rest is background/other
             double newGuiInput = _currentUploadRate * 0.3; // GUI commands
             double newNetwork = _currentDownloadRate; // Telemetry download
 

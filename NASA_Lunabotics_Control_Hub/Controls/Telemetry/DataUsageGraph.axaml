@@ -2,48 +2,67 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:vm="clr-namespace:NASA_Lunabotics_Control_Hub.ViewModels"
              mc:Ignorable="d" d:DesignWidth="300" d:DesignHeight="200"
-             x:Class="NASA_Lunabotics_Control_Hub.Controls.Telemetry.DataUsageGraph"
-             x:DataType="vm:MainViewModel">
-  <Design.DataContext><vm:MainViewModel /></Design.DataContext>
+             x:Class="NASA_Lunabotics_Control_Hub.Controls.Telemetry.DataUsageGraph">
   <Border Background="#1A1A1A" BorderBrush="#333333" BorderThickness="1" CornerRadius="6" Padding="12">
     <StackPanel Spacing="8">
       <!-- Header -->
-      <TextBlock Text="DATA USAGE" Foreground="#606060" FontSize="10" FontWeight="Bold" FontFamily="Consolas"/>
+      <TextBlock Text="NETWORK TRAFFIC" Foreground="#606060" FontSize="10" FontWeight="Bold" FontFamily="Consolas"/>
 
-      <!-- Legend with arrows side by side -->
+      <!-- Legend -->
       <StackPanel Orientation="Horizontal" Spacing="12">
-        <TextBlock Foreground="#4ADE80" FontSize="10" FontWeight="Bold" FontFamily="Consolas">
-          <Run Text="↑"/></TextBlock>
-        <TextBlock Foreground="#60A5FA" FontSize="10" FontWeight="Bold" FontFamily="Consolas">
-          <Run Text="↓"/> GUI Commands</TextBlock>
+        <TextBlock Foreground="#4ADE80" FontSize="9" FontFamily="Consolas">
+          <Run Text="↑"/> GUI Commands</TextBlock>
+        <TextBlock Foreground="#60A5FA" FontSize="9" FontFamily="Consolas">
+          <Run Text="↓"/> Telemetry</TextBlock>
       </StackPanel>
 
-      <!-- Live Chart Canvas -->
-      <Border Background="#0F0F0F" CornerRadius="4" ClipToBounds="True" Height="100">
-        <Canvas Name="ChartCanvas"/>
-      </Border>
+      <!-- Live Chart with Y-axis -->
+      <Grid Height="100">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="35"/> <!-- Y-axis labels -->
+          <ColumnDefinition Width="*"/>  <!-- Chart area -->
+        </Grid.ColumnDefinitions>
+
+        <!-- Y-axis labels -->
+        <StackPanel Grid.Column="0" VerticalAlignment="Stretch" Spacing="0">
+          <TextBlock Text="60" Foreground="#808080" FontSize="8" FontFamily="Consolas" HorizontalAlignment="Right"/>
+          <TextBlock Text="45" Foreground="#808080" FontSize="8" FontFamily="Consolas" HorizontalAlignment="Right"/>
+          <TextBlock Text="30" Foreground="#808080" FontSize="8" FontFamily="Consolas" HorizontalAlignment="Right"/>
+          <TextBlock Text="15" Foreground="#808080" FontSize="8" FontFamily="Consolas" HorizontalAlignment="Right"/>
+          <TextBlock Text="0" Foreground="#808080" FontSize="8" FontFamily="Consolas" HorizontalAlignment="Right"/>
+        </StackPanel>
+
+        <!-- Chart Canvas -->
+        <Border Grid.Column="1" Background="#0F0F0F" CornerRadius="4" ClipToBounds="True">
+          <Canvas Name="ChartCanvas"/>
+        </Border>
+      </Grid>
+
+      <!-- Y-axis label -->
+      <TextBlock Text="KB/s" Foreground="#606060" FontSize="8" FontFamily="Consolas" Margin="35,0,0,0"/>
 
       <!-- Current Rates -->
-      <Grid Margin="0,6,0,0">
+      <Grid Margin="0,4,0,0">
         <Grid.ColumnDefinitions>
           <ColumnDefinition Width="*"/>
-          <ColumnDefinition Width="10"/>
+          <ColumnDefinition Width="8"/>
           <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-        <Border Grid.Column="0" Background="#1B4D3E" Padding="8" CornerRadius="4">
+
+        <!-- Upload -->
+        <Border Grid.Column="0" Background="#1B4D3E" Padding="6" CornerRadius="3">
           <StackPanel>
-            <TextBlock Text="UPLOAD" Foreground="#4ADE80" FontSize="9" FontWeight="Bold"/>
-            <TextBlock Text="{Binding UploadRate, StringFormat={}{0:F1} MB/s}"
-                       Foreground="#A7F3D0" FontSize="11" FontFamily="Consolas"/>
+            <TextBlock Text="↑ UPLOAD" Foreground="#4ADE80" FontSize="8" FontWeight="Bold"/>
+            <TextBlock x:Name="UploadRateText" Text="0.0 KB/s" Foreground="#A7F3D0" FontSize="10" FontFamily="Consolas"/>
           </StackPanel>
         </Border>
-        <Border Grid.Column="2" Background="#1E3A5F" Padding="8" CornerRadius="4">
+
+        <!-- Download -->
+        <Border Grid.Column="2" Background="#1E3A5F" Padding="6" CornerRadius="3">
           <StackPanel>
-            <TextBlock Text="DOWNLOAD" Foreground="#60A5FA" FontSize="9" FontWeight="Bold"/>
-            <TextBlock Text="{Binding DownloadRate, StringFormat={}{0:F1} MB/s}"
-                       Foreground="#BFDBFE" FontSize="11" FontFamily="Consolas"/>
+            <TextBlock Text="↓ DOWNLOAD" Foreground="#60A5FA" FontSize="8" FontWeight="Bold"/>
+            <TextBlock x:Name="DownloadRateText" Text="0.0 KB/s" Foreground="#BFDBFE" FontSize="10" FontFamily="Consolas"/>
           </StackPanel>
         </Border>
       </Grid>
@@ -52,14 +71,22 @@
       <Grid Margin="0,2,0,0">
         <Grid.ColumnDefinitions>
           <ColumnDefinition Width="*"/>
-          <ColumnDefinition Width="10"/>
+          <ColumnDefinition Width="8"/>
           <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-        <Border Grid.Column="0" Background="#0D291E" Padding="6" CornerRadius="3">
-          <TextBlock Text="Total: 0.00 MB" Foreground="#3D7A55" FontSize="8" FontFamily="Consolas"/>
+
+        <Border Grid.Column="0" Background="#0D291E" Padding="5" CornerRadius="2">
+          <StackPanel>
+            <TextBlock Text="Total Up" Foreground="#3D7A55" FontSize="7" FontFamily="Consolas"/>
+            <TextBlock x:Name="TotalUploadText" Text="0.00 KB" Foreground="#6EE7B7" FontSize="9" FontFamily="Consolas"/>
+          </StackPanel>
         </Border>
-        <Border Grid.Column="2" Background="#0D1F33" Padding="6" CornerRadius="3">
-          <TextBlock Text="Total: 0.00 MB" Foreground="#2B5980" FontSize="8" FontFamily="Consolas"/>
+
+        <Border Grid.Column="2" Background="#0D1F33" Padding="5" CornerRadius="2">
+          <StackPanel>
+            <TextBlock Text="Total Down" Foreground="#2B5980" FontSize="7" FontFamily="Consolas"/>
+            <TextBlock x:Name="TotalDownloadText" Text="0.00 KB" Foreground="#93C5FD" FontSize="9" FontFamily="Consolas"/>
+          </StackPanel>
         </Border>
       </Grid>
     </StackPanel>
