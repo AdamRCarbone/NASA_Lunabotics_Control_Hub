@@ -130,47 +130,29 @@ namespace NASA_Lunabotics_Control_Hub.Views
 
         private void OnNetworkSelected(object? sender, SelectionChangedEventArgs e)
         {
-            if (NetworkSelector.SelectedItem is ComboBoxItem item)
+            if (NetworkSelector.SelectedItem is ComboBoxItem item && item.Tag is string localIp)
             {
-                string content = item.Content?.ToString() ?? "";
-                string ipAddress = ExtractIpAddress(content);
+                // Broadcast to rover at standard rover IP on selected network
+                string roverIp = "192.168.1.100";
+                _networkClient.SetRoverIp(roverIp);
 
-                _networkClient.SetRoverIp(ipAddress);
-                Console.WriteLine($"[MainView] Network changed to: {ipAddress}");
+                // Note: In a real implementation, you'd bind the socket to localIp
+                Console.WriteLine($"[MainView] Network changed: {item.Content} (local: {localIp}, rover: {roverIp})");
             }
-        }
-
-        private string ExtractIpAddress(string content)
-        {
-            if (content.Contains("Auto-detect"))
-                return "192.168.1.100";
-
-            if (content.Contains("Rover @"))
-            {
-                var parts = content.Split('@');
-                if (parts.Length > 1)
-                    return parts[1].Trim();
-            }
-
-            var colonIndex = content.LastIndexOf(':');
-            if (colonIndex > 0)
-                return content.Substring(colonIndex + 1).Trim();
-
-            return "192.168.1.100";
         }
 
         private void PopulateNetworkSelector()
         {
             NetworkSelector.Items.Clear();
 
-            NetworkSelector.Items.Add(new ComboBoxItem { Content = "Auto-detect (Rover IP: 192.168.1.100)" });
-
-            string[] roverIps = { "192.168.1.100", "10.0.0.100" };
-            foreach (var ip in roverIps)
+            // Auto-detect option
+            NetworkSelector.Items.Add(new ComboBoxItem
             {
-                NetworkSelector.Items.Add(new ComboBoxItem { Content = $"Rover @ {ip}" });
-            }
+                Content = "Auto-detect",
+                Tag = "0.0.0.0"  // Bind to all interfaces
+            });
 
+            // Enumerate network interfaces
             foreach (var networkInterface in NetworkInterface.GetAllNetworkInterfaces())
             {
                 if (networkInterface.OperationalStatus == OperationalStatus.Up &&
@@ -183,7 +165,24 @@ namespace NASA_Lunabotics_Control_Hub.Views
                         if (unicast.Address.AddressFamily == AddressFamily.InterNetwork)
                         {
                             var ip = unicast.Address.ToString();
-                            NetworkSelector.Items.Add(new ComboBoxItem { Content = $"{networkInterface.Name}: {ip}" });
+
+                            // Format: "WiFi (SSID)" for WiFi, "Ethernet (IP)" for wired
+                            string displayName;
+                            if (networkInterface.NetworkInterfaceType == NetworkInterfaceType.Wireless80211)
+                            {
+                                // Try to get WiFi SSID from interface name
+                                displayName = $"WiFi: {networkInterface.Name} ({ip})";
+                            }
+                            else
+                            {
+                                displayName = $"Ethernet: {networkInterface.Name} ({ip})";
+                            }
+
+                            NetworkSelector.Items.Add(new ComboBoxItem
+                            {
+                                Content = displayName,
+                                Tag = ip  // Store local IP for socket binding
+                            });
                         }
                     }
                 }
