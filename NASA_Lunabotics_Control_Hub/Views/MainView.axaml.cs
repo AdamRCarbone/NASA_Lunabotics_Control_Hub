@@ -6,6 +6,7 @@ using NASA_Lunabotics_Control_Hub.Components;
 using NASA_Lunabotics_Control_Hub.Controls;
 using NASA_Lunabotics_Control_Hub.Controls.Controls;
 using NASA_Lunabotics_Control_Hub.Controls.Telemetry;
+using NASA_Lunabotics_Control_Hub.Helpers;
 using NASA_Lunabotics_Control_Hub.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -182,39 +183,16 @@ namespace NASA_Lunabotics_Control_Hub.Views
                 Tag = "all"
             });
 
-            // Enumerate network interfaces
-            foreach (var networkInterface in NetworkInterface.GetAllNetworkInterfaces())
+            // Use NetworkHelper to get interfaces with SSIDs
+            var interfaces = NetworkHelper.GetNetworkInterfaces();
+
+            foreach (var (displayName, interfaceName) in interfaces)
             {
-                if (networkInterface.OperationalStatus == OperationalStatus.Up &&
-                    (networkInterface.NetworkInterfaceType == NetworkInterfaceType.Wireless80211 ||
-                     networkInterface.NetworkInterfaceType == NetworkInterfaceType.Ethernet))
+                NetworkSelector.Items.Add(new ComboBoxItem
                 {
-                    var ipProperties = networkInterface.GetIPProperties();
-                    foreach (var unicast in ipProperties.UnicastAddresses)
-                    {
-                        if (unicast.Address.AddressFamily == AddressFamily.InterNetwork)
-                        {
-                            var ip = unicast.Address.ToString();
-
-                            // Format: "WiFi: AdapterName (IP)" for WiFi, "Ethernet: AdapterName (IP)" for wired
-                            string displayName;
-                            if (networkInterface.NetworkInterfaceType == NetworkInterfaceType.Wireless80211)
-                            {
-                                displayName = $"WiFi: {networkInterface.Name} ({ip})";
-                            }
-                            else
-                            {
-                                displayName = $"Ethernet: {networkInterface.Name} ({ip})";
-                            }
-
-                            NetworkSelector.Items.Add(new ComboBoxItem
-                            {
-                                Content = displayName,
-                                Tag = networkInterface.Name  // Store interface name for traffic monitoring
-                            });
-                        }
-                    }
-                }
+                    Content = displayName,
+                    Tag = interfaceName
+                });
             }
 
             NetworkSelector.SelectedIndex = 0;
