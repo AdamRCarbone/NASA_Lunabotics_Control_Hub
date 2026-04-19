@@ -57,7 +57,7 @@ namespace NASA_Lunabotics_Control_Hub.Components
         /// </summary>
         public static byte[] EncodeCommand(char mode, bool estop = false)
         {
-            byte modeByte = mode;
+            byte modeByte = (byte)mode;
             byte estopByte = estop ? (byte)'1' : (byte)'0';
 
             byte[] payload = { modeByte, estopByte };
@@ -215,7 +215,7 @@ namespace NASA_Lunabotics_Control_Hub.Components
                         {
                             Type = "fault",
                             Severity = payload[0],
-                            FaultChar = (char)payload[1]
+                            FaultChar = (byte)payload[1]
                         };
                     }
                     break;

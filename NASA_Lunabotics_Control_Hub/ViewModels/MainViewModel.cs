@@ -100,7 +100,7 @@ namespace NASA_Lunabotics_Control_Hub.ViewModels
             CurrentMode = mode;
         }
 
-        private void SetModeState(string mode, ModeState state)
+        public void SetModeState(string mode, ModeState state)
         {
             // Clear all states first
             StandbyStatus = ModeState.Idle;
