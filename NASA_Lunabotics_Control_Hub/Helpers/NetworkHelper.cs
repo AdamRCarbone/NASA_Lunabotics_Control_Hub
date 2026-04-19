@@ -12,107 +12,40 @@ namespace NASA_Lunabotics_Control_Hub.Helpers
     /// </summary>
     public static class NetworkHelper
     {
-        // WLAN API constants
-        private const int WLAN_CLIENT_VERSION = 0x00000002;
-        private const int ERROR_SUCCESS = 0;
-
-        // WLAN interface info structure
-        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
-        struct WLAN_INTERFACE_INFO
-        {
-            public Guid InterfaceGuid;
-            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 256)]
-            public string strInterfaceDescription;
-            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 256)]
-            public string strProfileName;
-        }
-
-        [StructLayout(LayoutKind.Sequential)]
-        struct WLAN_INTERFACE_INFO_LIST
-        {
-            public int dwNumberOfItems;
-            public int dwIndex;
-            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 1)]
-            public WLAN_INTERFACE_INFO[] InterfaceInfo;
-        }
-
-        [DllImport("wlanapi.dll", SetLastError = true)]
-        private static extern int WlanOpenHandle(uint dwClientVersion, IntPtr pReserved, out uint pdwNegotiatedVersion, out IntPtr pClientHandle);
-
-        [DllImport("wlanapi.dll", SetLastError = true)]
-        private static extern int WlanEnumInterfaces(IntPtr hClientHandle, IntPtr pReserved, out IntPtr ppInterfaceList);
-
-        [DllImport("wlanapi.dll", SetLastError = true)]
-        private static extern int WlanCloseHandle(IntPtr hClientHandle, IntPtr pReserved);
+        // Use NetworkInterface.Name directly - it often contains the SSID on Windows
+        // or fall back to the friendly name
 
         /// <summary>
-        /// Get the SSID for a wireless network interface by matching GUID
+        /// Get a display-friendly name for the network interface
+        /// For WiFi, try to extract or find the SSID
         /// </summary>
-        public static string GetWiFiSSID(NetworkInterface nic)
+        public static string GetInterfaceDisplayName(NetworkInterface nic)
         {
-            var nic_guid = nic.Id; // NetworkInterface.Id contains the GUID string
-
-            try
+            if (nic.NetworkInterfaceType == NetworkInterfaceType.Wireless80211)
             {
-                IntPtr clientHandle = IntPtr.Zero;
-                IntPtr interfaceList = IntPtr.Zero;
+                // On Windows, the Name property often IS the SSID for connected WiFi
+                // or contains helpful info like "Wi-Fi"
+                string name = nic.Name;
 
-                try
+                // If the name looks like an adapter name (contains "Wireless", "Adapter", etc),
+                // try to get more info
+                if (name.Contains("Wireless", StringComparison.OrdinalIgnoreCase) ||
+                    name.Contains("Adapter", StringComparison.OrdinalIgnoreCase))
                 {
-                    uint negotiatedVersion;
-                    int result = WlanOpenHandle(WLAN_CLIENT_VERSION, IntPtr.Zero, out negotiatedVersion, out clientHandle);
-                    if (result != ERROR_SUCCESS)
-                    {
-                        Console.WriteLine($"[NetworkHelper] WlanOpenHandle failed: {result}");
-                        return nic.Name;
-                    }
-
-                    result = WlanEnumInterfaces(clientHandle, IntPtr.Zero, out interfaceList);
-                    if (result != ERROR_SUCCESS)
-                    {
-                        Console.WriteLine($"[NetworkHelper] WlanEnumInterfaces failed: {result}");
-                        return nic.Name;
-                    }
-
-                    var list = Marshal.PtrToStructure<WLAN_INTERFACE_INFO_LIST>(interfaceList);
-                    Console.WriteLine($"[NetworkHelper] Found {list.dwNumberOfItems} WLAN interfaces");
-
-                    var infoPtr = interfaceList + Marshal.SizeOf<int>() * 2;
-                    for (int i = 0; i < list.dwNumberOfItems; i++)
-                    {
-                        var info = Marshal.PtrToStructure<WLAN_INTERFACE_INFO>(infoPtr);
-                        Console.WriteLine($"[NetworkHelper] WLAN Interface: {info.strInterfaceDescription} - Profile: {info.strProfileName}");
-
-                        // Match by GUID
-                        if (info.InterfaceGuid.ToString().Equals(nic_guid.ToString(), StringComparison.OrdinalIgnoreCase))
-                        {
-                            Console.WriteLine($"[NetworkHelper] GUID matched! SSID: {info.strProfileName}");
-                            if (!string.IsNullOrWhiteSpace(info.strProfileName))
-                                return info.strProfileName;
-                        }
-
-                        infoPtr += Marshal.SizeOf<WLAN_INTERFACE_INFO>();
-                    }
+                    // Use the OperationalStatus description or fallback to a generic name
+                    // The SSID info is typically not easily accessible without admin privileges
+                    return name;
                 }
-                finally
-                {
-                    if (interfaceList != IntPtr.Zero)
-                        Marshal.FreeHGlobal(interfaceList);
-                    if (clientHandle != IntPtr.Zero)
-                        WlanCloseHandle(clientHandle, IntPtr.Zero);
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"[NetworkHelper] WLAN API error: {ex.Message}");
+
+                // Otherwise, the name might already be the SSID (e.g., "MyWiFiNetwork")
+                return name;
             }
 
-            // Fall back to adapter name
             return nic.Name;
         }
 
         /// <summary>
-        /// Get formatted network interface list with SSIDs for WiFi
+        /// Get formatted network interface list
         /// </summary>
         public static List<(string DisplayName, string InterfaceName)> GetNetworkInterfaces()
         {
@@ -146,13 +79,13 @@ namespace NASA_Lunabotics_Control_Hub.Helpers
                 string displayName;
                 if (nic.NetworkInterfaceType == NetworkInterfaceType.Wireless80211)
                 {
-                    string ssid = GetWiFiSSID(nic);
-                    displayName = $"WiFi: {ssid} ({ip})";
-                    Console.WriteLine($"[NetworkHelper] WiFi {nic.Name} -> SSID: {ssid}");
+                    string nicName = GetInterfaceDisplayName(nic);
+                    displayName = $"{nicName} ({ip})";
+                    Console.WriteLine($"[NetworkHelper] WiFi {nic.Name} -> Display: {nicName}");
                 }
                 else
                 {
-                    displayName = $"Ethernet: {nic.Name} ({ip})";
+                    displayName = $"{nic.Name} ({ip})";
                     Console.WriteLine($"[NetworkHelper] Ethernet {nic.Name}");
                 }
 
