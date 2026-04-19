@@ -126,29 +126,25 @@
             <!-- RIGHT PANEL -->
             <Border Grid.Column="2" Margin="4" Classes="card-primary">
                 <StackPanel Margin="16" Spacing="10">
-                    <!-- Viewport Selection Bar -->
-                    <TextBlock Text="Viewports" Classes="section-header"/>
-                    <StackPanel Orientation="Horizontal" Spacing="4">
-                        <sensors:ViewportCard Icon="🗺️" Label="3D Map" ViewportId="map"/>
-                        <sensors:ViewportCard Icon="📷" Label="Depth Cam" ViewportId="depth"/>
-                        <sensors:ViewportCard Icon="📷" Label="Front RGB" ViewportId="front"/>
-                    </StackPanel>
+                    <!-- 3D Map Widget -->
+                    <TextBlock Text="3D Map" Classes="section-header"/>
+                    <sensors:ViewportCard Icon="🗺️" Label="3D Map" ViewportId="map" Margin="0,0,0,4"/>
 
-                    <TextBlock Text="Near Cameras" Classes="section-header" Margin="0,8,0,0"/>
+                    <TextBlock Text="Near Cameras" Classes="section-header" Margin="0,4,0,0"/>
                     <StackPanel Spacing="3">
-                        <cameras:CameraStatusCard CameraName="Depth Camera" CameraType="Depth" IsActive="False" StatusText="No Data"/>
-                        <cameras:CameraStatusCard CameraName="Left Side" CameraType="RGB" StatusText="No Data"/>
-                        <cameras:CameraStatusCard CameraName="Left Front" CameraType="RGB" StatusText="No Data"/>
-                        <cameras:CameraStatusCard CameraName="Right Side" CameraType="RGB" StatusText="No Data"/>
-                        <cameras:CameraStatusCard CameraName="Right Front" CameraType="RGB" StatusText="No Data"/>
-                        <cameras:CameraStatusCard CameraName="Back Rear" CameraType="RGB" StatusText="No Data"/>
+                        <cameras:CameraStatusCard CameraName="Depth Camera" CameraType="Depth" IsActive="False" StatusText="No Data" ViewportId="depth_cam"/>
+                        <cameras:CameraStatusCard CameraName="Left Side" CameraType="RGB" StatusText="No Data" ViewportId="left_side"/>
+                        <cameras:CameraStatusCard CameraName="Left Front" CameraType="RGB" StatusText="No Data" ViewportId="left_front"/>
+                        <cameras:CameraStatusCard CameraName="Right Side" CameraType="RGB" StatusText="No Data" ViewportId="right_side"/>
+                        <cameras:CameraStatusCard CameraName="Right Front" CameraType="RGB" StatusText="No Data" ViewportId="right_front"/>
+                        <cameras:CameraStatusCard CameraName="Back Rear" CameraType="RGB" StatusText="No Data" ViewportId="back_rear"/>
                     </StackPanel>
                     <TextBlock Text="Far Cameras (April Tags)" Classes="section-header"/>
                     <StackPanel Spacing="3">
-                        <cameras:CameraStatusCard CameraName="Front" CameraType="AprilTag" StatusText="No Tag"/>
-                        <cameras:CameraStatusCard CameraName="Right" CameraType="AprilTag" StatusText="No Tag"/>
-                        <cameras:CameraStatusCard CameraName="Back" CameraType="AprilTag" StatusText="No Tag"/>
-                        <cameras:CameraStatusCard CameraName="Left" CameraType="AprilTag" StatusText="No Tag"/>
+                        <cameras:CameraStatusCard CameraName="Front" CameraType="AprilTag" StatusText="No Tag" ViewportId="far_front"/>
+                        <cameras:CameraStatusCard CameraName="Right" CameraType="AprilTag" StatusText="No Tag" ViewportId="far_right"/>
+                        <cameras:CameraStatusCard CameraName="Back" CameraType="AprilTag" StatusText="No Tag" ViewportId="far_back"/>
+                        <cameras:CameraStatusCard CameraName="Left" CameraType="AprilTag" StatusText="No Tag" ViewportId="far_left"/>
                     </StackPanel>
                 </StackPanel>
             </Border>

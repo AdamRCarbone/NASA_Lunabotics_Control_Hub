@@ -1,7 +1,9 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Media;
 using Avalonia.Markup.Xaml;
+using NASA_Lunabotics_Control_Hub.ViewModels;
 
 namespace NASA_Lunabotics_Control_Hub.Controls.Cameras;
 
@@ -18,6 +20,9 @@ public partial class CameraStatusCard : UserControl
 
     public static readonly StyledProperty<bool> IsActiveProperty =
         AvaloniaProperty.Register<CameraStatusCard, bool>(nameof(IsActive));
+
+    public static readonly StyledProperty<string> ViewportIdProperty =
+        AvaloniaProperty.Register<CameraStatusCard, string>(nameof(ViewportId));
 
     public CameraStatusCard()
     {
@@ -47,6 +52,12 @@ public partial class CameraStatusCard : UserControl
     {
         get => GetValue(IsActiveProperty);
         set { SetValue(IsActiveProperty, value); UpdateVisualState(); }
+    }
+
+    public string ViewportId
+    {
+        get => GetValue(ViewportIdProperty);
+        set => SetValue(ViewportIdProperty, value);
     }
 
     private void UpdateVisualState()
@@ -90,6 +101,16 @@ public partial class CameraStatusCard : UserControl
             statusBadge?.SetValue(BackgroundProperty, new SolidColorBrush(Color.Parse("#2D2D2D")));
             statusTextBlock?.SetValue(ForegroundProperty, new SolidColorBrush(Color.Parse("#606060")));
             indicator?.SetValue(BackgroundProperty, new SolidColorBrush(Color.Parse("#606060")));
+        }
+    }
+
+    private void RootBorder_PointerPressed(object? sender, PointerPressedEventArgs e)
+    {
+        // Notify ViewModel when camera is clicked
+        var dataContext = this.DataContext;
+        if (dataContext is MainViewModel vm)
+        {
+            vm.OnViewportSelected(ViewportId);
         }
     }
 }
