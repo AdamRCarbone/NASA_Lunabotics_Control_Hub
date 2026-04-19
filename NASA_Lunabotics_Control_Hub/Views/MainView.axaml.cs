@@ -68,6 +68,12 @@ namespace NASA_Lunabotics_Control_Hub.Views
             Console.WriteLine($"[MainView] UI updated: {modeName} = Confirmed");
         }
 
+        private void OnConnectionChanged(bool isConnected)
+        {
+            Console.WriteLine($"[MainView] Connection changed: {isConnected}");
+            _mainViewModel.IsConnected = isConnected;
+        }
+
         private void KeyUpdateTimer_Tick(object? sender, EventArgs e)
         {
             // Update DynamicKeyDisplay with current active keys from the hidden JoystickControl
