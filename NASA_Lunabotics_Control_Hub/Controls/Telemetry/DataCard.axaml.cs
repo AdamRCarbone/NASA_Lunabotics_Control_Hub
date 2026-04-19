@@ -15,6 +15,9 @@ public partial class DataCard : UserControl
     public static readonly StyledProperty<string> SubValueProperty =
         AvaloniaProperty.Register<DataCard, string>(nameof(SubValue));
 
+    public static readonly StyledProperty<string> UnitProperty =
+        AvaloniaProperty.Register<DataCard, string>(nameof(Unit));
+
     public DataCard()
     {
         InitializeComponent();
@@ -36,5 +39,11 @@ public partial class DataCard : UserControl
     {
         get => GetValue(SubValueProperty);
         set => SetValue(SubValueProperty, value);
+    }
+
+    public string Unit
+    {
+        get => GetValue(UnitProperty);
+        set => SetValue(UnitProperty, value);
     }
 }

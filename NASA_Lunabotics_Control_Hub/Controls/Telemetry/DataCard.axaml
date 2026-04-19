@@ -9,9 +9,17 @@
         <StackPanel>
             <TextBlock Text="{Binding Label, RelativeSource={RelativeSource AncestorType=UserControl}}"
                        Classes="data-label"/>
-            <TextBlock Text="{Binding Value, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                       Classes="data-value-accent"/>
-            <TextBlock Text="{Binding SubValue, RelativeSource={RelativeSource AncestorType=UserControl}}"
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <TextBlock Text="{Binding Value, RelativeSource={RelativeSource AncestorType=UserControl}, TargetNullValue=--}"
+                           FontSize="{Binding ValueFontSize, RelativeSource={RelativeSource AncestorType=UserControl}, TargetNullValue=16}"
+                           Foreground="{Binding ValueForeground, RelativeSource={RelativeSource AncestorType=UserControl}, TargetNullValue=#606060}"
+                           FontWeight="Bold" FontFamily="Consolas"/>
+                <TextBlock Text="{Binding Unit, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                           FontSize="{Binding ValueFontSize, RelativeSource={RelativeSource AncestorType=UserControl}, TargetNullValue=16}"
+                           Foreground="{Binding ValueForeground, RelativeSource={RelativeSource AncestorType=UserControl}, TargetNullValue=#606060}"
+                           FontWeight="Bold" FontFamily="Consolas" Margin="2,0,0,0"/>
+            </StackPanel>
+            <TextBlock Text="{Binding SubValue, RelativeSource={RelativeSource AncestorType=UserControl}, TargetNullValue=--}"
                        Classes="data-label"/>
         </StackPanel>
     </Border>

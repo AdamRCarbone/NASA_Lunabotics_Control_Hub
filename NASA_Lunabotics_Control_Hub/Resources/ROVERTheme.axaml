@@ -168,6 +168,20 @@
         <Setter Property="Background" Value="#606060"/>
     </Style>
 
+    <!-- Sensor Card Style (for Viewport cards) -->
+    <Style Selector="Border.sensor-card">
+        <Setter Property="Background" Value="#1A1A1A"/>
+        <Setter Property="CornerRadius" Value="8"/>
+        <Setter Property="BorderBrush" Value="#333333"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Cursor" Value="Hand"/>
+    </Style>
+
+    <Style Selector="Border.sensor-card:pointerover">
+        <Setter Property="Background" Value="#252525"/>
+        <Setter Property="BorderBrush" Value="#404040"/>
+    </Style>
+
     <!-- Key Cap Style -->
     <Style Selector="Border.key-cap">
         <Setter Property="Background" Value="#2D2D2D"/>

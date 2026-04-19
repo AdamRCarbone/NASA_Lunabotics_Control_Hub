@@ -1,0 +1,38 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:telemetry="clr-namespace:NASA_Lunabotics_Control_Hub.Controls.Telemetry"
+             x:Class="NASA_Lunabotics_Control_Hub.Controls.Telemetry.MotorSideCard"
+             mc:Ignorable="d" d:DesignWidth="160" d:DesignHeight="180">
+
+    <Border Classes="card-secondary" Padding="12" Margin="4">
+        <StackPanel>
+            <TextBlock Text="{Binding SideName, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                       Foreground="#00643C" FontSize="11" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,10"/>
+
+            <telemetry:WheelTelemetryCard WheelName="{Binding W1Name, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                          AngularVelocity="{Binding W1AngularVel, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                          Position="{Binding W1Position, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                          Torque="{Binding W1Torque, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                          Current="{Binding W1Current, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                          Voltage="{Binding W1Voltage, RelativeSource={RelativeSource AncestorType=UserControl}}"/>
+
+            <telemetry:WheelTelemetryCard WheelName="{Binding W2Name, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                          AngularVelocity="{Binding W2AngularVel, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                          Position="{Binding W2Position, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                          Torque="{Binding W2Torque, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                          Current="{Binding W2Current, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                          Voltage="{Binding W2Voltage, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                          Margin="0,4,0,0"/>
+
+            <telemetry:WheelTelemetryCard WheelName="{Binding W3Name, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                          AngularVelocity="{Binding W3AngularVel, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                          Position="{Binding W3Position, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                          Torque="{Binding W3Torque, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                          Current="{Binding W3Current, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                          Voltage="{Binding W3Voltage, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                          Margin="0,4,0,0"/>
+        </StackPanel>
+    </Border>
+</UserControl>

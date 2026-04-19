@@ -10,32 +10,14 @@ public partial class CameraStatusCard : UserControl
     public static readonly StyledProperty<string> CameraNameProperty =
         AvaloniaProperty.Register<CameraStatusCard, string>(nameof(CameraName));
 
-    public static readonly StyledProperty<string> CameraDescriptionProperty =
-        AvaloniaProperty.Register<CameraStatusCard, string>(nameof(CameraDescription));
+    public static readonly StyledProperty<string> CameraTypeProperty =
+        AvaloniaProperty.Register<CameraStatusCard, string>(nameof(CameraType));
 
     public static readonly StyledProperty<string> StatusTextProperty =
         AvaloniaProperty.Register<CameraStatusCard, string>(nameof(StatusText));
 
     public static readonly StyledProperty<bool> IsActiveProperty =
         AvaloniaProperty.Register<CameraStatusCard, bool>(nameof(IsActive));
-
-    public static readonly StyledProperty<bool> IsOnlineProperty =
-        AvaloniaProperty.Register<CameraStatusCard, bool>(nameof(IsOnline));
-
-    public static readonly StyledProperty<string> StatusClassProperty =
-        AvaloniaProperty.Register<CameraStatusCard, string>(nameof(StatusClass));
-
-    public static readonly StyledProperty<string> IndicatorClassProperty =
-        AvaloniaProperty.Register<CameraStatusCard, string>(nameof(IndicatorClass));
-
-    public static readonly StyledProperty<IBrush> TextColorProperty =
-        AvaloniaProperty.Register<CameraStatusCard, IBrush>(nameof(TextColor));
-
-    public static readonly StyledProperty<IBrush> StatusBackgroundProperty =
-        AvaloniaProperty.Register<CameraStatusCard, IBrush>(nameof(StatusBackground));
-
-    public static readonly StyledProperty<IBrush> StatusTextColorProperty =
-        AvaloniaProperty.Register<CameraStatusCard, IBrush>(nameof(StatusTextColor));
 
     public CameraStatusCard()
     {
@@ -49,16 +31,16 @@ public partial class CameraStatusCard : UserControl
         set { SetValue(CameraNameProperty, value); UpdateVisualState(); }
     }
 
-    public string CameraDescription
+    public string CameraType
     {
-        get => GetValue(CameraDescriptionProperty);
-        set => SetValue(CameraDescriptionProperty, value);
+        get => GetValue(CameraTypeProperty);
+        set { SetValue(CameraTypeProperty, value); UpdateVisualState(); }
     }
 
     public string StatusText
     {
         get => GetValue(StatusTextProperty);
-        set => SetValue(StatusTextProperty, value);
+        set { SetValue(StatusTextProperty, value); UpdateVisualState(); }
     }
 
     public bool IsActive
@@ -67,67 +49,47 @@ public partial class CameraStatusCard : UserControl
         set { SetValue(IsActiveProperty, value); UpdateVisualState(); }
     }
 
-    public bool IsOnline
-    {
-        get => GetValue(IsOnlineProperty);
-        set { SetValue(IsOnlineProperty, value); UpdateVisualState(); }
-    }
-
-    public string StatusClass
-    {
-        get => GetValue(StatusClassProperty);
-        set => SetValue(StatusClassProperty, value);
-    }
-
-    public string IndicatorClass
-    {
-        get => GetValue(IndicatorClassProperty);
-        set => SetValue(IndicatorClassProperty, value);
-    }
-
-    public IBrush TextColor
-    {
-        get => GetValue(TextColorProperty);
-        set => SetValue(TextColorProperty, value);
-    }
-
-    public IBrush StatusBackground
-    {
-        get => GetValue(StatusBackgroundProperty);
-        set => SetValue(StatusBackgroundProperty, value);
-    }
-
-    public IBrush StatusTextColor
-    {
-        get => GetValue(StatusTextColorProperty);
-        set => SetValue(StatusTextColorProperty, value);
-    }
-
     private void UpdateVisualState()
     {
+        var rootBorder = this.FindControl<Border>("RootBorder");
+        var typeBadge = this.FindControl<Border>("TypeBadge");
+        var typeText = this.FindControl<TextBlock>("TypeText");
+        var statusBadge = this.FindControl<Border>("StatusBadge");
+        var statusTextBlock = this.FindControl<TextBlock>("StatusTextBlock");
+        var indicator = this.FindControl<Border>("Indicator");
+
+        // Set type badge colors based on camera type
+        if (CameraType == "Depth")
+        {
+            typeBadge?.SetValue(BackgroundProperty, new SolidColorBrush(Color.Parse("#00643C")));
+            typeText?.SetValue(ForegroundProperty, Brushes.White);
+        }
+        else if (CameraType == "RGB")
+        {
+            typeBadge?.SetValue(BackgroundProperty, new SolidColorBrush(Color.Parse("#2D2D2D")));
+            typeText?.SetValue(ForegroundProperty, new SolidColorBrush(Color.Parse("#C0C0C0")));
+        }
+        else if (CameraType == "AprilTag")
+        {
+            typeBadge?.SetValue(BackgroundProperty, new SolidColorBrush(Color.Parse("#3D3D3D")));
+            typeText?.SetValue(ForegroundProperty, new SolidColorBrush(Color.Parse("#A0A0A0")));
+        }
+
+        // Set active/offline state
         if (IsActive)
         {
-            StatusClass = "camera-status-active";
-            IndicatorClass = "active";
-            StatusBackground = Brushes.FromHex("#00643C");
-            StatusTextColor = Brushes.White;
-            TextColor = Brushes.White;
-        }
-        else if (IsOnline)
-        {
-            StatusClass = "status-offline";
-            IndicatorClass = "inactive";
-            StatusBackground = Brushes.FromHex("#2D2D2D");
-            StatusTextColor = Brushes.FromHex("#606060");
-            TextColor = Brushes.FromHex("#C0C0C0");
+            rootBorder?.Classes.Add("camera-status-active");
+            statusBadge?.SetValue(BackgroundProperty, new SolidColorBrush(Color.Parse("#00643C")));
+            statusTextBlock?.SetValue(ForegroundProperty, Brushes.White);
+            indicator?.SetValue(BackgroundProperty, new SolidColorBrush(Color.Parse("#4ade80")));
         }
         else
         {
-            StatusClass = "status-offline";
-            IndicatorClass = "inactive";
-            StatusBackground = Brushes.FromHex("#2D2D2D");
-            StatusTextColor = Brushes.FromHex("#606060");
-            TextColor = Brushes.FromHex("#C0C0C0");
+            if (rootBorder?.Classes.Contains("camera-status-active") == true)
+                rootBorder.Classes.Remove("camera-status-active");
+            statusBadge?.SetValue(BackgroundProperty, new SolidColorBrush(Color.Parse("#2D2D2D")));
+            statusTextBlock?.SetValue(ForegroundProperty, new SolidColorBrush(Color.Parse("#606060")));
+            indicator?.SetValue(BackgroundProperty, new SolidColorBrush(Color.Parse("#606060")));
         }
     }
 }

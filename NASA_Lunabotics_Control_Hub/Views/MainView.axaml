@@ -4,319 +4,204 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:NASA_Lunabotics_Control_Hub.ViewModels"
-             xmlns:controls="clr-namespace:NASA_Lunabotics_Control_Hub.Controls"
+             xmlns:telemetry="clr-namespace:NASA_Lunabotics_Control_Hub.Controls.Telemetry"
+             xmlns:cameras="clr-namespace:NASA_Lunabotics_Control_Hub.Controls.Cameras"
+             xmlns:sensors="clr-namespace:NASA_Lunabotics_Control_Hub.Controls.Sensors"
+             xmlns:ctrl="clr-namespace:NASA_Lunabotics_Control_Hub.Controls.Controls"
              mc:Ignorable="d" d:DesignWidth="1920" d:DesignHeight="1080"
              x:DataType="vm:MainViewModel">
+    <Design.DataContext><vm:MainViewModel /></Design.DataContext>
+    <Grid Background="#121212">
+        <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
 
-    <Design.DataContext>
-        <vm:MainViewModel />
-    </Design.DataContext>
-
-    <UserControl.Styles>
-        <!-- Glassmorphism Background -->
-        <Style Selector="Border.glass-panel">
-            <Setter Property="Background" Value="#1AFFFFFF" />
-            <Setter Property="BorderBrush" Value="#40FFFFFF" />
-            <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="CornerRadius" Value="12" />
-            <Setter Property="Effect">
-                <BatchEffect>
-                    <BatchEffect.Shaders>
-                        <ShaderEffect Source="assets:///blur.hlsl" />
-                    </ShaderEffect.Shaders>
-                </BatchEffect>
-            </Setter>
-        </Style>
-
-        <!-- Primary Button -->
-        <Style Selector="Button.primary-btn">
-            <Setter Property="Background" Value="#FF6B44" />
-            <Setter Property="Foreground" Value="White" />
-            <Setter Property="CornerRadius" Value="8" />
-            <Setter Property="Padding" Value="16,8" />
-            <Setter Property="FontWeight" Value="SemiBold" />
-            <Setter Property="FontSize" Value="14" />
-        </Style>
-
-        <!-- Emergency Stop Button -->
-        <Style Selector="Button.estop-btn">
-            <Setter Property="Background" Value="#FF3B30" />
-            <Setter Property="Foreground" Value="White" />
-            <Setter Property="CornerRadius" Value="12" />
-            <Setter Property="Padding" Value="24,12" />
-            <Setter Property="FontWeight" Value="Bold" />
-            <Setter Property="FontSize" Value="16" />
-        </Style>
-
-        <!-- Status Badge -->
-        <Style Selector="Border.status-badge">
-            <Setter Property="Background" Value="#202020" />
-            <Setter Property="BorderBrush" Value="#40FF6B44" />
-            <Setter Property="BorderThickness" Value="2" />
-            <Setter Property="CornerRadius" Value="6" />
-        </Style>
-
-        <!-- Data Text -->
-        <Style Selector="TextBlock.data-value">
-            <Setter Property="FontSize" Value="18" />
-            <Setter Property="FontWeight" Value="Bold" />
-            <Setter Property="Foreground" Value="#FF6B44" />
-        </Style>
-
-        <!-- Label Text -->
-        <Style Selector="TextBlock.data-label">
-            <Setter Property="FontSize" Value="12" />
-            <Setter Property="Foreground" Value="#808080" />
-            <Setter Property="Margin" Value="0,0,8,0" />
-        </Style>
-    </UserControl.Styles>
-
-    <Grid Background="#0D0D0D">
-        <Grid.ColumnDefinitions>
-            <!-- Left Sidebar: Controls -->
-            <ColumnDefinition Width="300" />
-            <!-- Center: 3D Point Cloud -->
-            <ColumnDefinition Width="*" />
-            <!-- Right Sidebar: Telemetry -->
-            <ColumnDefinition Width="350" />
-        </Grid.ColumnDefinitions>
-
-        <!-- LEFT SIDEBAR: CONTROLS -->
-        <Border Grid.Column="0" Classes="glass-panel" Margin="8,8,4,8">
-            <StackPanel Margin="20">
-                <!-- Connection Status -->
-                <Border Classes="status-badge" Padding="12,8" Margin="0,0,0,20">
-                    <StackPanel Orientation="Horizontal" Spacing="8">
-                        <Ellipse Width="10" Height="10" Fill="#FF6B44" />
-                        <TextBlock Text="Connecting..." FontWeight="SemiBold" />
-                    </StackPanel>
-                </Border>
-
-                <!-- Mode Selection -->
-                <TextBlock Text="OPERATION MODE" FontSize="11"
-                           Foreground="#606060" Margin="0,0,0,12" />
-
-                <StackPanel Spacing="8" Margin="0,0,0,24">
-                    <Button Content="STANDBY" Classes="primary-btn" />
-                    <Button Content="MANUAL" Classes="primary-btn" />
-                    <Button Content="AUTONOMOUS" Classes="primary-btn" />
-                    <Button Content="FAULT RESET" Classes="primary-btn" />
+        <!-- TOP HEADER -->
+        <Border Background="#1A1A1A" Padding="16,12" BorderBrush="#00643C" BorderThickness="0,0,0,2">
+            <Grid VerticalAlignment="Center"><Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+                    <Border Background="#00643C" Padding="12,10" CornerRadius="7"><TextBlock Text="OCTANE" Foreground="Black" FontSize="16" FontWeight="Bold" FontFamily="Arial Rounded MT Bold"/></Border>
+                    <Border Background="#1A1F16" BorderBrush="#333333" BorderThickness="1.5" Padding="12,10" CornerRadius="7" VerticalAlignment="Center"><StackPanel Orientation="Horizontal" Spacing="8"><Border Width="10" Height="10" Background="#DC2626" CornerRadius="5"/><TextBlock Text="OFFLINE" Foreground="#DC2626" FontSize="13" FontWeight="Bold" FontFamily="Arial Rounded MT Bold" VerticalAlignment="Center"/></StackPanel></Border>
                 </StackPanel>
 
-                <!-- Emergency Stop -->
-                <Border Background="#20FF3B30" CornerRadius="12" Padding="16" Margin="0,0,0,24">
-                    <StackPanel>
-                        <TextBlock Text="EMERGENCY STOP"
-                                   Foreground="#FFA0A0"
-                                   FontSize="11"
-                                   HorizontalAlignment="Center"
-                                   Margin="0,0,0,8" />
-                        <Button Content="🛑 ESTOP"
-                                Classes="estop-btn"
-                                HorizontalAlignment="Stretch" />
-                    </StackPanel>
-                </Border>
+                <!-- Mode Selection with LED indicators -->
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <Button Width="110" Height="48" Classes="btn-secondary" Background="#2D2D2D" Foreground="Gray"
+                            Command="{Binding OnModeSelected}" CommandParameter="Standby">
+                        <Grid>
+                            <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="12"/></Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="Standby" TextAlignment="Center" VerticalAlignment="Center"/>
+                            <Border Grid.Column="1" Width="12" Height="12" CornerRadius="6"
+                                    Background="{Binding StandbyStatus, Converter={StaticResource ModeStateToBrush}}"/>
+                        </Grid>
+                    </Button>
+                    <Button Width="110" Height="48" Classes="btn-primary"
+                            Command="{Binding OnModeSelected}" CommandParameter="Manual">
+                        <Grid>
+                            <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="12"/></Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="Manual" TextAlignment="Center" VerticalAlignment="Center"/>
+                            <Border Grid.Column="1" Width="12" Height="12" CornerRadius="6"
+                                    Background="{Binding ManualStatus, Converter={StaticResource ModeStateToBrush}}"/>
+                        </Grid>
+                    </Button>
+                    <Button Width="110" Height="48" Classes="btn-secondary" Background="#2D2D2D" Foreground="Gray"
+                            Command="{Binding OnModeSelected}" CommandParameter="Autonomous">
+                        <Grid>
+                            <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="12"/></Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="Autonomous" TextAlignment="Center" VerticalAlignment="Center"/>
+                            <Border Grid.Column="1" Width="12" Height="12" CornerRadius="6"
+                                    Background="{Binding AutonomousStatus, Converter={StaticResource ModeStateToBrush}}"/>
+                        </Grid>
+                    </Button>
+                    <Button Width="120" Height="48" Classes="btn-secondary" Background="#2D2D2D" Foreground="Gray"
+                            Command="{Binding OnModeSelected}" CommandParameter="Fault Reset">
+                        <Grid>
+                            <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="12"/></Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="Fault Reset" TextAlignment="Center" VerticalAlignment="Center"/>
+                            <Border Grid.Column="1" Width="12" Height="12" CornerRadius="6"
+                                    Background="{Binding FaultResetStatus, Converter={StaticResource ModeStateToBrush}}"/>
+                        </Grid>
+                    </Button>
+                </StackPanel>
 
-                <!-- Manual Controls -->
-                <TextBlock Text="MANUAL CONTROL" FontSize="11"
-                           Foreground="#606060" Margin="0,0,0,12" />
-
-                <Border Classes="glass-panel" Padding="16" CornerRadius="8">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                        </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-
-                        <!-- WASD -->
-                        <TextBlock Grid.Row="0" Grid.Column="0"
-                                   Text="WASD"
-                                   FontSize="32"
-                                   FontWeight="Bold"
-                                   Foreground="#404040" />
-                        <TextBlock Grid.Row="1" Grid.Column="0"
-                                   Text="Move"
-                                   FontSize="11"
-                                   Foreground="#606060"
-                                   Margin="0,4,0,0" />
-
-                        <!-- Arrows -->
-                        <TextBlock Grid.Row="0" Grid.Column="1"
-                                   Text="←↑↓→"
-                                   FontSize="32"
-                                   FontWeight="Bold"
-                                   Foreground="#404040" />
-                        <TextBlock Grid.Row="1" Grid.Column="1"
-                                   Text="Rotate"
-                                   FontSize="11"
-                                   Foreground="#606060"
-                                   Margin="0,4,0,0" />
-                    </Grid>
-                </Border>
-
-                <!-- Joystick Section (placeholder for future) -->
-                <TextBlock Text="JOYSTICK" FontSize="11"
-                           Foreground="#606060"
-                           Margin="0,24,0,12" />
-                <Border Classes="glass-panel" Padding="16" CornerRadius="8" Height="150">
-                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                        <TextBlock Text="🕹️" FontSize="48" />
-                        <TextBlock Text="Connect USB Controller"
-                                   Foreground="#606060"
-                                   FontSize="11"
-                                   Margin="0,8,0,0" />
-                    </StackPanel>
-                </Border>
-            </StackPanel>
-        </Border>
-
-        <!-- CENTER: 3D POINT CLOUD VIEWER -->
-        <Border Grid.Column="1" Classes="glass-panel" Margin="4,8,4,8">
-            <Grid>
-                <!-- Camera selector overlay -->
-                <Border Background="#80000000" Padding="16" CornerRadius="8"
-                        HorizontalAlignment="Top" VerticalAlignment="Top"
-                        Margin="16,16,16,0">
-                    <StackPanel Orientation="Horizontal" Spacing="12">
-                        <TextBlock Text="CAMERA:" Foreground="White" FontWeight="SemiBold" />
-                        <Border Background="#404040" CornerRadius="4" Padding="8,4">
-                            <TextBlock Text="Near RGB - Left Side" Foreground="White" />
-                        </Border>
-                    </StackPanel>
-                </Border>
-
-                <!-- Point Cloud Placeholder -->
-                <Border Background="#0A0A0A" CornerRadius="8">
-                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                        <TextBlock Text="🖼️" FontSize="72" />
-                        <TextBlock Text="3D Point Cloud Viewer"
-                                   Foreground="#404040"
-                                   FontSize="16"
-                                   FontWeight="SemiBold"
-                                   Margin="0,16,0,0" />
-                        <TextBlock Text="Point cloud will appear here when depth camera is active"
-                                   Foreground="#404040"
-                                   FontSize="12"
-                                   Margin="0,8,0,0"
-                                   HorizontalAlignment="Center"
-                                   MaxWidth="400"
-                                   TextAlignment="Center" />
-                    </StackPanel>
-                </Border>
-
-                <!-- Overlay Statistics -->
-                <Border Background="#80000000" Padding="12" CornerRadius="8"
-                        HorizontalAlignment="Bottom" VerticalAlignment="Bottom"
-                        Margin="16,0,16,16">
-                    <StackPanel Spacing="4">
-                        <TextBlock Text="FPS: 30" Foreground="#80FF6B44" FontSize="14" />
-                        <TextBlock Text="Points: 128,432" Foreground="#80FF6B44" FontSize="14" />
-                        <TextBlock Text="Depth Range: 0.5-8.0m" Foreground="#80FF6B44" FontSize="14" />
-                    </StackPanel>
-                </Border>
+                <Border Grid.Column="2" VerticalAlignment="Center"><Button Classes="btn-danger" Height="44"><TextBlock Text="E-Suggestion" TextAlignment="Center" VerticalAlignment="Center"/></Button></Border>
             </Grid>
         </Border>
 
-        <!-- RIGHT SIDEBAR: TELEMETRY -->
-        <Border Grid.Column="2" Classes="glass-panel" Margin="4,8,8,8">
-            <StackPanel Margin="20">
-                <!-- System State -->
-                <TextBlock Text="SYSTEM STATUS" FontSize="11"
-                           Foreground="#606060" Margin="0,0,0,12" />
-
-                <Border Classes="glass-panel" Padding="16" CornerRadius="8" Margin="0,0,0,16">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                        </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-
-                        <!-- Mode -->
-                        <TextBlock Grid.Row="0" Grid.Column="0"
-                                   Classes="data-label" Text="MODE" />
-                        <TextBlock Grid.Row="0" Grid.Column="1"
-                                   Classes="data-value"
-                                   Text="MANUAL"
-                                   Foreground="#FF6B44" />
-
-                        <!-- Battery -->
-                        <TextBlock Grid.Row="1" Grid.Column="0"
-                                   Classes="data-label" Text="BATTERY"
-                                   Margin="0,8,0,0" />
-                        <TextBlock Grid.Row="1" Grid.Column="1"
-                                   Classes="data-value"
-                                   Text="11.4 V"
-                                   Margin="0,8,0,0" />
-
-                        <!-- Connection -->
-                        <TextBlock Grid.Row="2" Grid.Column="0"
-                                   Classes="data-label" Text="CONNECTION"
-                                   Margin="0,8,0,0" />
-                        <Border Grid.Row="2" Grid.Column="1"
-                                Background="#20FF6B44"
-                                CornerRadius="4"
-                                Padding="8,2"
-                                Margin="0,8,0,0">
-                            <TextBlock Text="ONLINE"
-                                       Foreground="#FF6B44"
-                                       FontSize="12"
-                                       FontWeight="SemiBold" />
-                        </Border>
-                    </Grid>
-                </Border>
-
-                <!-- Active Faults -->
-                <TextBlock Text="FAULTS" FontSize="11"
-                           Foreground="#606060" Margin="0,0,0,12" />
-
-                <Border Classes="glass-panel" Padding="16" CornerRadius="8" Margin="0,0,0,16">
-                    <StackPanel>
-                        <TextBlock Text="No active faults"
-                                   Foreground="#808080"
-                                   FontSize="13" />
-                    </StackPanel>
-                </Border>
-
-                <!-- Telemetry History -->
-                <TextBlock Text="TIMELINE" FontSize="11"
-                           Foreground="#606060" Margin="0,0,0,12" />
-
-                <ScrollViewer Height="200">
-                    <StackPanel Spacing="8">
-                        <!-- Timeline entries -->
-                        <Border Background="#1AFFFFFF" CornerRadius="4" Padding="10,8">
-                            <StackPanel Spacing="2">
-                                <TextBlock Text="14:32:15.234"
-                                           Foreground="#404040"
-                                           FontSize="10" />
-                                <TextBlock Text="Connected to rover"
-                                           Foreground="#808080"
-                                           FontSize="11" />
+        <!-- MIDDLE -->
+        <Grid Grid.Row="1"><Grid.ColumnDefinitions><ColumnDefinition Width="300"/><ColumnDefinition Width="*"/><ColumnDefinition Width="380"/></Grid.ColumnDefinitions>
+            <!-- LEFT PANEL -->
+            <Border Grid.Column="0" Margin="4" Classes="card-primary">
+                <StackPanel Margin="16" Spacing="12">
+                    <TextBlock Text="Driving Control" Classes="section-header"/>
+                    <Border Classes="card-secondary" Padding="12">
+                        <StackPanel Spacing="12">
+                            <StackPanel>
+                                <TextBlock Text="Forward / Backward" Foreground="White" FontSize="11" FontWeight="Bold" Margin="0,0,0,6"/>
+                                <Slider Minimum="-100" Maximum="100" Value="0" Height="30" Background="#2D2D2D" Foreground="#00643C" VerticalAlignment="Center"/>
+                                <TextBlock Text="0 %" Foreground="#C5D86D" FontSize="16" FontWeight="Bold" FontFamily="Consolas" HorizontalAlignment="Center"/>
                             </StackPanel>
-                        </Border>
-
-                        <Border Background="#1AFFFFFF" CornerRadius="4" Padding="10,8">
-                            <StackPanel Spacing="2">
-                                <TextBlock Text="14:31:48.567"
-                                           Foreground="#404040"
-                                           FontSize="10" />
-                                <TextBlock Text="Mode changed: STANDBY → MANUAL"
-                                           Foreground="#808080"
-                                           FontSize="11" />
+                            <StackPanel>
+                                <TextBlock Text="Left / Right" Foreground="White" FontSize="11" FontWeight="Bold" Margin="0,0,0,6"/>
+                                <Slider Minimum="-100" Maximum="100" Value="0" Height="30" Background="#2D2D2D" Foreground="#00643C" VerticalAlignment="Center"/>
+                                <TextBlock Text="0 %" Foreground="#C5D86D" FontSize="16" FontWeight="Bold" FontFamily="Consolas" HorizontalAlignment="Center"/>
                             </StackPanel>
-                        </Border>
+                        </StackPanel>
+                    </Border>
+                    <ctrl:KeyInputGrid/>
+                    <TextBlock Text="Actuators" Classes="section-header" Margin="0,16,0,0"/>
+                    <Border Classes="card-secondary" Padding="12">
+                        <StackPanel Spacing="12">
+                            <StackPanel>
+                                <TextBlock Text="Linear Actuator" Foreground="White" FontSize="11" FontWeight="Bold" Margin="0,0,0,6"/>
+                                <Slider Minimum="0" Maximum="100" Value="50" Height="30" Background="#2D2D2D" Foreground="#00643C" VerticalAlignment="Center"/>
+                                <TextBlock Text="50.0 %" Foreground="#C5D86D" FontSize="16" FontWeight="Bold" FontFamily="Consolas" HorizontalAlignment="Center"/>
+                            </StackPanel>
+                            <StackPanel>
+                                <TextBlock Text="Bucket Pitch" Foreground="White" FontSize="11" FontWeight="Bold" Margin="0,0,0,6"/>
+                                <Slider Minimum="0" Maximum="100" Value="50" Height="30" Background="#2D2D2D" Foreground="#00643C" VerticalAlignment="Center"/>
+                                <TextBlock Text="50.0 %" Foreground="#C5D86D" FontSize="16" FontWeight="Bold" FontFamily="Consolas" HorizontalAlignment="Center"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Border>
+
+            <!-- CENTER VIEWPORT -->
+            <Border Grid.Column="1" Margin="4" Classes="card-primary"><Border Background="#0F0F0F" BorderBrush="#333333" BorderThickness="1">
+                <Grid>
+                    <!-- Centered "No Data" message - would change based on ActiveViewport -->
+                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <TextBlock Text="No Map Data" Foreground="#606060" FontSize="18" FontWeight="Bold" Margin="0,0,0,8" HorizontalAlignment="Center"/>
+                        <TextBlock Text="Waiting for /slam/map" Foreground="#404040" FontSize="13" HorizontalAlignment="Center"/>
                     </StackPanel>
-                </ScrollViewer>
-            </StackPanel>
+                    <!-- Viewport stats overlay -->
+                    <Border Background="#1A1A1A80" BorderBrush="#333333" BorderThickness="1" CornerRadius="6" Padding="10" Margin="12" HorizontalAlignment="Left" VerticalAlignment="Top">
+                        <StackPanel Spacing="3">
+                            <TextBlock Text="DISCONNECTED" Foreground="#DC2626" FontSize="10" FontFamily="Consolas" FontWeight="Bold"/>
+                            <TextBlock Text="Coverage: -- m²" Foreground="#606060" FontSize="9" FontFamily="Consolas"/>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </Border></Border>
+
+            <!-- RIGHT PANEL -->
+            <Border Grid.Column="2" Margin="4" Classes="card-primary">
+                <StackPanel Margin="16" Spacing="10">
+                    <!-- Viewport Selection Bar -->
+                    <TextBlock Text="Viewports" Classes="section-header"/>
+                    <StackPanel Orientation="Horizontal" Spacing="4">
+                        <sensors:ViewportCard Icon="🗺️" Label="3D Map" ViewportId="map"/>
+                        <sensors:ViewportCard Icon="📷" Label="Depth Cam" ViewportId="depth"/>
+                        <sensors:ViewportCard Icon="📷" Label="Front RGB" ViewportId="front"/>
+                    </StackPanel>
+
+                    <TextBlock Text="Near Cameras" Classes="section-header" Margin="0,8,0,0"/>
+                    <StackPanel Spacing="3">
+                        <cameras:CameraStatusCard CameraName="Depth Camera" CameraType="Depth" IsActive="False" StatusText="No Data"/>
+                        <cameras:CameraStatusCard CameraName="Left Side" CameraType="RGB" StatusText="No Data"/>
+                        <cameras:CameraStatusCard CameraName="Left Front" CameraType="RGB" StatusText="No Data"/>
+                        <cameras:CameraStatusCard CameraName="Right Side" CameraType="RGB" StatusText="No Data"/>
+                        <cameras:CameraStatusCard CameraName="Right Front" CameraType="RGB" StatusText="No Data"/>
+                        <cameras:CameraStatusCard CameraName="Back Rear" CameraType="RGB" StatusText="No Data"/>
+                    </StackPanel>
+                    <TextBlock Text="Far Cameras (April Tags)" Classes="section-header"/>
+                    <StackPanel Spacing="3">
+                        <cameras:CameraStatusCard CameraName="Front" CameraType="AprilTag" StatusText="No Tag"/>
+                        <cameras:CameraStatusCard CameraName="Right" CameraType="AprilTag" StatusText="No Tag"/>
+                        <cameras:CameraStatusCard CameraName="Back" CameraType="AprilTag" StatusText="No Tag"/>
+                        <cameras:CameraStatusCard CameraName="Left" CameraType="AprilTag" StatusText="No Tag"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <!-- BOTTOM TELEMETRY -->
+        <Border Grid.Row="2" Background="#1A1A1A" Padding="16,12" BorderBrush="#00643C" BorderThickness="0,1,0,0">
+            <Grid VerticalAlignment="Center">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="20"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="20"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <!-- Left: Power/Battery Telemetry -->
+                <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="12">
+                    <telemetry:DataCard Label="Battery" Value="--" SubValue="--" Unit="V"/>
+                    <telemetry:DataCard Label="Current" Value="--" SubValue="--" Unit="A"/>
+                    <telemetry:DataCard Label="Power" Value="--" SubValue="--" Unit="W"/>
+                    <telemetry:DataCard Label="Temp" Value="--" SubValue="--" Unit="°C"/>
+                </StackPanel>
+                <!-- Center: Motor Side Cards with full wheel telemetry -->
+                <Grid Grid.Column="2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="12"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="12"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <telemetry:MotorSideCard Grid.Column="0" SideName="LEFT"
+                        W1Name="W1" W1AngularVel="--" W1Position="--" W1Torque="--" W1Current="--" W1Voltage="--"
+                        W2Name="W2" W2AngularVel="--" W2Position="--" W2Torque="--" W2Current="--" W2Voltage="--"
+                        W3Name="W3" W3AngularVel="--" W3Position="--" W3Torque="--" W3Current="--" W3Voltage="--"/>
+                    <Border Grid.Column="2" Background="#0D1F16" BorderBrush="#00643C" BorderThickness="1.5" CornerRadius="8" Padding="16,12" VerticalAlignment="Center">
+                        <TextBlock Text="Latency: -- ms" Foreground="#606060" FontSize="13" FontWeight="Bold" FontFamily="Consolas"/>
+                    </Border>
+                    <telemetry:MotorSideCard Grid.Column="4" SideName="RIGHT"
+                        W1Name="W4" W1AngularVel="--" W1Position="--" W1Torque="--" W1Current="--" W1Voltage="--"
+                        W2Name="W5" W2AngularVel="--" W2Position="--" W2Torque="--" W2Current="--" W2Voltage="--"
+                        W3Name="W6" W3AngularVel="--" W3Position="--" W3Torque="--" W3Current="--" W3Voltage="--"/>
+                </Grid>
+                <!-- Right: IMU + System Status -->
+                <StackPanel Grid.Column="4" Orientation="Horizontal" Spacing="12">
+                    <telemetry:DataCard Label="Roll" Value="--" SubValue="--" Unit="°"/>
+                    <telemetry:DataCard Label="Pitch" Value="--" SubValue="--" Unit="°"/>
+                    <telemetry:DataCard Label="Yaw" Value="--" SubValue="--" Unit="°"/>
+                    <Border Background="#0D1F16" BorderBrush="#DC2626" BorderThickness="1.5" Padding="14,10" CornerRadius="8">
+                        <TextBlock Text="NO DATA" Foreground="#606060" FontSize="12" FontWeight="Bold"/>
+                    </Border>
+                </StackPanel>
+            </Grid>
         </Border>
     </Grid>
-</UserPanel>
+</UserControl>

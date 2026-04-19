@@ -1,0 +1,49 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             x:Class="NASA_Lunabotics_Control_Hub.Controls.Telemetry.WheelTelemetryCard"
+             mc:Ignorable="d" d:DesignWidth="140" d:DesignHeight="120">
+
+    <Border Classes="card-secondary" Padding="10" Margin="2">
+        <StackPanel Spacing="6">
+            <TextBlock Text="{Binding WheelName, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                       Foreground="#00643C" FontSize="10" FontWeight="Bold" HorizontalAlignment="Center"/>
+
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="10"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="Vel" Foreground="#606060" FontSize="8"/>
+                <TextBlock Grid.Row="0" Grid.Column="2" Text="{Binding AngularVelocity, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                           Foreground="#C5D86D" FontSize="9" FontFamily="Consolas" HorizontalAlignment="Right"/>
+
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="Pos" Foreground="#606060" FontSize="8"/>
+                <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding Position, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                           Foreground="White" FontSize="9" FontFamily="Consolas" HorizontalAlignment="Right"/>
+
+                <TextBlock Grid.Row="2" Grid.Column="0" Text="Tq" Foreground="#606060" FontSize="8"/>
+                <TextBlock Grid.Row="2" Grid.Column="2" Text="{Binding Torque, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                           Foreground="White" FontSize="9" FontFamily="Consolas" HorizontalAlignment="Right"/>
+
+                <TextBlock Grid.Row="3" Grid.Column="0" Text="Cur" Foreground="#606060" FontSize="8"/>
+                <TextBlock Grid.Row="3" Grid.Column="2" Text="{Binding Current, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                           Foreground="#C5D86D" FontSize="9" FontFamily="Consolas" HorizontalAlignment="Right"/>
+
+                <TextBlock Grid.Row="4" Grid.Column="0" Text="Volt" Foreground="#606060" FontSize="8"/>
+                <TextBlock Grid.Row="4" Grid.Column="2" Text="{Binding Voltage, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                           Foreground="#C5D86D" FontSize="9" FontFamily="Consolas" HorizontalAlignment="Right"/>
+            </Grid>
+        </StackPanel>
+    </Border>
+</UserControl>

@@ -4,28 +4,31 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              x:Class="NASA_Lunabotics_Control_Hub.Controls.Cameras.CameraStatusCard"
              mc:Ignorable="d" d:DesignWidth="300" d:DesignHeight="60">
-
-    <Border Classes="{Binding StatusClass, RelativeSource={RelativeSource AncestorType=UserControl}}">
-        <Grid>
+    <Border Name="RootBorder" Classes="camera-status" Padding="8" Margin="0,4" BorderBrush="#333333" BorderThickness="1">
+        <Grid VerticalAlignment="Center">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-            <StackPanel Grid.Column="0">
+            <StackPanel Grid.Column="0" VerticalAlignment="Center">
                 <TextBlock Text="{Binding CameraName, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                           Foreground="{Binding TextColor, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                           FontSize="12" FontWeight="Bold"/>
-                <TextBlock Text="{Binding CameraDescription, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                           Foreground="#C0C0C0" FontSize="12" FontWeight="Bold"/>
+                <TextBlock Text="{Binding CameraType, RelativeSource={RelativeSource AncestorType=UserControl}}"
                            Foreground="#606060" FontSize="8"/>
             </StackPanel>
-            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6">
-                <Border Background="{Binding StatusBackground, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                        Padding="8,3" CornerRadius="3">
-                    <TextBlock Text="{Binding StatusText, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                               Foreground="{Binding StatusTextColor, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                               FontSize="9" FontWeight="Bold"/>
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                <Border Name="TypeBadge" Background="#00643C" Padding="6,3" CornerRadius="3">
+                    <TextBlock Name="TypeText"
+                               Text="{Binding CameraType, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                               Foreground="White" FontSize="8" FontWeight="Bold"/>
                 </Border>
-                <Border Classes="status-indicator-dot {Binding IndicatorClass, RelativeSource={RelativeSource AncestorType=UserControl}}"/>
+                <Border Name="StatusBadge" Background="#2D2D2D" Padding="6,3" CornerRadius="3">
+                    <TextBlock Name="StatusTextBlock"
+                               Text="{Binding StatusText, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                               Foreground="#606060" FontSize="8" FontWeight="Bold"/>
+                </Border>
+                <Border Name="Indicator" Width="8" Height="8" CornerRadius="4" Background="#606060"/>
             </StackPanel>
         </Grid>
     </Border>

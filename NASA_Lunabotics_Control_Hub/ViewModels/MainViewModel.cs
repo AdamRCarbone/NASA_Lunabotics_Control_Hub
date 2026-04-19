@@ -1,20 +1,120 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Threading;
 using NASA_Lunabotics_Control_Hub.Components;
 using ReactiveUI;
 
 namespace NASA_Lunabotics_Control_Hub.ViewModels
 {
+    public enum ModeState { Idle, Pending, Confirmed }
+
     public class MainViewModel : ViewModelBase
     {
         private Vector _joystickPosition;
+        private string _currentMode = "Manual";
+        private ModeState _standbyStatus = ModeState.Idle;
+        private ModeState _manualStatus = ModeState.Confirmed;
+        private ModeState _autonomousStatus = ModeState.Idle;
+        private ModeState _faultResetStatus = ModeState.Idle;
+        private bool _isTransitioning = false;
+        private string _activeViewport = "map";
+
+        public string ActiveViewport
+        {
+            get => _activeViewport;
+            private set => this.RaiseAndSetIfChanged(ref _activeViewport, value);
+        }
 
         public Vector JoystickPosition
         {
             get => _joystickPosition;
             set => this.RaiseAndSetIfChanged(ref _joystickPosition, value);
+        }
+
+        public string CurrentMode
+        {
+            get => _currentMode;
+            private set => this.RaiseAndSetIfChanged(ref _currentMode, value);
+        }
+
+        public ModeState StandbyStatus
+        {
+            get => _standbyStatus;
+            private set => this.RaiseAndSetIfChanged(ref _standbyStatus, value);
+        }
+
+        public ModeState ManualStatus
+        {
+            get => _manualStatus;
+            private set => this.RaiseAndSetIfChanged(ref _manualStatus, value);
+        }
+
+        public ModeState AutonomousStatus
+        {
+            get => _autonomousStatus;
+            private set => this.RaiseAndSetIfChanged(ref _autonomousStatus, value);
+        }
+
+        public ModeState FaultResetStatus
+        {
+            get => _faultResetStatus;
+            private set => this.RaiseAndSetIfChanged(ref _faultResetStatus, value);
+        }
+
+        public bool IsTransitioning
+        {
+            get => _isTransitioning;
+            private set => this.RaiseAndSetIfChanged(ref _isTransitioning, value);
+        }
+
+        public async void OnModeSelected(string mode)
+        {
+            if (_isTransitioning || mode == _currentMode) return;
+            _isTransitioning = true;
+
+            // Set requested mode to Pending (red LED)
+            await Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                SetModeState(mode, ModeState.Pending);
+            });
+
+            // Simulate ROS confirmation delay (1 second)
+            await Task.Delay(1000);
+
+            // Set to Confirmed (bright green LED) and update current mode
+            await Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                SetModeState(mode, ModeState.Confirmed);
+                CurrentMode = mode;
+                _isTransitioning = false;
+            });
+        }
+
+        private void SetModeState(string mode, ModeState state)
+        {
+            // Clear all states first
+            StandbyStatus = ModeState.Idle;
+            ManualStatus = ModeState.Idle;
+            AutonomousStatus = ModeState.Idle;
+            FaultResetStatus = ModeState.Idle;
+
+            // Set the requested mode's state
+            switch (mode)
+            {
+                case "Standby": StandbyStatus = state; break;
+                case "Manual": ManualStatus = state; break;
+                case "Autonomous": AutonomousStatus = state; break;
+                case "Fault Reset": FaultResetStatus = state; break;
+            }
+        }
+
+        public void OnViewportSelected(string viewportId)
+        {
+            ActiveViewport = viewportId;
         }
     }
 

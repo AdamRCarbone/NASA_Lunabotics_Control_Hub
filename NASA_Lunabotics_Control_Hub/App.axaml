@@ -1,12 +1,14 @@
 <Application x:Class="NASA_Lunabotics_Control_Hub.App"
              xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:converters="clr-namespace:NASA_Lunabotics_Control_Hub.Converters"
              RequestedThemeVariant="Dark">
 
     <Application.Resources>
         <Color x:Key="PrimaryColor">#00643C</Color>
         <Color x:Key="AccentColor">#C5D86D</Color>
         <Color x:Key="SuccessColor">#4ade80</Color>
+        <converters:ModeStateToBrushConverter x:Key="ModeStateToBrush"/>
     </Application.Resources>
 
     <Application.Styles>
