@@ -107,13 +107,30 @@
             </Border>
 
             <!-- CENTER VIEWPORT -->
-            <Border Grid.Column="1" Margin="4" Classes="card-primary"><Border Background="#0F0F0F" BorderBrush="#333333" BorderThickness="1">
+            <Border Grid.Column="1" Margin="4" Classes="card-primary">
                 <Grid>
-                    <!-- Centered "No Data" message - would change based on ActiveViewport -->
-                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                        <TextBlock Text="No Map Data" Foreground="#606060" FontSize="18" FontWeight="Bold" Margin="0,0,0,8" HorizontalAlignment="Center"/>
-                        <TextBlock Text="Waiting for /slam/map" Foreground="#404040" FontSize="13" HorizontalAlignment="Center"/>
-                    </StackPanel>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Viewport Header -->
+                    <TextBlock Grid.Row="0" Text="{Binding ActiveViewport, Converter={StaticResource ViewportIdToDisplayNameConverter}}"
+                               Classes="section-header" HorizontalAlignment="Center" Margin="0,0,0,8"/>
+
+                    <!-- Viewport Content -->
+                    <Border Grid.Row="1" Background="#0F0F0F" BorderBrush="#333333" BorderThickness="1">
+                        <Grid>
+                            <!-- Single placeholder that shows what's active -->
+                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <TextBlock Text="🗺️" FontSize="48"/>
+                                <TextBlock Text="{Binding ActiveViewport, Converter={StaticResource ViewportIdToDisplayNameConverter}} Feed"
+                                           Foreground="#606060" FontSize="18" FontWeight="Bold" Margin="0,12,0,0" HorizontalAlignment="Center"/>
+                                <TextBlock Text="Waiting for data..." Foreground="#404040" FontSize="14" HorizontalAlignment="Center"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
                     <!-- Viewport stats overlay -->
                     <Border Background="#1A1A1A80" BorderBrush="#333333" BorderThickness="1" CornerRadius="6" Padding="10" Margin="12" HorizontalAlignment="Left" VerticalAlignment="Top">
                         <StackPanel Spacing="3">
@@ -122,7 +139,7 @@
                         </StackPanel>
                     </Border>
                 </Grid>
-            </Border></Border>
+            </Border>
 
             <!-- RIGHT PANEL -->
             <Border Grid.Column="2" Margin="4" Classes="card-primary">

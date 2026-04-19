@@ -10,6 +10,7 @@
         <Color x:Key="SuccessColor">#4ade80</Color>
         <converters:ModeStateToBrushConverter x:Key="ModeStateToBrush"/>
         <converters:ViewportIdToIsActiveConverter x:Key="ViewportIdToIsActive"/>
+        <converters:ViewportIdToDisplayNameConverter x:Key="ViewportIdToDisplayName"/>
     </Application.Resources>
 
     <Application.Styles>
