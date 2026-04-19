@@ -46,10 +46,12 @@ namespace NASA_Lunabotics_Control_Hub.Helpers
         private static extern int WlanCloseHandle(IntPtr hClientHandle, IntPtr pReserved);
 
         /// <summary>
-        /// Get the SSID for a wireless network interface
+        /// Get the SSID for a wireless network interface by matching GUID
         /// </summary>
-        public static string GetWiFiSSID(string interfaceName)
+        public static string GetWiFiSSID(NetworkInterface nic)
         {
+            var nic_guid = nic.Id; // NetworkInterface.Id contains the GUID string
+
             try
             {
                 IntPtr clientHandle = IntPtr.Zero;
@@ -60,23 +62,31 @@ namespace NASA_Lunabotics_Control_Hub.Helpers
                     uint negotiatedVersion;
                     int result = WlanOpenHandle(WLAN_CLIENT_VERSION, IntPtr.Zero, out negotiatedVersion, out clientHandle);
                     if (result != ERROR_SUCCESS)
-                        return interfaceName; // Return adapter name if we can't get SSID
+                    {
+                        Console.WriteLine($"[NetworkHelper] WlanOpenHandle failed: {result}");
+                        return nic.Name;
+                    }
 
                     result = WlanEnumInterfaces(clientHandle, IntPtr.Zero, out interfaceList);
                     if (result != ERROR_SUCCESS)
-                        return interfaceName;
+                    {
+                        Console.WriteLine($"[NetworkHelper] WlanEnumInterfaces failed: {result}");
+                        return nic.Name;
+                    }
 
                     var list = Marshal.PtrToStructure<WLAN_INTERFACE_INFO_LIST>(interfaceList);
+                    Console.WriteLine($"[NetworkHelper] Found {list.dwNumberOfItems} WLAN interfaces");
 
                     var infoPtr = interfaceList + Marshal.SizeOf<int>() * 2;
                     for (int i = 0; i < list.dwNumberOfItems; i++)
                     {
                         var info = Marshal.PtrToStructure<WLAN_INTERFACE_INFO>(infoPtr);
+                        Console.WriteLine($"[NetworkHelper] WLAN Interface: {info.strInterfaceDescription} - Profile: {info.strProfileName}");
 
-                        // Check if this matches our interface
-                        if (info.strInterfaceDescription.Contains(interfaceName))
+                        // Match by GUID
+                        if (info.InterfaceGuid.ToString().Equals(nic_guid.ToString(), StringComparison.OrdinalIgnoreCase))
                         {
-                            // Return the profile name (SSID) if available
+                            Console.WriteLine($"[NetworkHelper] GUID matched! SSID: {info.strProfileName}");
                             if (!string.IsNullOrWhiteSpace(info.strProfileName))
                                 return info.strProfileName;
                         }
@@ -92,12 +102,13 @@ namespace NASA_Lunabotics_Control_Hub.Helpers
                         WlanCloseHandle(clientHandle, IntPtr.Zero);
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                // If WLAN API fails, fall back to adapter name
+                Console.WriteLine($"[NetworkHelper] WLAN API error: {ex.Message}");
             }
 
-            return interfaceName;
+            // Fall back to adapter name
+            return nic.Name;
         }
 
         /// <summary>
@@ -107,14 +118,24 @@ namespace NASA_Lunabotics_Control_Hub.Helpers
         {
             var interfaces = new List<(string, string)>();
 
+            Console.WriteLine("[NetworkHelper] Enumerating network interfaces...");
+
             foreach (var nic in NetworkInterface.GetAllNetworkInterfaces())
             {
+                Console.WriteLine($"[NetworkHelper] Checking: {nic.Name} - Type: {nic.NetworkInterfaceType} - Status: {nic.OperationalStatus}");
+
                 if (nic.OperationalStatus != OperationalStatus.Up)
+                {
+                    Console.WriteLine($"[NetworkHelper] Skipping {nic.Name} - not up");
                     continue;
+                }
 
                 if (nic.NetworkInterfaceType != NetworkInterfaceType.Wireless80211 &&
                     nic.NetworkInterfaceType != NetworkInterfaceType.Ethernet)
+                {
+                    Console.WriteLine($"[NetworkHelper] Skipping {nic.Name} - wrong type");
                     continue;
+                }
 
                 var ipProps = nic.GetIPProperties();
                 var unicast = ipProps.UnicastAddresses
@@ -125,17 +146,20 @@ namespace NASA_Lunabotics_Control_Hub.Helpers
                 string displayName;
                 if (nic.NetworkInterfaceType == NetworkInterfaceType.Wireless80211)
                 {
-                    string ssid = GetWiFiSSID(nic.Name);
+                    string ssid = GetWiFiSSID(nic);
                     displayName = $"WiFi: {ssid} ({ip})";
+                    Console.WriteLine($"[NetworkHelper] WiFi {nic.Name} -> SSID: {ssid}");
                 }
                 else
                 {
                     displayName = $"Ethernet: {nic.Name} ({ip})";
+                    Console.WriteLine($"[NetworkHelper] Ethernet {nic.Name}");
                 }
 
                 interfaces.Add((displayName, nic.Name));
             }
 
+            Console.WriteLine($"[NetworkHelper] Total interfaces found: {interfaces.Count}");
             return interfaces;
         }
     }
