@@ -5,22 +5,28 @@ using Avalonia.Media;
 using Avalonia.Threading;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Net.NetworkInformation;
 
 namespace NASA_Lunabotics_Control_Hub.Controls.Telemetry
 {
     public partial class DataUsageGraph : UserControl
     {
         private readonly Canvas _chartCanvas;
-        private readonly List<double> _guiInputHistory = new();  // GUI → Rover (commands)
-        private readonly List<double> _networkHistory = new();   // Network telemetry (faint background)
+        private readonly List<double> _guiInputHistory = new(); // GUI → Rover (commands)
+        private readonly List<double> _networkHistory = new(); // Network telemetry (faint background)
         private const int HistorySize = 40;
 
         private DispatcherTimer _updateTimer;
-        private Random _rng = new Random();
         private double _totalUpload = 0;
         private double _totalDownload = 0;
         private double _currentUploadRate = 0;
         private double _currentDownloadRate = 0;
+
+        // Network interface monitoring
+        private string? _selectedInterfaceName;
+        private long _lastBytesSent = 0;
+        private long _lastBytesReceived = 0;
 
         public DataUsageGraph()
         {
@@ -44,28 +50,83 @@ namespace NASA_Lunabotics_Control_Hub.Controls.Telemetry
             _updateTimer.Start();
         }
 
+        /// <summary>
+        /// Set which network interface to monitor
+        /// </summary>
+        public void SetNetworkInterface(string interfaceName)
+        {
+            _selectedInterfaceName = interfaceName;
+            _lastBytesSent = 0;
+            _lastBytesReceived = 0;
+            _totalUpload = 0;
+            _totalDownload = 0;
+
+            Console.WriteLine($"[DataUsageGraph] Monitoring interface: {interfaceName}");
+        }
+
         private void UpdateChart(object? sender, EventArgs e)
         {
-            // Simulate GUI command traffic (when user interacts with controls)
-            // In real usage, this would come from actual command sending
-            double newGuiInput = _rng.NextDouble() * 3;  // Base traffic
-            if (_rng.Next(100) < 30)  // 30% chance of burst (simulating button/slider use)
-                newGuiInput += _rng.NextDouble() * 7;
+            if (_selectedInterfaceName == null)
+            {
+                // No interface selected - show zeros
+                _guiInputHistory.RemoveAt(0);
+                _guiInputHistory.Add(0);
+                _networkHistory.RemoveAt(0);
+                _networkHistory.Add(0);
+                DrawChart();
+                return;
+            }
 
-            // Simulate network telemetry (faint background traffic)
-            double newNetwork = _rng.NextDouble() * 5;  // Constant telemetry stream
+            // Get network interface by name
+            var networkInterface = NetworkInterface.GetAllNetworkInterfaces()
+                .FirstOrDefault(n => n.Name == _selectedInterfaceName);
+
+            if (networkInterface == null || networkInterface.OperationalStatus != OperationalStatus.Up)
+            {
+                // Interface not available - show zeros
+                _guiInputHistory.RemoveAt(0);
+                _guiInputHistory.Add(0);
+                _networkHistory.RemoveAt(0);
+                _networkHistory.Add(0);
+                DrawChart();
+                return;
+            }
+
+            // Get byte counters
+            var ipStats = networkInterface.GetIPStatistics();
+            long currentBytesSent = ipStats.BytesSent;
+            long currentBytesReceived = ipStats.BytesReceived;
+
+            // Calculate rates (bytes per 200ms interval)
+            double bytesSentThisInterval = 0;
+            double bytesReceivedThisInterval = 0;
+
+            if (_lastBytesSent > 0)
+            {
+                bytesSentThisInterval = currentBytesSent - _lastBytesSent;
+                bytesReceivedThisInterval = currentBytesReceived - _lastBytesReceived;
+            }
+
+            _lastBytesSent = currentBytesSent;
+            _lastBytesReceived = currentBytesReceived;
+
+            // Convert to KB/s for display (bytes per 200ms * 5 = bytes per second, / 1024 = KB/s)
+            _currentUploadRate = (bytesSentThisInterval * 5) / 1024.0;
+            _currentDownloadRate = (bytesReceivedThisInterval * 5) / 1024.0;
+
+            _totalUpload += bytesSentThisInterval / 1024.0;
+            _totalDownload += bytesReceivedThisInterval / 1024.0;
+
+            // Split upload into GUI commands (higher frequency) and background telemetry
+            // Assume ~20% of upload is GUI commands, ~80% is background/other
+            double newGuiInput = _currentUploadRate * 0.3; // GUI commands
+            double newNetwork = _currentDownloadRate; // Telemetry download
 
             _guiInputHistory.RemoveAt(0);
             _guiInputHistory.Add(newGuiInput);
 
             _networkHistory.RemoveAt(0);
             _networkHistory.Add(newNetwork);
-
-            _currentUploadRate = newGuiInput;
-            _currentDownloadRate = newNetwork;
-
-            _totalUpload += newGuiInput / 5;  // Adjust for 200ms interval
-            _totalDownload += newNetwork / 5;
 
             DrawChart();
         }
@@ -85,7 +146,7 @@ namespace NASA_Lunabotics_Control_Hub.Controls.Telemetry
                 double networkHeight = Math.Min(_networkHistory[i] * 8, height * 0.6);
                 var networkRect = new Rectangle
                 {
-                    Fill = new SolidColorBrush(Color.Parse("#223A5F")),  // Very faint blue
+                    Fill = new SolidColorBrush(Color.Parse("#223A5F")), // Very faint blue
                     Width = barWidth - 2,
                     Height = networkHeight
                 };
@@ -120,5 +181,25 @@ namespace NASA_Lunabotics_Control_Hub.Controls.Telemetry
             Canvas.SetTop(centerLine, height / 2);
             _chartCanvas.Children.Add(centerLine);
         }
+
+        /// <summary>
+        /// Get current upload rate (KB/s) for display in UI
+        /// </summary>
+        public double CurrentUploadRate => _currentUploadRate;
+
+        /// <summary>
+        /// Get current download rate (KB/s) for display in UI
+        /// </summary>
+        public double CurrentDownloadRate => _currentDownloadRate;
+
+        /// <summary>
+        /// Get total upload (KB) for display in UI
+        /// </summary>
+        public double TotalUpload => _totalUpload;
+
+        /// <summary>
+        /// Get total download (KB) for display in UI
+        /// </summary>
+        public double TotalDownload => _totalDownload;
     }
 }

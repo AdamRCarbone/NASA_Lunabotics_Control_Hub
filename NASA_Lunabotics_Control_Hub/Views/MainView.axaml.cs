@@ -5,6 +5,7 @@ using Avalonia.Threading;
 using NASA_Lunabotics_Control_Hub.Components;
 using NASA_Lunabotics_Control_Hub.Controls;
 using NASA_Lunabotics_Control_Hub.Controls.Controls;
+using NASA_Lunabotics_Control_Hub.Controls.Telemetry;
 using NASA_Lunabotics_Control_Hub.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -130,14 +131,43 @@ namespace NASA_Lunabotics_Control_Hub.Views
 
         private void OnNetworkSelected(object? sender, SelectionChangedEventArgs e)
         {
-            if (NetworkSelector.SelectedItem is ComboBoxItem item && item.Tag is string localIp)
+            if (NetworkSelector.SelectedItem is ComboBoxItem item)
             {
-                // Broadcast to rover at standard rover IP on selected network
-                string roverIp = "192.168.1.100";
-                _networkClient.SetRoverIp(roverIp);
+                string? localIp = item.Tag as string;
+                string? interfaceName = item.Tag as string;
 
-                // Note: In a real implementation, you'd bind the socket to localIp
-                Console.WriteLine($"[MainView] Network changed: {item.Content} (local: {localIp}, rover: {roverIp})");
+                // Update rover IP (always 192.168.1.100)
+                _networkClient.SetRoverIp("192.168.1.100");
+
+                // Update data usage graph to monitor this interface
+                UpdateDataUsageGraphInterface();
+
+                string displayMode = localIp == "all" ? "all interfaces" : $"interface {interfaceName}";
+                Console.WriteLine($"[MainView] Network changed: {item.Content} (monitoring: {displayMode})");
+            }
+        }
+
+        private void UpdateDataUsageGraphInterface()
+        {
+            var dataUsageGraph = this.FindControl<DataUsageGraph>("DataUsageGraph");
+            if (dataUsageGraph == null || NetworkSelector.SelectedItem is not ComboBoxItem selectedItem)
+                return;
+
+            string? tag = selectedItem.Tag as string;
+            if (tag == "all")
+            {
+                // Auto-detect: try to find the default interface
+                var defaultInterface = NetworkInterface.GetAllNetworkInterfaces()
+                    .FirstOrDefault(n => n.OperationalStatus == OperationalStatus.Up &&
+                                        (n.NetworkInterfaceType == NetworkInterfaceType.Wireless80211 ||
+                                         n.NetworkInterfaceType == NetworkInterfaceType.Ethernet));
+
+                if (defaultInterface != null)
+                    dataUsageGraph.SetNetworkInterface(defaultInterface.Name);
+            }
+            else if (tag != null)
+            {
+                dataUsageGraph.SetNetworkInterface(tag);
             }
         }
 
@@ -145,11 +175,11 @@ namespace NASA_Lunabotics_Control_Hub.Views
         {
             NetworkSelector.Items.Clear();
 
-            // Auto-detect option
+            // Auto-detect option (monitor all interfaces)
             NetworkSelector.Items.Add(new ComboBoxItem
             {
-                Content = "Auto-detect",
-                Tag = "0.0.0.0"  // Bind to all interfaces
+                Content = "Auto-detect (All interfaces)",
+                Tag = "all"
             });
 
             // Enumerate network interfaces
@@ -166,11 +196,10 @@ namespace NASA_Lunabotics_Control_Hub.Views
                         {
                             var ip = unicast.Address.ToString();
 
-                            // Format: "WiFi (SSID)" for WiFi, "Ethernet (IP)" for wired
+                            // Format: "WiFi: AdapterName (IP)" for WiFi, "Ethernet: AdapterName (IP)" for wired
                             string displayName;
                             if (networkInterface.NetworkInterfaceType == NetworkInterfaceType.Wireless80211)
                             {
-                                // Try to get WiFi SSID from interface name
                                 displayName = $"WiFi: {networkInterface.Name} ({ip})";
                             }
                             else
@@ -181,7 +210,7 @@ namespace NASA_Lunabotics_Control_Hub.Views
                             NetworkSelector.Items.Add(new ComboBoxItem
                             {
                                 Content = displayName,
-                                Tag = ip  // Store local IP for socket binding
+                                Tag = networkInterface.Name  // Store interface name for traffic monitoring
                             });
                         }
                     }
@@ -190,6 +219,9 @@ namespace NASA_Lunabotics_Control_Hub.Views
 
             NetworkSelector.SelectedIndex = 0;
             Console.WriteLine($"[MainView] Network selector populated with {NetworkSelector.Items.Count} options");
+
+            // Initialize data usage graph with selected interface
+            UpdateDataUsageGraphInterface();
         }
 
         public void HandleKeyDown(Key key)
