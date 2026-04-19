@@ -15,9 +15,9 @@ namespace NASA_Lunabotics_Control_Hub.ViewModels
     public class MainViewModel : ViewModelBase
     {
         private Vector _joystickPosition;
-        private string _currentMode = "Manual";
+        private string _currentMode = "";
         private ModeState _standbyStatus = ModeState.Idle;
-        private ModeState _manualStatus = ModeState.Confirmed;
+        private ModeState _manualStatus = ModeState.Idle;
         private ModeState _autonomousStatus = ModeState.Idle;
         private ModeState _faultResetStatus = ModeState.Idle;
         private bool _isTransitioning = false;
@@ -75,27 +75,26 @@ namespace NASA_Lunabotics_Control_Hub.ViewModels
             private set => this.RaiseAndSetIfChanged(ref _isTransitioning, value);
         }
 
-        public async void OnModeSelected(string mode)
+        public void OnModeSelected(string mode)
         {
-            if (_isTransitioning || mode == _currentMode) return;
-            _isTransitioning = true;
+            if (mode == _currentMode) return;
 
-            // Set requested mode to Pending (red LED)
-            await Dispatcher.UIThread.InvokeAsync(() =>
+            // Set ALL modes to Idle first (grey dots, grey backgrounds)
+            StandbyStatus = ModeState.Idle;
+            ManualStatus = ModeState.Idle;
+            AutonomousStatus = ModeState.Idle;
+            FaultResetStatus = ModeState.Idle;
+
+            // Set the selected mode to Pending (red LED, but dark green bg for selection)
+            switch (mode)
             {
-                SetModeState(mode, ModeState.Pending);
-            });
+                case "Standby": StandbyStatus = ModeState.Pending; break;
+                case "Manual": ManualStatus = ModeState.Pending; break;
+                case "Autonomous": AutonomousStatus = ModeState.Pending; break;
+                case "Fault Reset": FaultResetStatus = ModeState.Pending; break;
+            }
 
-            // Simulate ROS confirmation delay (1 second)
-            await Task.Delay(1000);
-
-            // Set to Confirmed (bright green LED) and update current mode
-            await Dispatcher.UIThread.InvokeAsync(() =>
-            {
-                SetModeState(mode, ModeState.Confirmed);
-                CurrentMode = mode;
-                _isTransitioning = false;
-            });
+            CurrentMode = mode;
         }
 
         private void SetModeState(string mode, ModeState state)

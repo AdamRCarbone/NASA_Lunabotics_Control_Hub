@@ -25,8 +25,9 @@
 
                 <!-- Mode Selection with LED indicators -->
                 <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10" HorizontalAlignment="Center" VerticalAlignment="Center">
-                    <Button Width="110" Height="48" Classes="btn-secondary" Background="#2D2D2D" Foreground="Gray"
-                            Command="{Binding OnModeSelected}" CommandParameter="Standby">
+                    <Button Width="140" Height="48" Classes="btn-secondary" Background="#2D2D2D"  
+                            Click="StandbyButton_Click"
+            Foreground="{Binding StandbyStatus, Converter={StaticResource ModeStateToBrush}, ConverterParameter=text}">
                         <Grid>
                             <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="12"/></Grid.ColumnDefinitions>
                             <TextBlock Grid.Column="0" Text="Standby" TextAlignment="Center" VerticalAlignment="Center"/>
@@ -34,8 +35,9 @@
                                     Background="{Binding StandbyStatus, Converter={StaticResource ModeStateToBrush}}"/>
                         </Grid>
                     </Button>
-                    <Button Width="110" Height="48" Classes="btn-primary"
-                            Command="{Binding OnModeSelected}" CommandParameter="Manual">
+                    <Button Width="140" Height="48" Classes="btn-secondary" Background="#2D2D2D"
+                            Click="ManualButton_Click"
+            Foreground="{Binding ManualStatus, Converter={StaticResource ModeStateToBrush}, ConverterParameter=text}">
                         <Grid>
                             <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="12"/></Grid.ColumnDefinitions>
                             <TextBlock Grid.Column="0" Text="Manual" TextAlignment="Center" VerticalAlignment="Center"/>
@@ -43,8 +45,9 @@
                                     Background="{Binding ManualStatus, Converter={StaticResource ModeStateToBrush}}"/>
                         </Grid>
                     </Button>
-                    <Button Width="110" Height="48" Classes="btn-secondary" Background="#2D2D2D" Foreground="Gray"
-                            Command="{Binding OnModeSelected}" CommandParameter="Autonomous">
+                    <Button Width="140" Height="48" Classes="btn-secondary" Background="#2D2D2D"  
+                            Click="AutonomousButton_Click"
+            Foreground="{Binding AutonomousStatus, Converter={StaticResource ModeStateToBrush}, ConverterParameter=text}">
                         <Grid>
                             <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="12"/></Grid.ColumnDefinitions>
                             <TextBlock Grid.Column="0" Text="Autonomous" TextAlignment="Center" VerticalAlignment="Center"/>
@@ -52,8 +55,9 @@
                                     Background="{Binding AutonomousStatus, Converter={StaticResource ModeStateToBrush}}"/>
                         </Grid>
                     </Button>
-                    <Button Width="120" Height="48" Classes="btn-secondary" Background="#2D2D2D" Foreground="Gray"
-                            Command="{Binding OnModeSelected}" CommandParameter="Fault Reset">
+                    <Button Width="150" Height="48" Classes="btn-secondary" Background="#2D2D2D"  
+                            Click="FaultResetButton_Click"
+            Foreground="{Binding FaultResetStatus, Converter={StaticResource ModeStateToBrush}, ConverterParameter=text}">
                         <Grid>
                             <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="12"/></Grid.ColumnDefinitions>
                             <TextBlock Grid.Column="0" Text="Fault Reset" TextAlignment="Center" VerticalAlignment="Center"/>
@@ -123,9 +127,8 @@
                         <Grid>
                             <!-- Single placeholder that shows what's active -->
                             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                                <TextBlock Text="🗺️" FontSize="48"/>
                                 <TextBlock Text="{Binding ActiveViewport, Converter={StaticResource ViewportIdToDisplayName}, StringFormat='{}{0} Feed'}"
-                                           Foreground="#606060" FontSize="18" FontWeight="Bold" Margin="0,12,0,0" HorizontalAlignment="Center"/>
+                                           Foreground="#606060" FontSize="20" FontWeight="Bold" Margin="0,24,0,0" HorizontalAlignment="Center"/>
                                 <TextBlock Text="{Binding ActiveViewport, Converter={StaticResource ViewportIdToDisplayName}, StringFormat='Waiting for {0}'}"
                                            Foreground="#404040" FontSize="14" HorizontalAlignment="Center"/>
                             </StackPanel>
