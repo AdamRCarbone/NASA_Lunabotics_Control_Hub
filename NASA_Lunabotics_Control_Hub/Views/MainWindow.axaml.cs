@@ -1,4 +1,4 @@
-﻿using Avalonia.Controls;
+using Avalonia.Controls;
 using Avalonia.Input;
 using NASA_Lunabotics_Control_Hub.Controls;
 using NASA_Lunabotics_Control_Hub.Views;
@@ -26,26 +26,32 @@ namespace NASA_Lunabotics_Control_Hub.Views
         {
             if (_mainView != null)
             {
+                // Forward to MainView's key tracking joystick
+                _mainView.HandleKeyDown(e.Key);
+
                 var joystick1 = _mainView.FindControl<JoystickControl>("Joystick1");
                 var joystick2 = _mainView.FindControl<JoystickControl>("Joystick2");
 
                 joystick1?.HandleKeyDown(e.Key);
                 joystick2?.HandleKeyDown(e.Key);
             }
-            e.Handled = true;
+            e.Handled = false;
         }
 
         private void MainWindow_KeyUp(object sender, KeyEventArgs e)
         {
             if (_mainView != null)
             {
+                // Forward to MainView's key tracking joystick
+                _mainView.HandleKeyUp(e.Key);
+
                 var joystick1 = _mainView.FindControl<JoystickControl>("Joystick1");
                 var joystick2 = _mainView.FindControl<JoystickControl>("Joystick2");
 
                 joystick1?.HandleKeyUp(e.Key);
                 joystick2?.HandleKeyUp(e.Key);
             }
-            e.Handled = true;
+            e.Handled = false;
         }
     }
 }

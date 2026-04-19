@@ -358,6 +358,10 @@ namespace NASA_Lunabotics_Control_Hub.Controls
             }
         }
 
+
+public bool IsKeyActive(Key key) => _activeKeys.Contains(key);
+
+public HashSet<Key> GetActiveKeys() => new HashSet<Key>(_activeKeys);
         private Vector? GetGamepadInput()
         {
             if (_controller == IntPtr.Zero)

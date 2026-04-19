@@ -1,0 +1,39 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:NASA_Lunabotics_Control_Hub.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="280" d:DesignHeight="250"
+             x:Class="NASA_Lunabotics_Control_Hub.Controls.Telemetry.FaultConsole"
+             x:DataType="vm:MainViewModel">
+  <Design.DataContext><vm:MainViewModel /></Design.DataContext>
+  <Border Background="#0C0C0C" BorderBrush="#333333" BorderThickness="1" CornerRadius="4">
+    <StackPanel Spacing="0">
+      <!-- Command Line Style Header -->
+      <Border Background="#1F1F1F" Padding="8,6" BorderBrush="#333333" BorderThickness="0,0,0,1">
+        <Grid>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
+          </Grid.ColumnDefinitions>
+          <TextBlock Text="root@rover:~#" Foreground="#4ADE80" FontSize="10" FontWeight="Bold" FontFamily="Consolas"/>
+          <TextBlock Grid.Column="1" Text="FAULT_LOG" Foreground="#606060" FontSize="10" FontFamily="Consolas"/>
+        </Grid>
+      </Border>
+
+      <!-- Scrollable Fault Log - Terminal Style -->
+      <Border Background="#000000" Height="180" ClipToBounds="True">
+        <ScrollViewer Name="FaultScrollArea"
+                      VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Disabled">
+          <StackPanel Name="FaultList" Margin="8">
+            <!-- Fault entries will be added here dynamically -->
+            <TextBlock Text="$ Ready for fault monitoring..."
+                       Foreground="#4A4A4A" FontSize="9" FontFamily="Consolas"
+                       FontStyle="Italic"/>
+          </StackPanel>
+        </ScrollViewer>
+      </Border>
+    </StackPanel>
+  </Border>
+</UserControl>
