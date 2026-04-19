@@ -2,6 +2,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
+using NASA_Lunabotics_Control_Hub.Components;
 using NASA_Lunabotics_Control_Hub.Controls;
 using NASA_Lunabotics_Control_Hub.Controls.Controls;
 using NASA_Lunabotics_Control_Hub.ViewModels;
@@ -17,6 +18,7 @@ namespace NASA_Lunabotics_Control_Hub.Views
         private MainViewModel _mainViewModel;
         private JoystickViewModel _joystickViewModel;
         private DispatcherTimer _keyUpdateTimer;
+        private NetworkModeClient _networkClient;
 
         public MainView()
         {
@@ -24,6 +26,11 @@ namespace NASA_Lunabotics_Control_Hub.Views
 
             _mainViewModel = new MainViewModel();
             _joystickViewModel = new JoystickViewModel(_mainViewModel);
+            _networkClient = new NetworkModeClient();
+
+            // Subscribe to state changes from network client
+            _networkClient.StateChanged += OnRosStateReceived;
+        _networkClient.ConnectionChanged += OnConnectionChanged;
 
             DataContext = _mainViewModel;
 
@@ -34,6 +41,31 @@ namespace NASA_Lunabotics_Control_Hub.Views
             };
             _keyUpdateTimer.Tick += KeyUpdateTimer_Tick;
             _keyUpdateTimer.Start();
+
+            // Auto-connect to rover on startup (optional)
+            // _networkClient.ConnectAsync();
+        }
+
+        private void OnRosStateReceived(string state)
+        {
+            // ROS state confirmation received from network
+            Console.WriteLine($"[MainView] ROS state confirmation: {state}");
+
+            // Map ROS state to UI mode name
+            string modeName = state.ToLower() switch
+            {
+                "standby" => "Standby",
+                "manual" => "Manual",
+                "autonomous" => "Autonomous",
+                "fault" => "Fault Reset", // ROS FAULT state maps to Fault Reset button
+                _ => state
+            };
+
+            // Update UI to show Confirmed state (green LED)
+            _mainViewModel.SetModeState(modeName, NASA_Lunabotics_Control_Hub.ViewModels.ModeState.Confirmed);
+            _mainViewModel.CurrentMode = modeName;
+
+            Console.WriteLine($"[MainView] UI updated: {modeName} = Confirmed");
         }
 
         private void KeyUpdateTimer_Tick(object? sender, EventArgs e)
@@ -50,22 +82,31 @@ namespace NASA_Lunabotics_Control_Hub.Views
 
         private void StandbyButton_Click(object? sender, RoutedEventArgs e)
         {
-            _mainViewModel.OnModeSelected("Standby");
+            OnModeSelected("Standby");
         }
 
         private void ManualButton_Click(object? sender, RoutedEventArgs e)
         {
-            _mainViewModel.OnModeSelected("Manual");
+            OnModeSelected("Manual");
         }
 
         private void AutonomousButton_Click(object? sender, RoutedEventArgs e)
         {
-            _mainViewModel.OnModeSelected("Autonomous");
+            OnModeSelected("Autonomous");
         }
 
         private void FaultResetButton_Click(object? sender, RoutedEventArgs e)
         {
-            _mainViewModel.OnModeSelected("Fault Reset");
+            OnModeSelected("Fault Reset");
+        }
+
+        private async void OnModeSelected(string mode)
+        {
+            // Update local UI state (shows Pending - red LED, green text/bg)
+            _mainViewModel.OnModeSelected(mode);
+
+            // Send mode command to rover via TCP
+            await _networkClient.SendModeCommandAsync(mode);
         }
 
         public void HandleKeyDown(Key key)
