@@ -115,7 +115,7 @@
                     </Grid.RowDefinitions>
 
                     <!-- Viewport Header -->
-                    <TextBlock Grid.Row="0" Text="{Binding ActiveViewport, Converter={StaticResource ViewportIdToDisplayNameConverter}}"
+                    <TextBlock Grid.Row="0" Text="{Binding ActiveViewport, Converter={StaticResource ViewportIdToDisplayName}}"
                                Classes="section-header" HorizontalAlignment="Center" Margin="0,0,0,8"/>
 
                     <!-- Viewport Content -->
@@ -124,9 +124,10 @@
                             <!-- Single placeholder that shows what's active -->
                             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
                                 <TextBlock Text="🗺️" FontSize="48"/>
-                                <TextBlock Text="{Binding ActiveViewport, Converter={StaticResource ViewportIdToDisplayNameConverter}} Feed"
+                                <TextBlock Text="{Binding ActiveViewport, Converter={StaticResource ViewportIdToDisplayName}, StringFormat='{}{0} Feed'}"
                                            Foreground="#606060" FontSize="18" FontWeight="Bold" Margin="0,12,0,0" HorizontalAlignment="Center"/>
-                                <TextBlock Text="Waiting for data..." Foreground="#404040" FontSize="14" HorizontalAlignment="Center"/>
+                                <TextBlock Text="{Binding ActiveViewport, Converter={StaticResource ViewportIdToDisplayName}, StringFormat='Waiting for {0}'}"
+                                           Foreground="#404040" FontSize="14" HorizontalAlignment="Center"/>
                             </StackPanel>
                         </Grid>
                     </Border>

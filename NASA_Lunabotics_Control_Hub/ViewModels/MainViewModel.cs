@@ -29,6 +29,10 @@ namespace NASA_Lunabotics_Control_Hub.ViewModels
             private set => this.RaiseAndSetIfChanged(ref _activeViewport, value);
         }
 
+        public MainViewModel()
+        {
+        }
+
         public Vector JoystickPosition
         {
             get => _joystickPosition;
