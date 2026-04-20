@@ -38,8 +38,8 @@
         <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
           <!-- OCTANE Logo - styled as a badge -->
           <Border Background="#00643C" CornerRadius="3" Padding="10,4">
-            <TextBlock Text="OCTANE" Foreground="White" FontSize="13" FontWeight="Bold"
-                       FontFamily="Arial Rounded MT Bold" FontStyle="Italic"
+            <TextBlock Text="OCTANE" Foreground="White" FontSize="13" FontWeight="Bold" VerticalAlignment="Center"
+                       FontFamily="Arial Rounded MT Bold" 
                        TextAlignment="Center"/>
           </Border>
 
@@ -74,6 +74,18 @@
             </StackPanel>
           </Border>
         </StackPanel>
+<!-- VNC Connection Indicator -->
+(Border Background="#1A1F16" BorderBrush="#333333" BorderThickness="1"
+                Padding="8,4" CornerRadius="7" VerticalAlignment="Center">
+    (StackPanel Orientation="Horizontal" Spacing="5">
+        (TextBlock Text="VNC:" Foreground="#808080" FontSize="10"
+                   FontWeight="Bold" FontFamily="Arial Rounded MT Bold"
+                   VerticalAlignment="Center" />
+        (TextBlock Text="192.168.55.1:5900" Foreground="#00643C" FontSize="10"
+                   FontWeight="Bold" FontFamily="Consolas"
+                   VerticalAlignment="Center" />
+    /StackPanel
+(Border Background="#1A1F16" BorderBrush="#333333" BorderThickness="1"/>
 
         <!-- Mode Selection with LED indicators -->
         <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10"
