@@ -75,17 +75,17 @@
           </Border>
         </StackPanel>
 <!-- VNC Connection Indicator -->
-(Border Background="#1A1F16" BorderBrush="#333333" BorderThickness="1"
-                Padding="8,4" CornerRadius="7" VerticalAlignment="Center">
-    (StackPanel Orientation="Horizontal" Spacing="5">
-        (TextBlock Text="VNC:" Foreground="#808080" FontSize="10"
+<Border Background="#1A1F16" BorderBrush="#333333" BorderThickness="1"
+        Padding="8,4" CornerRadius="7" VerticalAlignment="Center">
+    <StackPanel Orientation="Horizontal" Spacing="5">
+        <TextBlock Text="VNC:" Foreground="#808080" FontSize="10"
                    FontWeight="Bold" FontFamily="Arial Rounded MT Bold"
                    VerticalAlignment="Center" />
-        (TextBlock Text="192.168.55.1:5900" Foreground="#00643C" FontSize="10"
+        <TextBlock Text="192.168.55.1:5900" Foreground="#00643C" FontSize="10"
                    FontWeight="Bold" FontFamily="Consolas"
                    VerticalAlignment="Center" />
-    /StackPanel
-(Border Background="#1A1F16" BorderBrush="#333333" BorderThickness="1"/>
+    </StackPanel>
+</Border>
 
         <!-- Mode Selection with LED indicators -->
         <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10"
@@ -176,6 +176,19 @@
           <telemetry:FaultConsole Margin="0,12,0,0" />
         </StackPanel>
       </Border>
+
+n<!-- VNC Connection - centered above viewport -->
+<Border Grid.Column="1" Background="#1A1F16" BorderBrush="#00643C" BorderThickness="2"
+        CornerRadius="8" Padding="16,12" Margin="0,40,0,0" VerticalAlignment="Top" HorizontalAlignment="Center">
+    <StackPanel Orientation="Horizontal" Spacing="10">
+        <TextBlock Text="VNC:" Foreground="#808080" FontSize="14"
+                   FontWeight="Bold" FontFamily="Arial Rounded MT Bold"
+                   VerticalAlignment="Center" />
+        <TextBlock Text="192.168.55.1:5900" Foreground="#00643C" FontSize="14"
+                   FontWeight="Bold" FontFamily="Consolas"
+                   VerticalAlignment="Center" />
+    </StackPanel>
+</Border>
 
       <!-- CENTER VIEWPORT -->
       <Border Grid.Column="1" Margin="4" Classes="card-primary">
