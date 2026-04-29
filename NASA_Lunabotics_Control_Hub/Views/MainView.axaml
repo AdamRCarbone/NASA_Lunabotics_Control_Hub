@@ -8,6 +8,7 @@
              xmlns:cameras="clr-namespace:NASA_Lunabotics_Control_Hub.Controls.Cameras"
              xmlns:sensors="clr-namespace:NASA_Lunabotics_Control_Hub.Controls.Sensors"
              xmlns:ctrl="clr-namespace:NASA_Lunabotics_Control_Hub.Controls.Controls"
+             xmlns:manual="clr-namespace:NASA_Lunabotics_Control_Hub.Controls.Manual"
              xmlns:converters="clr-namespace:NASA_Lunabotics_Control_Hub.Converters"
              xmlns:joy="clr-namespace:NASA_Lunabotics_Control_Hub.Controls"
              mc:Ignorable="d" d:DesignWidth="1920" d:DesignHeight="1080"
@@ -161,7 +162,7 @@
 <TextBlock Text="192.168.55.1:5900" Foreground="#00643C" FontSize="14" FontWeight="Bold" FontFamily="Consolas" Margin="0,4,0,0" />
 </StackPanel>
 </Border>
-          <ctrl:KeyInputGrid x:Name="KeyInputGrid" />
+          <manual:ManualControl x:Name="ManualControlCard" />
           <telemetry:DataUsageGraph x:Name="DataUsageGraph" Margin="0,16,0,0" />
           <telemetry:FaultConsole Margin="0,12,0,0" />
         </StackPanel>

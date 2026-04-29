@@ -5,6 +5,7 @@ using Avalonia.Threading;
 using NASA_Lunabotics_Control_Hub.Components;
 using NASA_Lunabotics_Control_Hub.Controls;
 using NASA_Lunabotics_Control_Hub.Controls.Controls;
+using NASA_Lunabotics_Control_Hub.Controls.Manual;
 using NASA_Lunabotics_Control_Hub.Controls.Telemetry;
 using NASA_Lunabotics_Control_Hub.Helpers;
 using NASA_Lunabotics_Control_Hub.ViewModels;
@@ -39,6 +40,17 @@ namespace NASA_Lunabotics_Control_Hub.Views
             _networkClient.HeartbeatReceived += OnHeartbeatReceived;
 
             DataContext = _mainViewModel;
+
+            _mainViewModel.PropertyChanged += (_, args) =>
+            {
+                if (args.PropertyName == nameof(MainViewModel.ManualStatus))
+                {
+                    var manualControl = this.FindControl<ManualControl>("ManualControlCard");
+                    if (manualControl != null)
+                        manualControl.IsActive =
+                            (_mainViewModel.ManualStatus == NASA_Lunabotics_Control_Hub.ViewModels.ModeState.Confirmed);
+                }
+            };
 
             // Populate network selector with available interfaces
             PopulateNetworkSelector();
@@ -95,12 +107,19 @@ namespace NASA_Lunabotics_Control_Hub.Views
 
         private void KeyUpdateTimer_Tick(object? sender, EventArgs e)
         {
-            var dynamicKeyDisplay = this.FindControl<DynamicKeyDisplay>("DynamicKeyDisplay");
-            var joystick = this.FindControl<JoystickControl>("KeyTrackingJoystick");
+            var joystick      = this.FindControl<Controls.JoystickControl>("KeyTrackingJoystick");
+            var manualControl = this.FindControl<ManualControl>("ManualControlCard");
 
-            if (dynamicKeyDisplay != null && joystick != null)
+            if (joystick == null || manualControl == null) return;
+
+            var activeKeys = joystick.GetActiveKeys();
+            manualControl.UpdateFromJoystick(activeKeys);
+            manualControl.Tick(0.050);
+
+            if (manualControl.IsActive)
             {
-                dynamicKeyDisplay.UpdateActiveKeys(joystick.GetActiveKeys());
+                byte bitfield = manualControl.GetKeyBitfield(activeKeys);
+                _ = _networkClient.SendManipulatorCommandAsync(bitfield);
             }
         }
 
@@ -204,14 +223,18 @@ namespace NASA_Lunabotics_Control_Hub.Views
 
         public void HandleKeyDown(Key key)
         {
-            var joystick = this.FindControl<Controls.JoystickControl>("KeyTrackingJoystick");
+            var joystick      = this.FindControl<Controls.JoystickControl>("KeyTrackingJoystick");
+            var manualControl = this.FindControl<ManualControl>("ManualControlCard");
             joystick?.HandleKeyDown(key);
+            manualControl?.HandleKeyDown(key);
         }
 
         public void HandleKeyUp(Key key)
         {
-            var joystick = this.FindControl<Controls.JoystickControl>("KeyTrackingJoystick");
+            var joystick      = this.FindControl<Controls.JoystickControl>("KeyTrackingJoystick");
+            var manualControl = this.FindControl<ManualControl>("ManualControlCard");
             joystick?.HandleKeyUp(key);
+            manualControl?.HandleKeyUp(key);
         }
     }
 }
