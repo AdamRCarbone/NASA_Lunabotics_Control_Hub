@@ -4,7 +4,6 @@ using Avalonia.Interactivity;
 using Avalonia.Threading;
 using NASA_Lunabotics_Control_Hub.Components;
 using NASA_Lunabotics_Control_Hub.Controls;
-using NASA_Lunabotics_Control_Hub.Controls.Controls;
 using NASA_Lunabotics_Control_Hub.Controls.Manual;
 using NASA_Lunabotics_Control_Hub.Controls.Telemetry;
 using NASA_Lunabotics_Control_Hub.Helpers;
@@ -55,7 +54,7 @@ namespace NASA_Lunabotics_Control_Hub.Views
             // Populate network selector with available interfaces
             PopulateNetworkSelector();
 
-            // Setup key update timer for KeyInputGrid
+            // Setup key update timer for manual control
             _keyUpdateTimer = new DispatcherTimer
             {
                 Interval = TimeSpan.FromMilliseconds(50)
