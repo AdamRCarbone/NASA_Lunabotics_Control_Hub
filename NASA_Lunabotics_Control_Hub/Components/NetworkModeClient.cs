@@ -244,6 +244,7 @@ namespace NASA_Lunabotics_Control_Hub.Components
         {
             // var frame = NetworkProtocol.EncodeManipulator(keyBitfield);
             // await _stream.WriteAsync(frame, 0, frame.Length, _cancelSource.Token);
+            // await _stream.FlushAsync(_cancelSource.Token);
             return Task.CompletedTask;
         }
 
