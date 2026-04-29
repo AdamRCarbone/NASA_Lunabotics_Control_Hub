@@ -143,17 +143,9 @@ namespace NASA_Lunabotics_Control_Hub.Views
         {
             if (NetworkSelector.SelectedItem is ComboBoxItem item)
             {
-                string? localIp = item.Tag as string;
-                string? interfaceName = item.Tag as string;
-
-                // Update rover IP (always 192.168.1.100)
-                _networkClient.SetRoverIp("192.168.1.100");
-
-                // Update data usage graph to monitor this interface
+                // Network selector only controls which interface the data usage graph monitors.
+                // Rover is always resolved via mDNS (octane.local) — no IP to update.
                 UpdateDataUsageGraphInterface();
-
-                string displayMode = localIp == "all" ? "all interfaces" : $"interface {interfaceName}";
-                Console.WriteLine($"[MainView] Network changed: {item.Content} (monitoring: {displayMode})");
             }
         }
 

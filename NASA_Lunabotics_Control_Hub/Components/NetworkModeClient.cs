@@ -24,7 +24,7 @@ namespace NASA_Lunabotics_Control_Hub.Components
         private Thread? _udpReceiveThread;
 
         // Configuration - match octane_network settings
-        private string _roverIpAddress = "192.168.1.100"; // Rover's network IP (WiFi or wired)
+        private string _roverIpAddress = "octane.local"; // Resolved via mDNS — works across network changes
         private int _tcpPort = 5000; // TCP port for mode commands
         private int _udpPort = 5001; // UDP port for heartbeat
 
@@ -43,15 +43,6 @@ namespace NASA_Lunabotics_Control_Hub.Components
             _cancelSource = new CancellationTokenSource();
             LastHeartbeat = DateTime.MinValue;
             Console.WriteLine($"[NetworkModeClient] Initialized - Ready to connect to {_roverIpAddress}:{_tcpPort}");
-        }
-
-        /// <summary>
-        /// Set the rover's IP address
-        /// </summary>
-        public void SetRoverIp(string ipAddress)
-        {
-            _roverIpAddress = ipAddress;
-            Console.WriteLine($"[NetworkModeClient] Rover IP set to: {ipAddress}");
         }
 
         /// <summary>
