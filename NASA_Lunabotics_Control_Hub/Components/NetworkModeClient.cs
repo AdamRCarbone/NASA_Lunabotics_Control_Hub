@@ -236,6 +236,17 @@ namespace NASA_Lunabotics_Control_Hub.Components
             }
         }
 
+        /// <summary>
+        /// Send manipulator key state to rover.
+        /// TODO: un-comment once ROS-side 'M' frame parser is confirmed.
+        /// </summary>
+        public Task SendManipulatorCommandAsync(byte keyBitfield)
+        {
+            // var frame = NetworkProtocol.EncodeManipulator(keyBitfield);
+            // await _stream.WriteAsync(frame, 0, frame.Length, _cancelSource.Token);
+            return Task.CompletedTask;
+        }
+
         private void ReceiveLoop()
         {
             byte[] buffer = new byte[4096];

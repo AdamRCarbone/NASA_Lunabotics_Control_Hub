@@ -18,6 +18,7 @@ namespace NASA_Lunabotics_Control_Hub.Components
         public const byte TYPE_COMMAND = 0x43; // 'C'
         public const byte TYPE_ACK = 0x41; // 'A'
         public const byte TYPE_FAULT = 0x46; // 'F'
+        public const byte TYPE_MANIPULATOR = 0x4D; // 'M'
 
         // State/Mode codes
         public const byte STATE_STANDBY = 0x30; // '0'
@@ -70,6 +71,23 @@ namespace NASA_Lunabotics_Control_Hub.Components
             frame[4] = payload[1];
             frame[5] = CalcCrc8(frame, 5);
 
+            return frame;
+        }
+
+        /// <summary>
+        /// Encode a Manipulator frame (Ground → Rover)
+        /// Format: [O][M][1][bitfield][crc] — 5 bytes
+        /// Bitfield: bit0=W, bit1=A, bit2=S, bit3=D, bit4=↑, bit5=↓, bit6=←, bit7=→
+        /// TODO: un-comment WriteAsync in NetworkModeClient once ROS parser is confirmed.
+        /// </summary>
+        public static byte[] EncodeManipulator(byte keyBitfield)
+        {
+            var frame = new byte[5];
+            frame[0] = MAGIC;
+            frame[1] = TYPE_MANIPULATOR;
+            frame[2] = 1;
+            frame[3] = keyBitfield;
+            frame[4] = CalcCrc8(frame, 4);
             return frame;
         }
 
