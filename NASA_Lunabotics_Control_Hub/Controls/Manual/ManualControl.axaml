@@ -7,24 +7,17 @@
              mc:Ignorable="d" d:DesignWidth="268" d:DesignHeight="360">
 
     <Border x:Name="ContainerBorder" Classes="card-secondary" Padding="12">
-        <StackPanel Spacing="10">
+        <Grid RowDefinitions="Auto,8,Auto,8,*">
 
-            <TextBlock Text="MANUAL CONTROL" Classes="section-header"/>
+            <TextBlock Grid.Row="0" Text="MANUAL CONTROL" Classes="section-header"/>
 
-            <!-- Drive sub-card: WASD d-pad -->
-            <Border Classes="card-secondary" Padding="10">
+            <!-- Drive sub-card -->
+            <Border Grid.Row="2" Classes="card-secondary" Padding="10">
                 <StackPanel Spacing="6">
                     <TextBlock Text="DRIVE" Classes="sub-header"/>
-                    <Grid HorizontalAlignment="Center">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                        </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
+                    <Grid HorizontalAlignment="Center"
+                          RowDefinitions="Auto,Auto"
+                          ColumnDefinitions="Auto,Auto,Auto">
                         <manual:KeyButton Grid.Row="0" Grid.Column="1" x:Name="WKey" KeyLabel="W"/>
                         <manual:KeyButton Grid.Row="1" Grid.Column="0" x:Name="AKey" KeyLabel="A"/>
                         <manual:KeyButton Grid.Row="1" Grid.Column="1" x:Name="SKey" KeyLabel="S"/>
@@ -33,31 +26,27 @@
                 </StackPanel>
             </Border>
 
-            <!-- Arm + Bucket sub-cards side by side -->
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="8"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
+            <!-- Arm + Bucket sub-cards: fills remaining height -->
+            <Grid Grid.Row="4" ColumnDefinitions="*,8,*">
 
-                <!-- Arm sub-card -->
                 <Border Grid.Column="0" Classes="card-secondary" Padding="10">
-                    <StackPanel Spacing="6" HorizontalAlignment="Center">
-                        <TextBlock Text="ARM" Classes="sub-header" HorizontalAlignment="Center"/>
-                        <manual:ArmSlider x:Name="ArmSliderWidget"/>
-                    </StackPanel>
+                    <Grid RowDefinitions="Auto,*">
+                        <TextBlock Grid.Row="0" Text="ARM" Classes="sub-header" HorizontalAlignment="Center"/>
+                        <manual:ArmSlider Grid.Row="1" x:Name="ArmSliderWidget"
+                                          HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Grid>
                 </Border>
 
-                <!-- Bucket sub-card -->
                 <Border Grid.Column="2" Classes="card-secondary" Padding="10">
-                    <StackPanel Spacing="6">
-                        <TextBlock Text="BUCKET" Classes="sub-header" HorizontalAlignment="Center"/>
-                        <manual:BucketDial x:Name="BucketDialWidget" HorizontalAlignment="Center"/>
-                    </StackPanel>
+                    <Grid RowDefinitions="Auto,*">
+                        <TextBlock Grid.Row="0" Text="BUCKET" Classes="sub-header" HorizontalAlignment="Center"/>
+                        <manual:BucketDial Grid.Row="1" x:Name="BucketDialWidget"
+                                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Grid>
                 </Border>
+
             </Grid>
 
-        </StackPanel>
+        </Grid>
     </Border>
 </UserControl>
