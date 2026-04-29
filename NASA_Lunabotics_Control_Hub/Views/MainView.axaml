@@ -27,7 +27,7 @@
     </Grid.RowDefinitions>
 
     <!-- TOP HEADER -->
-    <Border Background="#1A1A1A" Padding="16,12" BorderBrush="#00643C" BorderThickness="0,0,0,2">
+    <Border Background="#1A1A1A" Padding="12,8" BorderBrush="#00643C" BorderThickness="0,0,0,2">
       <Grid VerticalAlignment="Center">
         <Grid.ColumnDefinitions>
           <ColumnDefinition Width="Auto" />
@@ -80,7 +80,7 @@
         <!-- Mode Selection with LED indicators -->
         <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10"
                     HorizontalAlignment="Center" VerticalAlignment="Center">
-          <Button Width="140" Height="48" Classes="btn-secondary" Background="#2D2D2D"
+          <Button Width="130" Height="40" Classes="btn-secondary" Background="#2D2D2D"
                   Click="StandbyButton_Click"
                   Foreground="{Binding StandbyStatus, Converter={StaticResource ModeStateToBrush}, ConverterParameter=text}">
             <Grid>
@@ -94,7 +94,7 @@
                       Background="{Binding StandbyStatus, Converter={StaticResource ModeStateToBrush}}" />
             </Grid>
           </Button>
-          <Button Width="140" Height="48" Classes="btn-secondary" Background="#2D2D2D"
+          <Button Width="130" Height="40" Classes="btn-secondary" Background="#2D2D2D"
                   Click="ManualButton_Click"
                   Foreground="{Binding ManualStatus, Converter={StaticResource ModeStateToBrush}, ConverterParameter=text}">
             <Grid>
@@ -108,7 +108,7 @@
                       Background="{Binding ManualStatus, Converter={StaticResource ModeStateToBrush}}" />
             </Grid>
           </Button>
-          <Button Width="140" Height="48" Classes="btn-secondary" Background="#2D2D2D"
+          <Button Width="130" Height="40" Classes="btn-secondary" Background="#2D2D2D"
                   Click="AutonomousButton_Click"
                   Foreground="{Binding AutonomousStatus, Converter={StaticResource ModeStateToBrush}, ConverterParameter=text}">
             <Grid>
@@ -122,7 +122,7 @@
                       Background="{Binding AutonomousStatus, Converter={StaticResource ModeStateToBrush}}" />
             </Grid>
           </Button>
-          <Button Width="150" Height="48" Classes="btn-secondary" Background="#2D2D2D"
+          <Button Width="130" Height="40" Classes="btn-secondary" Background="#2D2D2D"
                   Click="FaultResetButton_Click"
                   Foreground="{Binding FaultResetStatus, Converter={StaticResource ModeStateToBrush}, ConverterParameter=text}">
             <Grid>
@@ -139,7 +139,7 @@
         </StackPanel>
 
         <Border Grid.Column="2" VerticalAlignment="Center">
-          <Button Classes="btn-danger" Height="44">
+          <Button Classes="btn-danger" Height="40">
             <TextBlock Text="E-Suggestion" TextAlignment="Center" VerticalAlignment="Center" />
           </Button>
         </Border>
@@ -149,14 +149,14 @@
     <!-- MIDDLE -->
     <Grid Grid.Row="1">
       <Grid.ColumnDefinitions>
-        <ColumnDefinition Width="400" />
-        <ColumnDefinition Width="*" />
-        <ColumnDefinition Width="380" />
+        <ColumnDefinition Width="1.5*" MinWidth="300"/>
+        <ColumnDefinition Width="3*"   MinWidth="400"/>
+        <ColumnDefinition Width="1.5*" MinWidth="300"/>
       </Grid.ColumnDefinitions>
 
       <!-- LEFT PANEL -->
       <Border Grid.Column="0" Margin="4" Classes="card-primary">
-        <Grid Margin="16" RowDefinitions="Auto,8,2*,8,*">
+        <Grid Margin="12" RowDefinitions="Auto,6,2*,6,*">
           <Border Grid.Row="0" Classes="card-secondary" Padding="12">
             <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center">
               <TextBlock Text="USB-VNC-SSH:" Foreground="#808080" FontSize="14" FontWeight="Bold" FontFamily="Arial Rounded MT Bold" VerticalAlignment="Center" Margin="0,0,0,1" />
@@ -213,59 +213,71 @@
 
       <!-- RIGHT PANEL -->
       <Border Grid.Column="2" Margin="4" Classes="card-primary">
-        <Grid Margin="16" RowDefinitions="Auto,4,Auto,8,Auto,4,Auto,8,Auto,4,Auto,8,Auto,4,*">
+        <Grid Margin="12" RowDefinitions="*, 6, 2*, 6, 1.5*, 6, 1.5*">
 
-          <TextBlock Grid.Row="0" Text="3D Map" Classes="section-header" />
-          <sensors:ViewportCard Grid.Row="2" Label="3D Map" ViewportId="map"
-                                IsActive="{Binding ActiveViewport, Converter={StaticResource ViewportIdToIsActive}, ConverterParameter=map}" />
-
-          <TextBlock Grid.Row="4" Text="Near Cameras" Classes="section-header" />
-          <Grid Grid.Row="6" ColumnDefinitions="*,3,*" RowDefinitions="Auto,3,Auto,3,Auto">
-            <cameras:CameraStatusCard Grid.Row="0" Grid.Column="0" CameraName="Depth Camera" CameraType="Depth"
-                                      StatusText="No Data" ViewportId="depth_cam"
-                                      IsActive="{Binding ActiveViewport, Converter={StaticResource ViewportIdToIsActive}, ConverterParameter=depth_cam}" />
-            <cameras:CameraStatusCard Grid.Row="0" Grid.Column="2" CameraName="Left Side" CameraType="RGB"
-                                      StatusText="No Data" ViewportId="left_side"
-                                      IsActive="{Binding ActiveViewport, Converter={StaticResource ViewportIdToIsActive}, ConverterParameter=left_side}" />
-            <cameras:CameraStatusCard Grid.Row="2" Grid.Column="0" CameraName="Left Front" CameraType="RGB"
-                                      StatusText="No Data" ViewportId="left_front"
-                                      IsActive="{Binding ActiveViewport, Converter={StaticResource ViewportIdToIsActive}, ConverterParameter=left_front}" />
-            <cameras:CameraStatusCard Grid.Row="2" Grid.Column="2" CameraName="Right Side" CameraType="RGB"
-                                      StatusText="No Data" ViewportId="right_side"
-                                      IsActive="{Binding ActiveViewport, Converter={StaticResource ViewportIdToIsActive}, ConverterParameter=right_side}" />
-            <cameras:CameraStatusCard Grid.Row="4" Grid.Column="0" CameraName="Right Front" CameraType="RGB"
-                                      StatusText="No Data" ViewportId="right_front"
-                                      IsActive="{Binding ActiveViewport, Converter={StaticResource ViewportIdToIsActive}, ConverterParameter=right_front}" />
-            <cameras:CameraStatusCard Grid.Row="4" Grid.Column="2" CameraName="Back Rear" CameraType="RGB"
-                                      StatusText="No Data" ViewportId="back_rear"
-                                      IsActive="{Binding ActiveViewport, Converter={StaticResource ViewportIdToIsActive}, ConverterParameter=back_rear}" />
+          <!-- 3D Map -->
+          <Grid Grid.Row="0" RowDefinitions="Auto,*">
+            <TextBlock Grid.Row="0" Text="3D Map" Classes="section-header"/>
+            <sensors:ViewportCard Grid.Row="1" Label="3D Map" ViewportId="map"
+                                  IsActive="{Binding ActiveViewport, Converter={StaticResource ViewportIdToIsActive}, ConverterParameter=map}"/>
           </Grid>
 
-          <TextBlock Grid.Row="8" Text="Far Cameras (April Tags)" Classes="section-header" />
-          <Grid Grid.Row="10" ColumnDefinitions="*,3,*" RowDefinitions="Auto,3,Auto">
-            <cameras:CameraStatusCard Grid.Row="0" Grid.Column="0" CameraName="Front" CameraType="AprilTag"
-                                      StatusText="No Tag" ViewportId="far_front"
-                                      IsActive="{Binding ActiveViewport, Converter={StaticResource ViewportIdToIsActive}, ConverterParameter=far_front}" />
-            <cameras:CameraStatusCard Grid.Row="0" Grid.Column="2" CameraName="Right" CameraType="AprilTag"
-                                      StatusText="No Tag" ViewportId="far_right"
-                                      IsActive="{Binding ActiveViewport, Converter={StaticResource ViewportIdToIsActive}, ConverterParameter=far_right}" />
-            <cameras:CameraStatusCard Grid.Row="2" Grid.Column="0" CameraName="Back" CameraType="AprilTag"
-                                      StatusText="No Tag" ViewportId="far_back"
-                                      IsActive="{Binding ActiveViewport, Converter={StaticResource ViewportIdToIsActive}, ConverterParameter=far_back}" />
-            <cameras:CameraStatusCard Grid.Row="2" Grid.Column="2" CameraName="Left" CameraType="AprilTag"
-                                      StatusText="No Tag" ViewportId="far_left"
-                                      IsActive="{Binding ActiveViewport, Converter={StaticResource ViewportIdToIsActive}, ConverterParameter=far_left}" />
+          <!-- Near Cameras -->
+          <Grid Grid.Row="2" RowDefinitions="Auto,*">
+            <TextBlock Grid.Row="0" Text="Near Cameras" Classes="section-header"/>
+            <Grid Grid.Row="1" ColumnDefinitions="*,3,*" RowDefinitions="*,3,*,3,*">
+              <cameras:CameraStatusCard Grid.Row="0" Grid.Column="0" CameraName="Depth Camera" CameraType="Depth"
+                                        StatusText="No Data" ViewportId="depth_cam"
+                                        IsActive="{Binding ActiveViewport, Converter={StaticResource ViewportIdToIsActive}, ConverterParameter=depth_cam}"/>
+              <cameras:CameraStatusCard Grid.Row="0" Grid.Column="2" CameraName="Left Side" CameraType="RGB"
+                                        StatusText="No Data" ViewportId="left_side"
+                                        IsActive="{Binding ActiveViewport, Converter={StaticResource ViewportIdToIsActive}, ConverterParameter=left_side}"/>
+              <cameras:CameraStatusCard Grid.Row="2" Grid.Column="0" CameraName="Left Front" CameraType="RGB"
+                                        StatusText="No Data" ViewportId="left_front"
+                                        IsActive="{Binding ActiveViewport, Converter={StaticResource ViewportIdToIsActive}, ConverterParameter=left_front}"/>
+              <cameras:CameraStatusCard Grid.Row="2" Grid.Column="2" CameraName="Right Side" CameraType="RGB"
+                                        StatusText="No Data" ViewportId="right_side"
+                                        IsActive="{Binding ActiveViewport, Converter={StaticResource ViewportIdToIsActive}, ConverterParameter=right_side}"/>
+              <cameras:CameraStatusCard Grid.Row="4" Grid.Column="0" CameraName="Right Front" CameraType="RGB"
+                                        StatusText="No Data" ViewportId="right_front"
+                                        IsActive="{Binding ActiveViewport, Converter={StaticResource ViewportIdToIsActive}, ConverterParameter=right_front}"/>
+              <cameras:CameraStatusCard Grid.Row="4" Grid.Column="2" CameraName="Back Rear" CameraType="RGB"
+                                        StatusText="No Data" ViewportId="back_rear"
+                                        IsActive="{Binding ActiveViewport, Converter={StaticResource ViewportIdToIsActive}, ConverterParameter=back_rear}"/>
+            </Grid>
           </Grid>
 
-          <TextBlock Grid.Row="12" Text="Fault Console" Classes="section-header" />
-          <telemetry:FaultConsole Grid.Row="14" />
+          <!-- Far Cameras -->
+          <Grid Grid.Row="4" RowDefinitions="Auto,*">
+            <TextBlock Grid.Row="0" Text="Far Cameras (April Tags)" Classes="section-header"/>
+            <Grid Grid.Row="1" ColumnDefinitions="*,3,*" RowDefinitions="*,3,*">
+              <cameras:CameraStatusCard Grid.Row="0" Grid.Column="0" CameraName="Front" CameraType="AprilTag"
+                                        StatusText="No Tag" ViewportId="far_front"
+                                        IsActive="{Binding ActiveViewport, Converter={StaticResource ViewportIdToIsActive}, ConverterParameter=far_front}"/>
+              <cameras:CameraStatusCard Grid.Row="0" Grid.Column="2" CameraName="Right" CameraType="AprilTag"
+                                        StatusText="No Tag" ViewportId="far_right"
+                                        IsActive="{Binding ActiveViewport, Converter={StaticResource ViewportIdToIsActive}, ConverterParameter=far_right}"/>
+              <cameras:CameraStatusCard Grid.Row="2" Grid.Column="0" CameraName="Back" CameraType="AprilTag"
+                                        StatusText="No Tag" ViewportId="far_back"
+                                        IsActive="{Binding ActiveViewport, Converter={StaticResource ViewportIdToIsActive}, ConverterParameter=far_back}"/>
+              <cameras:CameraStatusCard Grid.Row="2" Grid.Column="2" CameraName="Left" CameraType="AprilTag"
+                                        StatusText="No Tag" ViewportId="far_left"
+                                        IsActive="{Binding ActiveViewport, Converter={StaticResource ViewportIdToIsActive}, ConverterParameter=far_left}"/>
+            </Grid>
+          </Grid>
+
+          <!-- Fault Console -->
+          <Grid Grid.Row="6" RowDefinitions="Auto,*">
+            <TextBlock Grid.Row="0" Text="Fault Console" Classes="section-header"/>
+            <telemetry:FaultConsole Grid.Row="1"/>
+          </Grid>
 
         </Grid>
       </Border>
     </Grid>
 
     <!-- BOTTOM TELEMETRY -->
-    <Border Grid.Row="2" Background="#1A1A1A" Padding="16,12" BorderBrush="#00643C"
+    <Border Grid.Row="2" Background="#1A1A1A" Padding="12,8" BorderBrush="#00643C"
             BorderThickness="0,1,0,0">
       <Grid VerticalAlignment="Center">
         <Grid.ColumnDefinitions>

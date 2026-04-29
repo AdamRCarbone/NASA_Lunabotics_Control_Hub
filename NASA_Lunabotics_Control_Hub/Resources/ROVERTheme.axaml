@@ -34,7 +34,7 @@
         <Setter Property="CornerRadius" Value="8"/>
         <Setter Property="BorderBrush" Value="#00643C"/>
         <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="Padding" Value="10"/>
+        <Setter Property="Padding" Value="8,6"/>
     </Style>
 
     <!-- Button Styles -->
@@ -87,11 +87,11 @@
 
     <!-- Text Block Styles -->
     <Style Selector="TextBlock.section-header">
-        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="FontSize" Value="13"/>
         <Setter Property="Foreground" Value="#00643C"/>
         <Setter Property="FontWeight" Value="Bold"/>
         <Setter Property="FontFamily" Value="Arial Rounded MT Bold"/>
-        <Setter Property="Margin" Value="0,0,0,10"/>
+        <Setter Property="Margin" Value="0,0,0,4"/>
     </Style>
 
     <Style Selector="TextBlock.sub-header">

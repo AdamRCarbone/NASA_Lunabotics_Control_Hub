@@ -12,6 +12,9 @@ namespace NASA_Lunabotics_Control_Hub.Views
         public MainWindow()
         {
             InitializeComponent();
+            WindowState = WindowState.Maximized;
+            MinWidth = 1024;
+            MinHeight = 600;
             _mainView = Content as MainView;
             this.AddHandler(InputElement.KeyDownEvent, MainWindow_KeyDown, Avalonia.Interactivity.RoutingStrategies.Tunnel);
             this.AddHandler(InputElement.KeyUpEvent, MainWindow_KeyUp, Avalonia.Interactivity.RoutingStrategies.Tunnel);
