@@ -52,11 +52,13 @@ public partial class KeyButton : UserControl
 
     private void UpdateLabel()
     {
+        if (_keyLabelText is null) return;
         _keyLabelText.Text = KeyLabel;
     }
 
     private void UpdateActiveState()
     {
+        if (_keyBorder is null) return;
         _keyBorder.Classes.Set("active", IsActive);
     }
 }
