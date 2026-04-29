@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
+using System;
 
 namespace NASA_Lunabotics_Control_Hub.Controls.Manual;
 
@@ -18,21 +19,13 @@ public partial class KeyButton : UserControl
     public string KeyLabel
     {
         get => GetValue(KeyLabelProperty);
-        set
-        {
-            SetValue(KeyLabelProperty, value);
-            UpdateLabel();
-        }
+        set => SetValue(KeyLabelProperty, value);
     }
 
     public bool IsActive
     {
         get => GetValue(IsActiveProperty);
-        set
-        {
-            SetValue(IsActiveProperty, value);
-            UpdateActiveState();
-        }
+        set => SetValue(IsActiveProperty, value);
     }
 
     public KeyButton()
@@ -46,19 +39,13 @@ public partial class KeyButton : UserControl
         _keyBorder    = this.FindControl<Border>("KeyBorder")!;
         _keyLabelText = this.FindControl<TextBlock>("KeyLabelText")!;
 
-        UpdateLabel();
-        UpdateActiveState();
-    }
-
-    private void UpdateLabel()
-    {
-        if (_keyLabelText is null) return;
-        _keyLabelText.Text = KeyLabel;
-    }
-
-    private void UpdateActiveState()
-    {
-        if (_keyBorder is null) return;
-        _keyBorder.Classes.Set("active", IsActive);
+        this.GetObservable(KeyLabelProperty).Subscribe(v =>
+        {
+            if (_keyLabelText is not null) _keyLabelText.Text = v;
+        });
+        this.GetObservable(IsActiveProperty).Subscribe(v =>
+        {
+            if (_keyBorder is not null) _keyBorder.Classes.Set("active", v);
+        });
     }
 }
