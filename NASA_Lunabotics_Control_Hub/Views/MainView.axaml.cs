@@ -47,7 +47,7 @@ namespace NASA_Lunabotics_Control_Hub.Views
                     var manualControl = this.FindControl<ManualControl>("ManualControlCard");
                     if (manualControl != null)
                         manualControl.IsActive =
-                            (_mainViewModel.ManualStatus == NASA_Lunabotics_Control_Hub.ViewModels.ModeState.Confirmed);
+                            (_mainViewModel.ManualStatus != NASA_Lunabotics_Control_Hub.ViewModels.ModeState.Idle);
                 }
             };
 
