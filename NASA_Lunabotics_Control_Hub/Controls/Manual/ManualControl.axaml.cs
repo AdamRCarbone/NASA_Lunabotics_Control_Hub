@@ -49,13 +49,28 @@ public partial class ManualControl : UserControl
         });
     }
 
-    public void HandleKeyDown(Key key) => _state.HandleKeyDown(key);
+    public void HandleKeyDown(Key key)
+    {
+        if (!IsActive) return;
+        _state.HandleKeyDown(key);
+    }
 
-    public void HandleKeyUp(Key key) => _state.HandleKeyUp(key);
+    public void HandleKeyUp(Key key)
+    {
+        if (!IsActive) return;
+        _state.HandleKeyUp(key);
+    }
 
     /// <summary>Integrate values and push to child visuals. dt = elapsed seconds.</summary>
     public void Tick(double dtSeconds)
     {
+        if (!IsActive)
+        {
+            _state.Reset();
+            _armSlider.UpdateState(0, false, false);
+            _bucketDial.UpdateState(0, false, false);
+            return;
+        }
         _state.Tick(dtSeconds);
         _armSlider.UpdateState(_state.ArmValue, _state.UpHeld, _state.DownHeld);
         _bucketDial.UpdateState(_state.BucketValue, _state.LeftHeld, _state.RightHeld);

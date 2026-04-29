@@ -40,6 +40,13 @@ public class ManipulatorInputState
         }
     }
 
+    public void Reset()
+    {
+        UpHeld = DownHeld = LeftHeld = RightHeld = false;
+        ArmValue = 0.0;
+        BucketValue = 0.0;
+    }
+
     public void Tick(double dtSeconds)
     {
         double armDelta    = ((UpHeld    ? 1.0 : 0.0) - (DownHeld  ? 1.0 : 0.0)) * RampRate * dtSeconds;
