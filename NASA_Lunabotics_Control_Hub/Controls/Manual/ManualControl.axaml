@@ -51,9 +51,9 @@
 
                 <!-- Bucket sub-card -->
                 <Border Grid.Column="2" Classes="card-secondary" Padding="10">
-                    <StackPanel Spacing="6" HorizontalAlignment="Center">
+                    <StackPanel Spacing="6">
                         <TextBlock Text="BUCKET" Classes="sub-header" HorizontalAlignment="Center"/>
-                        <manual:BucketDial x:Name="BucketDialWidget"/>
+                        <manual:BucketDial x:Name="BucketDialWidget" HorizontalAlignment="Center"/>
                     </StackPanel>
                 </Border>
             </Grid>

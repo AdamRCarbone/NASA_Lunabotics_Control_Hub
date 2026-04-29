@@ -13,8 +13,8 @@ namespace NASA_Lunabotics_Control_Hub.Views
         {
             InitializeComponent();
             _mainView = Content as MainView;
-            this.KeyDown += MainWindow_KeyDown;
-            this.KeyUp += MainWindow_KeyUp;
+            this.AddHandler(InputElement.KeyDownEvent, MainWindow_KeyDown, Avalonia.Interactivity.RoutingStrategies.Tunnel);
+            this.AddHandler(InputElement.KeyUpEvent, MainWindow_KeyUp, Avalonia.Interactivity.RoutingStrategies.Tunnel);
         }
 
         private void InitializeComponent()
@@ -26,7 +26,6 @@ namespace NASA_Lunabotics_Control_Hub.Views
         {
             if (_mainView != null)
             {
-                // Forward to MainView's key tracking joystick
                 _mainView.HandleKeyDown(e.Key);
 
                 var joystick1 = _mainView.FindControl<JoystickControl>("Joystick1");
@@ -35,14 +34,15 @@ namespace NASA_Lunabotics_Control_Hub.Views
                 joystick1?.HandleKeyDown(e.Key);
                 joystick2?.HandleKeyDown(e.Key);
             }
-            e.Handled = false;
+            if (e.Key is Key.Up or Key.Down or Key.Left or Key.Right
+                      or Key.W or Key.A or Key.S or Key.D)
+                e.Handled = true;
         }
 
         private void MainWindow_KeyUp(object sender, KeyEventArgs e)
         {
             if (_mainView != null)
             {
-                // Forward to MainView's key tracking joystick
                 _mainView.HandleKeyUp(e.Key);
 
                 var joystick1 = _mainView.FindControl<JoystickControl>("Joystick1");
@@ -51,7 +51,9 @@ namespace NASA_Lunabotics_Control_Hub.Views
                 joystick1?.HandleKeyUp(e.Key);
                 joystick2?.HandleKeyUp(e.Key);
             }
-            e.Handled = false;
+            if (e.Key is Key.Up or Key.Down or Key.Left or Key.Right
+                      or Key.W or Key.A or Key.S or Key.D)
+                e.Handled = true;
         }
     }
 }

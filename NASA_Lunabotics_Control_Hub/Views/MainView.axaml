@@ -165,7 +165,6 @@
             </Border>
             <manual:ManualControl x:Name="ManualControlCard" />
             <telemetry:DataUsageGraph x:Name="DataUsageGraph" Margin="0,4,0,0" />
-            <telemetry:FaultConsole Margin="0,4,0,0" />
           </StackPanel>
         </ScrollViewer>
       </Border>
@@ -215,6 +214,7 @@
 
       <!-- RIGHT PANEL -->
       <Border Grid.Column="2" Margin="4" Classes="card-primary">
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
         <StackPanel Margin="16" Spacing="10">
           <!-- 3D Map Widget -->
           <TextBlock Text="3D Map" Classes="section-header" />
@@ -258,7 +258,10 @@
                                       StatusText="No Tag" ViewportId="far_left"
                                       IsActive="{Binding ActiveViewport, Converter={StaticResource ViewportIdToIsActive}, ConverterParameter=far_left}" />
           </StackPanel>
+          <TextBlock Text="Fault Console" Classes="section-header" Margin="0,4,0,0" />
+          <telemetry:FaultConsole />
         </StackPanel>
+        </ScrollViewer>
       </Border>
     </Grid>
 
