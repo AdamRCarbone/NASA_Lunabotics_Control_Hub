@@ -4,54 +4,52 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net.NetworkInformation;
 using System.Runtime.InteropServices;
-using System.Text;
 
 namespace NASA_Lunabotics_Control_Hub.Helpers
 {
-    /// <summary>
-    /// Helper class to get network interface information including WiFi SSIDs
-    /// Uses multiple methods to retrieve SSID reliably
-    /// </summary>
     public static class NetworkHelper
     {
-        /// <summary>
-        /// Try to get SSID using netsh command (most reliable on Windows)
-        /// </summary>
-        private static string GetSSIDFromNetsh(string interfaceName)
+        private static string? GetSSIDFromNetsh(string interfaceName)
         {
             try
             {
                 var startInfo = new ProcessStartInfo
                 {
                     FileName = "netsh",
-                    Arguments = $"wlan show interfaces name=\"{interfaceName}\"",
+                    Arguments = "wlan show interfaces",
                     RedirectStandardOutput = true,
                     UseShellExecute = false,
                     CreateNoWindow = true
                 };
 
-                using (var process = Process.Start(startInfo))
-                {
-                    string output = process.StandardOutput.ReadToEnd();
-                    process.WaitForExit();
+                using var process = Process.Start(startInfo);
+                if (process == null) return null;
 
-                    // Parse SSID from output
-                    foreach (var line in output.Split('\n'))
+                string output = process.StandardOutput.ReadToEnd();
+                process.WaitForExit();
+
+                // Find the block for this interface, then extract its SSID
+                bool inBlock = false;
+                foreach (var line in output.Split('\n'))
+                {
+                    string trimmed = line.Trim();
+
+                    if (trimmed.StartsWith("Name") && trimmed.Contains(":"))
                     {
-                        if (line.Contains("SSID") || line.Contains("BSSID"))
-                        {
-                            // Extract the SSID value
-                            var parts = line.Split(':');
-                            if (parts.Length > 1)
-                            {
-                                string ssid = parts[1].Trim();
-                                // Skip BSSID lines, we want SSID
-                                if (!line.Contains("BSSID") && !string.IsNullOrEmpty(ssid))
-                                {
-                                    return ssid;
-                                }
-                            }
-                        }
+                        string blockName = trimmed.Split(new char[] { ':' }, 2)[1].Trim();
+                        inBlock = blockName.Equals(interfaceName, StringComparison.OrdinalIgnoreCase);
+                        continue;
+                    }
+
+                    if (!inBlock) continue;
+
+                    // Match "SSID" but not "BSSID"
+                    if (trimmed.StartsWith("SSID") && !trimmed.StartsWith("BSSID") && trimmed.Contains(":"))
+                    {
+                        string ssid = trimmed.Split(new char[] { ':' }, 2)[1].Trim();
+                        if (!string.IsNullOrEmpty(ssid))
+                            return ssid;
+                        break;
                     }
                 }
             }
@@ -59,93 +57,71 @@ namespace NASA_Lunabotics_Control_Hub.Helpers
             {
                 Console.WriteLine($"[NetworkHelper] netsh failed: {ex.Message}");
             }
-
             return null;
         }
 
-        /// <summary>
-        /// Get a display-friendly name for the network interface
-        /// Tries multiple methods to get the SSID for WiFi
-        /// </summary>
         public static string GetInterfaceDisplayName(NetworkInterface nic)
         {
             if (nic.NetworkInterfaceType == NetworkInterfaceType.Wireless80211)
             {
-                // Method 1: Try netsh (most reliable)
-                string ssid = GetSSIDFromNetsh(nic.Name);
+                string? ssid = GetSSIDFromNetsh(nic.Name);
                 if (!string.IsNullOrEmpty(ssid))
-                {
-                    Console.WriteLine($"[NetworkHelper] Found SSID via netsh: {ssid}");
                     return ssid;
-                }
 
-                // Method 2: Check if Name is already the SSID
-                // On some systems, nic.Name contains the network name
-                if (!nic.Name.Contains("Wireless") && !nic.Name.Contains("Adapter") &&
-                    nic.Name.Length < 32 && !nic.Name.Contains("Connection"))
-                {
-                    Console.WriteLine($"[NetworkHelper] Using adapter name as SSID: {nic.Name}");
-                    return nic.Name;
-                }
-
-                // Method 3: Fallback to generic WiFi name
-                Console.WriteLine($"[NetworkHelper] Could not get SSID, using 'WiFi'");
-                return "WiFi";
+                // Fallback: hardware description is more useful than "WiFi"
+                return nic.Description;
             }
-
             return nic.Name;
         }
 
-        /// <summary>
-        /// Get formatted network interface list with SSIDs for WiFi
-        /// </summary>
         public static List<(string DisplayName, string InterfaceName)> GetNetworkInterfaces()
         {
             var interfaces = new List<(string, string)>();
 
-            Console.WriteLine("[NetworkHelper] Enumerating network interfaces...");
+            // Find the adapter that has a default gateway — that's the primary one
+            var gatewayAdapters = new HashSet<string>(
+                NetworkInterface.GetAllNetworkInterfaces()
+                    .Where(n => n.OperationalStatus == OperationalStatus.Up &&
+                                n.GetIPProperties().GatewayAddresses.Count > 0)
+                    .Select(n => n.Name));
 
             foreach (var nic in NetworkInterface.GetAllNetworkInterfaces())
             {
-                Console.WriteLine($"[NetworkHelper] Checking: {nic.Name} - Type: {nic.NetworkInterfaceType} - Status: {nic.OperationalStatus}");
-
                 if (nic.OperationalStatus != OperationalStatus.Up)
-                {
-                    Console.WriteLine($"[NetworkHelper] Skipping {nic.Name} - not up");
                     continue;
-                }
 
                 if (nic.NetworkInterfaceType != NetworkInterfaceType.Wireless80211 &&
                     nic.NetworkInterfaceType != NetworkInterfaceType.Ethernet)
-                {
-                    Console.WriteLine($"[NetworkHelper] Skipping {nic.Name} - wrong type");
                     continue;
-                }
 
                 var ipProps = nic.GetIPProperties();
                 var unicast = ipProps.UnicastAddresses
                     .FirstOrDefault(u => u.Address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork);
 
-                string ip = unicast != null ? unicast.Address.ToString() : "0.0.0.0";
+                string ip = unicast?.Address.ToString() ?? "0.0.0.0";
+                string displayName = $"{GetInterfaceDisplayName(nic)} ({ip})";
 
-                string displayName;
-                if (nic.NetworkInterfaceType == NetworkInterfaceType.Wireless80211)
-                {
-                    string wifiName = GetInterfaceDisplayName(nic);
-                    displayName = $"{wifiName} ({ip})";
-                    Console.WriteLine($"[NetworkHelper] WiFi {nic.Name} -> Display: {wifiName}");
-                }
+                // Primary adapter goes first in the list
+                if (gatewayAdapters.Contains(nic.Name))
+                    interfaces.Insert(0, (displayName, nic.Name));
                 else
-                {
-                    displayName = $"{nic.Name} ({ip})";
-                    Console.WriteLine($"[NetworkHelper] Ethernet {nic.Name}");
-                }
-
-                interfaces.Add((displayName, nic.Name));
+                    interfaces.Add((displayName, nic.Name));
             }
 
-            Console.WriteLine($"[NetworkHelper] Total interfaces found: {interfaces.Count}");
+            Console.WriteLine($"[NetworkHelper] Found {interfaces.Count} interface(s)");
             return interfaces;
+        }
+
+        /// <summary>Returns the interface name of the primary adapter (has default gateway).</summary>
+        public static string? GetPrimaryInterfaceName()
+        {
+            return NetworkInterface.GetAllNetworkInterfaces()
+                .Where(n => n.OperationalStatus == OperationalStatus.Up &&
+                            (n.NetworkInterfaceType == NetworkInterfaceType.Wireless80211 ||
+                             n.NetworkInterfaceType == NetworkInterfaceType.Ethernet) &&
+                            n.GetIPProperties().GatewayAddresses.Count > 0)
+                .Select(n => n.Name)
+                .FirstOrDefault();
         }
     }
 }

@@ -93,12 +93,12 @@
           </Border>
 
           <!-- Connect / Disconnect button -->
-          <Button x:Name="ConnectButton" Height="28" Padding="12,0"
+          <Button x:Name="ConnectButton" Padding="14,0" Height="28"
                   Click="ConnectButton_Click"
                   Background="#00643C" Foreground="White"
                   FontSize="11" FontWeight="Bold" FontFamily="Arial Rounded MT Bold"
-                  CornerRadius="6" VerticalAlignment="Center"
-                  Content="Connect"/>
+                  CornerRadius="6" VerticalAlignment="Center" HorizontalContentAlignment="Center"
+                  VerticalContentAlignment="Center" Content="Connect"/>
         </StackPanel>
 
         <!-- Mode Selection with LED indicators -->

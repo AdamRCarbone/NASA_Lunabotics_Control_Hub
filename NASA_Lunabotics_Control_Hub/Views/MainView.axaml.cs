@@ -12,9 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Net;
 using System.Net.NetworkInformation;
-using System.Net.Sockets;
 
 namespace NASA_Lunabotics_Control_Hub.Views
 {
@@ -153,51 +151,33 @@ namespace NASA_Lunabotics_Control_Hub.Views
             if (dataUsageGraph == null || NetworkSelector.SelectedItem is not ComboBoxItem selectedItem)
                 return;
 
-            string? tag = selectedItem.Tag as string;
-            if (tag == "all")
-            {
-                // Auto-detect: try to find the default interface
-                var defaultInterface = NetworkInterface.GetAllNetworkInterfaces()
-                    .FirstOrDefault(n => n.OperationalStatus == OperationalStatus.Up &&
-                                        (n.NetworkInterfaceType == NetworkInterfaceType.Wireless80211 ||
-                                         n.NetworkInterfaceType == NetworkInterfaceType.Ethernet));
-
-                if (defaultInterface != null)
-                    dataUsageGraph.SetNetworkInterface(defaultInterface.Name);
-            }
-            else if (tag != null)
-            {
+            if (selectedItem.Tag is string tag)
                 dataUsageGraph.SetNetworkInterface(tag);
-            }
         }
 
         private void PopulateNetworkSelector()
         {
             NetworkSelector.Items.Clear();
 
-            // Auto-detect option (monitor all interfaces)
-            NetworkSelector.Items.Add(new ComboBoxItem
-            {
-                Content = "Auto-detect (All interfaces)",
-                Tag = "all"
-            });
-
-            // Use NetworkHelper to get interfaces with SSIDs
             var interfaces = NetworkHelper.GetNetworkInterfaces();
+            string? primaryName = NetworkHelper.GetPrimaryInterfaceName();
 
+            int defaultIndex = 0;
             foreach (var (displayName, interfaceName) in interfaces)
             {
+                int idx = NetworkSelector.Items.Count;
                 NetworkSelector.Items.Add(new ComboBoxItem
                 {
                     Content = displayName,
                     Tag = interfaceName
                 });
+                if (interfaceName == primaryName)
+                    defaultIndex = idx;
             }
 
-            NetworkSelector.SelectedIndex = 0;
-            Console.WriteLine($"[MainView] Network selector populated with {NetworkSelector.Items.Count} options");
+            NetworkSelector.SelectedIndex = interfaces.Count > 0 ? defaultIndex : -1;
+            Console.WriteLine($"[MainView] Network selector: {interfaces.Count} adapter(s), default={primaryName}");
 
-            // Initialize data usage graph with selected interface
             UpdateDataUsageGraphInterface();
         }
 
