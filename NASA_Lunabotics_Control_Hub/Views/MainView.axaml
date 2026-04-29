@@ -71,7 +71,8 @@
                          VerticalAlignment="Center" />
               <ComboBox Name="NetworkSelector" Width="140" Height="18"
                         SelectionChanged="OnNetworkSelected"
-                        Background="#2D2D2D" BorderBrush="#333333" />
+                        Background="#2D2D2D" BorderBrush="#333333"
+                        Focusable="False" IsTabStop="False" />
             </StackPanel>
           </Border>
         </StackPanel>

@@ -40,17 +40,6 @@ namespace NASA_Lunabotics_Control_Hub.Views
 
             DataContext = _mainViewModel;
 
-            _mainViewModel.PropertyChanged += (_, args) =>
-            {
-                if (args.PropertyName == nameof(MainViewModel.ManualStatus))
-                {
-                    var manualControl = this.FindControl<ManualControl>("ManualControlCard");
-                    if (manualControl != null)
-                        manualControl.IsActive =
-                            (_mainViewModel.ManualStatus != NASA_Lunabotics_Control_Hub.ViewModels.ModeState.Idle);
-                }
-            };
-
             // Populate network selector with available interfaces
             PopulateNetworkSelector();
 
@@ -110,6 +99,8 @@ namespace NASA_Lunabotics_Control_Hub.Views
             var manualControl = this.FindControl<ManualControl>("ManualControlCard");
 
             if (joystick == null || manualControl == null) return;
+
+            manualControl.IsActive = (_mainViewModel.ManualStatus != NASA_Lunabotics_Control_Hub.ViewModels.ModeState.Idle);
 
             var activeKeys = joystick.GetActiveKeys();
             manualControl.UpdateFromJoystick(activeKeys);
