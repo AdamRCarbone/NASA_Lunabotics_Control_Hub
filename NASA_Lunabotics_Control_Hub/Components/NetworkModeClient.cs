@@ -48,10 +48,13 @@ namespace NASA_Lunabotics_Control_Hub.Components
         /// <summary>
         /// Connect to the rover (TCP + UDP heartbeat listener)
         /// </summary>
-        public async Task ConnectAsync()
+        public async Task ConnectAsync(string? address = null)
         {
             try
             {
+                if (address != null)
+                    _roverIpAddress = address;
+
                 if (_client != null && _client.Connected)
                 {
                     Console.WriteLine("[NetworkModeClient] Already connected");

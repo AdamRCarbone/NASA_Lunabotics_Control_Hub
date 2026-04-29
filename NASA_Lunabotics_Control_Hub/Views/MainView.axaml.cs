@@ -43,6 +43,7 @@ namespace NASA_Lunabotics_Control_Hub.Views
             // Populate network selector with available interfaces
             PopulateNetworkSelector();
 
+
             // Setup key update timer for manual control
             _keyUpdateTimer = new DispatcherTimer
             {
@@ -50,9 +51,6 @@ namespace NASA_Lunabotics_Control_Hub.Views
             };
             _keyUpdateTimer.Tick += KeyUpdateTimer_Tick;
             _keyUpdateTimer.Start();
-
-            // Auto-connect to rover on startup (optional)
-            // _networkClient.ConnectAsync();
         }
 
         private void OnRosStateReceived(string state)
@@ -76,8 +74,8 @@ namespace NASA_Lunabotics_Control_Hub.Views
 
         private void OnConnectionChanged(bool isConnected)
         {
-            Console.WriteLine($"[MainView] Connection changed: {isConnected}");
             _mainViewModel.SetConnected(isConnected);
+            Dispatcher.UIThread.Post(() => UpdateConnectButton(isConnected));
         }
 
         private void OnHeartbeatReceived()
@@ -201,6 +199,45 @@ namespace NASA_Lunabotics_Control_Hub.Views
 
             // Initialize data usage graph with selected interface
             UpdateDataUsageGraphInterface();
+        }
+
+        private void ConnectButton_Click(object? sender, RoutedEventArgs e)
+        {
+            if (_networkClient.IsConnected)
+            {
+                _networkClient.Disconnect();
+            }
+            else
+            {
+                var addressBox = this.FindControl<Avalonia.Controls.TextBox>("RoverAddressInput");
+                string address = addressBox?.Text?.Trim() ?? "octane.local";
+                if (string.IsNullOrWhiteSpace(address)) address = "octane.local";
+
+                UpdateConnectButton(null);
+                _ = _networkClient.ConnectAsync(address);
+            }
+        }
+
+        private void UpdateConnectButton(bool? connected)
+        {
+            if (connected == null)
+            {
+                ConnectButton.Content = "Connecting...";
+                ConnectButton.IsEnabled = false;
+                ConnectButton.Background = Avalonia.Media.Brush.Parse("#555555");
+            }
+            else if (connected == true)
+            {
+                ConnectButton.Content = "Disconnect";
+                ConnectButton.IsEnabled = true;
+                ConnectButton.Background = Avalonia.Media.Brush.Parse("#DC2626");
+            }
+            else
+            {
+                ConnectButton.Content = "Connect";
+                ConnectButton.IsEnabled = true;
+                ConnectButton.Background = Avalonia.Media.Brush.Parse("#00643C");
+            }
         }
 
         public void HandleKeyDown(Key key)

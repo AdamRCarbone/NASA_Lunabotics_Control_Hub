@@ -75,6 +75,30 @@
                         Focusable="False" IsTabStop="False" />
             </StackPanel>
           </Border>
+
+          <!-- Rover address input -->
+          <Border Background="#1A1F16" BorderBrush="#333333" BorderThickness="1"
+                  Padding="6,4" CornerRadius="7" VerticalAlignment="Center">
+            <StackPanel Orientation="Horizontal" Spacing="4">
+              <TextBlock Text="Rover:" Foreground="#808080" FontSize="10"
+                         FontWeight="Bold" FontFamily="Arial Rounded MT Bold"
+                         VerticalAlignment="Center" />
+              <TextBox x:Name="RoverAddressInput" Width="140" Height="22"
+                       Text="octane.local"
+                       Background="#2D2D2D" BorderBrush="#333333"
+                       FontSize="10" FontFamily="Consolas"
+                       Foreground="White" VerticalContentAlignment="Center"
+                       Focusable="True" IsTabStop="True" />
+            </StackPanel>
+          </Border>
+
+          <!-- Connect / Disconnect button -->
+          <Button x:Name="ConnectButton" Height="28" Padding="12,0"
+                  Click="ConnectButton_Click"
+                  Background="#00643C" Foreground="White"
+                  FontSize="11" FontWeight="Bold" FontFamily="Arial Rounded MT Bold"
+                  CornerRadius="6" VerticalAlignment="Center"
+                  Content="Connect"/>
         </StackPanel>
 
         <!-- Mode Selection with LED indicators -->
