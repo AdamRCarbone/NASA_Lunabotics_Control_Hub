@@ -49,17 +49,9 @@ public partial class ManualControl : UserControl
         });
     }
 
-    public void HandleKeyDown(Key key)
-    {
-        if (!IsActive) return;
-        _state.HandleKeyDown(key);
-    }
+    public void HandleKeyDown(Key key) => _state.HandleKeyDown(key);
 
-    public void HandleKeyUp(Key key)
-    {
-        if (!IsActive) return;
-        _state.HandleKeyUp(key);
-    }
+    public void HandleKeyUp(Key key) => _state.HandleKeyUp(key);
 
     /// <summary>Integrate values and push to child visuals. dt = elapsed seconds.</summary>
     public void Tick(double dtSeconds)
