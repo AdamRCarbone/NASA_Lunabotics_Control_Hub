@@ -1,6 +1,5 @@
 using System;
 using Avalonia.Controls;
-using Avalonia.Controls.Shapes;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 
@@ -20,12 +19,12 @@ public partial class BucketDial : UserControl
     private void InitializeComponent()
     {
         AvaloniaXamlLoader.Load(this);
-        var pointer  = this.FindControl<Rectangle>("DialPointer")!;
-        _dialRotation = pointer.RenderTransform as RotateTransform
+        var pivotCanvas = this.FindControl<Canvas>("DialPointer")!;
+        _dialRotation = pivotCanvas.RenderTransform as RotateTransform
             ?? throw new InvalidOperationException(
-                "BucketDial: DialPointer must have a RotateTransform as its RenderTransform.");
-        _leftBtn      = this.FindControl<KeyButton>("LeftBtn")!;
-        _rightBtn     = this.FindControl<KeyButton>("RightBtn")!;
+                "BucketDial: DialPointer canvas must have a RotateTransform as its RenderTransform.");
+        _leftBtn  = this.FindControl<KeyButton>("LeftBtn")!;
+        _rightBtn = this.FindControl<KeyButton>("RightBtn")!;
     }
 
     /// <summary>Called from ManualControl each timer tick.</summary>

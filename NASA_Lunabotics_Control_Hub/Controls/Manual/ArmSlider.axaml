@@ -7,7 +7,7 @@
              mc:Ignorable="d" d:DesignWidth="80" d:DesignHeight="220">
     <Grid HorizontalAlignment="Center" RowDefinitions="Auto,*,Auto">
 
-        <manual:KeyButton Grid.Row="0" x:Name="UpBtn" KeyLabel="I" HorizontalAlignment="Center"/>
+        <manual:KeyButton Grid.Row="0" x:Name="UpBtn" KeyLabel="↑" HorizontalAlignment="Center"/>
 
         <!-- Slider + tick labels side by side, stretches to fill star row -->
         <Grid Grid.Row="1" ColumnDefinitions="Auto,Auto">
@@ -15,7 +15,6 @@
                     Grid.Column="0"
                     Orientation="Vertical"
                     Minimum="0" Maximum="1"
-                    IsDirectionReversed="True"
                     IsHitTestVisible="False"
                     Width="28"
                     Foreground="#00643C"
@@ -37,6 +36,6 @@
             </Grid>
         </Grid>
 
-        <manual:KeyButton Grid.Row="2" x:Name="DownBtn" KeyLabel="K" HorizontalAlignment="Center"/>
+        <manual:KeyButton Grid.Row="2" x:Name="DownBtn" KeyLabel="↓" HorizontalAlignment="Center"/>
     </Grid>
 </UserControl>

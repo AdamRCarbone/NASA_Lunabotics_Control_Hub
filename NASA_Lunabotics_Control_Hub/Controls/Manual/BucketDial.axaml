@@ -12,16 +12,17 @@
             <!-- Dial ring -->
             <Ellipse Width="80" Height="80"
                      Fill="#1A1A1A" Stroke="#00643C" StrokeThickness="2"/>
-            <!-- Pointer: bottom-center pivot at (40,40), points up at Angle=0 -->
-            <Rectangle x:Name="DialPointer"
-                       Width="3" Height="28"
-                       Fill="#00643C"
-                       Canvas.Left="38.5" Canvas.Top="12"
-                       RenderTransformOrigin="0.5,1.0">
-                <Rectangle.RenderTransform>
+            <!-- Pointer: zero-size pivot canvas at dial center (40,40), rotates around its own origin -->
+            <Canvas x:Name="DialPointer"
+                    Canvas.Left="40" Canvas.Top="40"
+                    Width="0" Height="0"
+                    RenderTransformOrigin="0,0">
+                <Canvas.RenderTransform>
                     <RotateTransform Angle="0"/>
-                </Rectangle.RenderTransform>
-            </Rectangle>
+                </Canvas.RenderTransform>
+                <Rectangle Width="3" Height="28" Fill="#00643C"
+                           Canvas.Left="-1.5" Canvas.Top="-28"/>
+            </Canvas>
             <!-- Center dot -->
             <Ellipse Width="8" Height="8" Fill="#00643C"
                      Canvas.Left="36" Canvas.Top="36"/>
@@ -32,8 +33,8 @@
 
         <!-- Left/Right key buttons -->
         <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center">
-            <manual:KeyButton x:Name="LeftBtn"  KeyLabel="J"/>
-            <manual:KeyButton x:Name="RightBtn" KeyLabel="L"/>
+            <manual:KeyButton x:Name="LeftBtn"  KeyLabel="←"/>
+            <manual:KeyButton x:Name="RightBtn" KeyLabel="→"/>
         </StackPanel>
 
     </StackPanel>

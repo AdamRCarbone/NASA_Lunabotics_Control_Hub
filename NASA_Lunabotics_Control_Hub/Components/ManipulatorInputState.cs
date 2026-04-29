@@ -22,10 +22,10 @@ public class ManipulatorInputState
     {
         switch (key)
         {
-            case Key.I: UpHeld    = true; break;
-            case Key.K: DownHeld  = true; break;
-            case Key.J: LeftHeld  = true; break;
-            case Key.L: RightHeld = true; break;
+            case Key.Up:    UpHeld    = true; break;
+            case Key.Down:  DownHeld  = true; break;
+            case Key.Left:  LeftHeld  = true; break;
+            case Key.Right: RightHeld = true; break;
         }
     }
 
@@ -33,10 +33,10 @@ public class ManipulatorInputState
     {
         switch (key)
         {
-            case Key.I: UpHeld    = false; break;
-            case Key.K: DownHeld  = false; break;
-            case Key.J: LeftHeld  = false; break;
-            case Key.L: RightHeld = false; break;
+            case Key.Up:    UpHeld    = false; break;
+            case Key.Down:  DownHeld  = false; break;
+            case Key.Left:  LeftHeld  = false; break;
+            case Key.Right: RightHeld = false; break;
         }
     }
 
