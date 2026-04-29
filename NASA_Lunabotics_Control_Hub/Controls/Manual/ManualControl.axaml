@@ -33,7 +33,7 @@
                     <Grid RowDefinitions="Auto,*">
                         <TextBlock Grid.Row="0" Text="ARM" Classes="sub-header" HorizontalAlignment="Center"/>
                         <manual:ArmSlider Grid.Row="1" x:Name="ArmSliderWidget"
-                                          HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                          HorizontalAlignment="Center" VerticalAlignment="Stretch"/>
                     </Grid>
                 </Border>
 

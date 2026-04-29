@@ -5,37 +5,25 @@
              xmlns:manual="clr-namespace:NASA_Lunabotics_Control_Hub.Controls.Manual"
              x:Class="NASA_Lunabotics_Control_Hub.Controls.Manual.ArmSlider"
              mc:Ignorable="d" d:DesignWidth="80" d:DesignHeight="220">
-    <StackPanel HorizontalAlignment="Center" Spacing="4">
-        <!-- Up key button -->
-        <manual:KeyButton x:Name="UpBtn" KeyLabel="↑" HorizontalAlignment="Center"/>
+    <Grid HorizontalAlignment="Center" RowDefinitions="Auto,*,Auto">
 
-        <!-- Slider + tick labels side by side -->
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
+        <manual:KeyButton Grid.Row="0" x:Name="UpBtn" KeyLabel="I" HorizontalAlignment="Center"/>
 
+        <!-- Slider + tick labels side by side, stretches to fill star row -->
+        <Grid Grid.Row="1" ColumnDefinitions="Auto,Auto">
             <Slider x:Name="ArmSliderCtrl"
                     Grid.Column="0"
                     Orientation="Vertical"
                     Minimum="0" Maximum="1"
                     IsDirectionReversed="True"
                     IsHitTestVisible="False"
-                    Height="140" Width="28"
+                    Width="28"
                     Foreground="#00643C"
                     Background="#333333"
                     VerticalAlignment="Stretch"/>
 
-            <!-- Tick labels: 5 equal rows spanning slider height -->
-            <Grid Grid.Column="1" Height="140" Width="36" Margin="4,0,0,0">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
+            <Grid Grid.Column="1" Width="36" Margin="4,0,0,0"
+                  RowDefinitions="*,*,*,*,*">
                 <TextBlock Grid.Row="0" Text="100%" Foreground="#606060" FontSize="9"
                            FontFamily="Consolas" VerticalAlignment="Top"/>
                 <TextBlock Grid.Row="1" Text=" 75%" Foreground="#606060" FontSize="9"
@@ -49,7 +37,6 @@
             </Grid>
         </Grid>
 
-        <!-- Down key button -->
-        <manual:KeyButton x:Name="DownBtn" KeyLabel="↓" HorizontalAlignment="Center"/>
-    </StackPanel>
+        <manual:KeyButton Grid.Row="2" x:Name="DownBtn" KeyLabel="K" HorizontalAlignment="Center"/>
+    </Grid>
 </UserControl>

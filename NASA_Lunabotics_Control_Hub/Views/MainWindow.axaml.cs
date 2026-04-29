@@ -34,8 +34,8 @@ namespace NASA_Lunabotics_Control_Hub.Views
                 joystick1?.HandleKeyDown(e.Key);
                 joystick2?.HandleKeyDown(e.Key);
             }
-            if (e.Key is Key.Up or Key.Down or Key.Left or Key.Right
-                      or Key.W or Key.A or Key.S or Key.D)
+            if (e.Key is Key.W or Key.A or Key.S or Key.D
+                      or Key.I or Key.J or Key.K or Key.L)
                 e.Handled = true;
         }
 
@@ -51,8 +51,8 @@ namespace NASA_Lunabotics_Control_Hub.Views
                 joystick1?.HandleKeyUp(e.Key);
                 joystick2?.HandleKeyUp(e.Key);
             }
-            if (e.Key is Key.Up or Key.Down or Key.Left or Key.Right
-                      or Key.W or Key.A or Key.S or Key.D)
+            if (e.Key is Key.W or Key.A or Key.S or Key.D
+                      or Key.I or Key.J or Key.K or Key.L)
                 e.Handled = true;
         }
     }

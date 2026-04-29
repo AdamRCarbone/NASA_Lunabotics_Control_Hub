@@ -32,8 +32,8 @@
 
         <!-- Left/Right key buttons -->
         <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center">
-            <manual:KeyButton x:Name="LeftBtn"  KeyLabel="←"/>
-            <manual:KeyButton x:Name="RightBtn" KeyLabel="→"/>
+            <manual:KeyButton x:Name="LeftBtn"  KeyLabel="J"/>
+            <manual:KeyButton x:Name="RightBtn" KeyLabel="L"/>
         </StackPanel>
 
     </StackPanel>
