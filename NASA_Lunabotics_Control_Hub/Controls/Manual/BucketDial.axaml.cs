@@ -1,3 +1,4 @@
+using System;
 using Avalonia.Controls;
 using Avalonia.Controls.Shapes;
 using Avalonia.Markup.Xaml;
@@ -20,7 +21,9 @@ public partial class BucketDial : UserControl
     {
         AvaloniaXamlLoader.Load(this);
         var pointer  = this.FindControl<Rectangle>("DialPointer")!;
-        _dialRotation = (RotateTransform)pointer.RenderTransform!;
+        _dialRotation = pointer.RenderTransform as RotateTransform
+            ?? throw new InvalidOperationException(
+                "BucketDial: DialPointer must have a RotateTransform as its RenderTransform.");
         _leftBtn      = this.FindControl<KeyButton>("LeftBtn")!;
         _rightBtn     = this.FindControl<KeyButton>("RightBtn")!;
     }
