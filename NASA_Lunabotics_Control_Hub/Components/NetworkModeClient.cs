@@ -70,14 +70,10 @@ namespace NASA_Lunabotics_Control_Hub.Components
                 _receiveThread.IsBackground = true;
                 _receiveThread.Start();
 
-                // Start UDP heartbeat listener
+                // Start UDP heartbeat listener — IsConnected stays false until first heartbeat arrives
                 StartHeartbeatListener();
 
-                IsConnected = true;
-                LastHeartbeat = DateTime.UtcNow; // grace period — timeout counts from connect, not epoch
-                ConnectionChanged?.Invoke(true);
-
-                Console.WriteLine($"[NetworkModeClient] Connected to {_roverIpAddress}:{_tcpPort}");
+                Console.WriteLine($"[NetworkModeClient] TCP link up to {_roverIpAddress}:{_tcpPort} — waiting for first heartbeat");
             }
             catch (Exception ex)
             {
@@ -93,8 +89,11 @@ namespace NASA_Lunabotics_Control_Hub.Components
         {
             try
             {
-                _udpClient = new UdpClient(_udpPort);
-                Console.WriteLine($"[NetworkModeClient] Heartbeat listener started on UDP port {_udpPort}");
+                _udpClient = new UdpClient();
+                _udpClient.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+                _udpClient.EnableBroadcast = true;
+                _udpClient.Client.Bind(new System.Net.IPEndPoint(System.Net.IPAddress.Any, _udpPort));
+                Console.WriteLine($"[NetworkModeClient] Heartbeat listener started on UDP port {_udpPort} (broadcast enabled)");
 
                 _udpReceiveThread = new Thread(UdpReceiveLoop);
                 _udpReceiveThread.IsBackground = true;
@@ -126,16 +125,19 @@ namespace NASA_Lunabotics_Control_Hub.Components
                     // Validate heartbeat frame: [MAGIC][STATE][SEQ_HI][SEQ_LO][CRC] = 5 bytes
                     if (data.Length == 5 && data[0] == 0x4F)
                     {
-                        // Verify CRC
                         byte calculatedCrc = CalcCrc8(data, 4);
                         if (calculatedCrc == data[4])
                         {
-                            // Valid heartbeat received
-                            byte state = data[1];
-
                             LastHeartbeat = DateTime.UtcNow;
 
-                            // Trigger heartbeat event on UI thread
+                            // First heartbeat — promote TCP link to fully connected
+                            if (!IsConnected)
+                            {
+                                IsConnected = true;
+                                Console.WriteLine("[NetworkModeClient] First heartbeat received — connection confirmed");
+                                Dispatcher.UIThread.Post(() => ConnectionChanged?.Invoke(true));
+                            }
+
                             Dispatcher.UIThread.Post(() => HeartbeatReceived?.Invoke());
                         }
                     }
