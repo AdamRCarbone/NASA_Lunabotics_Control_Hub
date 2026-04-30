@@ -20,13 +20,10 @@ namespace NASA_Lunabotics_Control_Hub.Components
         private NetworkStream? _stream;
         private CancellationTokenSource _cancelSource;
         private Thread? _receiveThread;
-        private UdpClient? _udpClient;
-        private Thread? _udpReceiveThread;
 
         // Configuration - match octane_network settings
         private string _roverIpAddress = "octane.local"; // Resolved via mDNS — works across network changes
-        private int _tcpPort = 5000; // TCP port for mode commands
-        private int _udpPort = 5001; // UDP port for heartbeat
+        private int _tcpPort = 5000; // TCP port for all frames (commands + heartbeat)
 
         // Current state
         public string CurrentState { get; private set; } = "UNKNOWN";
@@ -70,90 +67,13 @@ namespace NASA_Lunabotics_Control_Hub.Components
                 _receiveThread.IsBackground = true;
                 _receiveThread.Start();
 
-                // Start UDP heartbeat listener — IsConnected stays false until first heartbeat arrives
-                StartHeartbeatListener();
-
+                // IsConnected stays false until first H frame arrives over TCP
                 Console.WriteLine($"[NetworkModeClient] TCP link up to {_roverIpAddress}:{_tcpPort} — waiting for first heartbeat");
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"[NetworkModeClient] Connection failed: {ex.Message}");
                 Disconnect();
-            }
-        }
-
-        /// <summary>
-        /// Start UDP listener for heartbeat packets
-        /// </summary>
-        private void StartHeartbeatListener()
-        {
-            try
-            {
-                _udpClient = new UdpClient();
-                _udpClient.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
-                _udpClient.EnableBroadcast = true;
-                _udpClient.Client.Bind(new System.Net.IPEndPoint(System.Net.IPAddress.Any, _udpPort));
-                Console.WriteLine($"[NetworkModeClient] Heartbeat listener started on UDP port {_udpPort} (broadcast enabled)");
-
-                _udpReceiveThread = new Thread(UdpReceiveLoop);
-                _udpReceiveThread.IsBackground = true;
-                _udpReceiveThread.Start();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"[NetworkModeClient] Failed to start heartbeat listener: {ex.Message}");
-            }
-        }
-
-        /// <summary>
-        /// UDP receive loop - listens for heartbeat packets
-        /// </summary>
-        private void UdpReceiveLoop()
-        {
-            while (!_cancelSource.Token.IsCancellationRequested && _udpClient != null)
-            {
-                try
-                {
-                    // Receive UDP packet (blocking call)
-                    var task = _udpClient.ReceiveAsync();
-                    if (!task.Wait(100)) // 100ms timeout
-                        continue;
-
-                    var result = task.Result;
-                    byte[] data = result.Buffer;
-
-                    // Validate heartbeat frame: [MAGIC][STATE][SEQ_HI][SEQ_LO][CRC] = 5 bytes
-                    if (data.Length == 5 && data[0] == 0x4F)
-                    {
-                        byte calculatedCrc = CalcCrc8(data, 4);
-                        if (calculatedCrc == data[4])
-                        {
-                            LastHeartbeat = DateTime.UtcNow;
-
-                            // First heartbeat — promote TCP link to fully connected
-                            if (!IsConnected)
-                            {
-                                IsConnected = true;
-                                Console.WriteLine("[NetworkModeClient] First heartbeat received — connection confirmed");
-                                Dispatcher.UIThread.Post(() => ConnectionChanged?.Invoke(true));
-                            }
-
-                            Dispatcher.UIThread.Post(() => HeartbeatReceived?.Invoke());
-                        }
-                    }
-                }
-                catch (ObjectDisposedException)
-                {
-                    break; // UDP client closed
-                }
-                catch (Exception ex) when (ex is TimeoutException || ex is AggregateException)
-                {
-                    // Timeout or other expected exception, continue loop
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"[NetworkModeClient] UDP receive error: {ex.Message}");
-                }
             }
         }
 
@@ -165,17 +85,13 @@ namespace NASA_Lunabotics_Control_Hub.Components
             _cancelSource.Cancel();
 
             _receiveThread?.Join(1000);
-            _udpReceiveThread?.Join(1000);
 
             _stream?.Dispose();
             _client?.Close();
             _client?.Dispose();
-            _udpClient?.Close();
-            _udpClient?.Dispose();
 
             _client = null;
             _stream = null;
-            _udpClient = null;
 
             IsConnected = false;
             LastHeartbeat = DateTime.MinValue;
@@ -334,6 +250,17 @@ namespace NASA_Lunabotics_Control_Hub.Components
             {
                 switch (msg.Type)
                 {
+                    case "heartbeat":
+                        LastHeartbeat = DateTime.UtcNow;
+                        if (!IsConnected)
+                        {
+                            IsConnected = true;
+                            Console.WriteLine("[NetworkModeClient] First heartbeat received — connection confirmed");
+                            Dispatcher.UIThread.Post(() => ConnectionChanged?.Invoke(true));
+                        }
+                        Dispatcher.UIThread.Post(() => HeartbeatReceived?.Invoke());
+                        break;
+
                     case "telemetry":
                         // Map state code to string
                         string state = msg.State switch
@@ -385,26 +312,6 @@ namespace NASA_Lunabotics_Control_Hub.Components
             _cancelSource.Cancel();
             Disconnect();
             _cancelSource.Dispose();
-        }
-
-        /// <summary>
-        /// Calculate CRC-8 over first N bytes of data
-        /// </summary>
-        private static byte CalcCrc8(byte[] data, int length)
-        {
-            byte crc = 0;
-            for (int i = 0; i < length; i++)
-            {
-                crc ^= data[i];
-                for (int j = 0; j < 8; j++)
-                {
-                    if ((crc & 0x80) != 0)
-                        crc = (byte)((crc << 1) ^ 0x07);
-                    else
-                        crc = (byte)(crc << 1);
-                }
-            }
-            return crc;
         }
     }
 }

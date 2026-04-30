@@ -14,11 +14,12 @@ namespace NASA_Lunabotics_Control_Hub.Components
     {
         // Constants
         public const byte MAGIC = 0x4F; // 'O' for OCTANE
-        public const byte TYPE_TELEMETRY = 0x54; // 'T'
-        public const byte TYPE_COMMAND = 0x43; // 'C'
-        public const byte TYPE_ACK = 0x41; // 'A'
-        public const byte TYPE_FAULT = 0x46; // 'F'
-        public const byte TYPE_MANIPULATOR = 0x4D; // 'M'
+        public const byte TYPE_TELEMETRY = 0x54;    // 'T'
+        public const byte TYPE_HEARTBEAT = 0x48;    // 'H'
+        public const byte TYPE_COMMAND = 0x43;      // 'C'
+        public const byte TYPE_ACK = 0x41;          // 'A'
+        public const byte TYPE_FAULT = 0x46;        // 'F'
+        public const byte TYPE_MANIPULATOR = 0x4D;  // 'M'
 
         // State/Mode codes
         public const byte STATE_STANDBY = 0x30; // '0'
@@ -192,6 +193,18 @@ namespace NASA_Lunabotics_Control_Hub.Components
             // Decode based on type
             switch (msgType)
             {
+                case TYPE_HEARTBEAT:
+                    if (payloadLen >= 3)
+                    {
+                        return new DecodedMessage
+                        {
+                            Type = "heartbeat",
+                            State = payload[0],
+                            SeqNum = (ushort)((payload[1] << 8) | payload[2])
+                        };
+                    }
+                    break;
+
                 case TYPE_TELEMETRY:
                     if (payloadLen >= 1)
                     {
@@ -270,6 +283,7 @@ namespace NASA_Lunabotics_Control_Hub.Components
     {
         public string Type { get; set; } = "";
         public byte State { get; set; }
+        public ushort SeqNum { get; set; }
         public byte Mode { get; set; }
         public bool EStop { get; set; }
         public bool Success { get; set; }
