@@ -16,6 +16,8 @@
                     Orientation="Vertical"
                     Minimum="0" Maximum="1"
                     IsHitTestVisible="False"
+                    Focusable="False"
+                    IsTabStop="False"
                     Width="28"
                     Foreground="#00643C"
                     Background="#333333"
