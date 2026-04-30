@@ -116,7 +116,7 @@ namespace NASA_Lunabotics_Control_Hub.Views
             manualControl.UpdateFromJoystick(activeKeys);
             manualControl.Tick(0.050);
 
-            if (manualControl.IsActive)
+            if (manualControl.IsActive && _networkClient.IsConnected)
             {
                 byte bitfield = manualControl.GetKeyBitfield(activeKeys);
                 _ = _networkClient.SendManipulatorCommandAsync(bitfield);

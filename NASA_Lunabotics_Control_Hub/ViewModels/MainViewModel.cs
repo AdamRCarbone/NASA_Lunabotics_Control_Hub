@@ -25,12 +25,21 @@ namespace NASA_Lunabotics_Control_Hub.ViewModels
 
         public void SetConnected(bool connected) { IsConnected = connected; }
         public void SetCurrentMode(string mode) { CurrentMode = mode; }
-    private bool _isConnected = false;
 
-        public bool IsConnected { get; private set; }
+        private bool _isConnected = false;
+        public bool IsConnected
+        {
+            get => _isConnected;
+            private set
+            {
+                this.RaiseAndSetIfChanged(ref _isConnected, value);
+                this.RaisePropertyChanged(nameof(ConnectionStatusText));
+                this.RaisePropertyChanged(nameof(ConnectionColor));
+            }
+        }
 
-    public string ConnectionStatusText => IsConnected ? "CONNECTED" : "OFFLINE";
-    public string ConnectionColor => IsConnected ? "#00643C" : "#DC2626"; // Green or Red
+        public string ConnectionStatusText => IsConnected ? "CONNECTED" : "OFFLINE";
+        public string ConnectionColor => IsConnected ? "#00643C" : "#DC2626";
 
         public string ActiveViewport
         {
