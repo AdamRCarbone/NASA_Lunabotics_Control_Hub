@@ -74,6 +74,7 @@ namespace NASA_Lunabotics_Control_Hub.Components
                 StartHeartbeatListener();
 
                 IsConnected = true;
+                LastHeartbeat = DateTime.UtcNow; // grace period — timeout counts from connect, not epoch
                 ConnectionChanged?.Invoke(true);
 
                 Console.WriteLine($"[NetworkModeClient] Connected to {_roverIpAddress}:{_tcpPort}");
