@@ -58,6 +58,13 @@ namespace NASA_Lunabotics_Control_Hub.Components
                     return;
                 }
 
+                // Reset cancellation token so reconnect works after a previous disconnect
+                if (_cancelSource.IsCancellationRequested)
+                {
+                    _cancelSource.Dispose();
+                    _cancelSource = new CancellationTokenSource();
+                }
+
                 // Start TCP connection
                 _client = new TcpClient();
                 await _client.ConnectAsync(_roverIpAddress, _tcpPort);

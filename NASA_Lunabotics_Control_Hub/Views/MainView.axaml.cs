@@ -74,8 +74,17 @@ namespace NASA_Lunabotics_Control_Hub.Views
 
         private void OnConnectionChanged(bool isConnected)
         {
-            _mainViewModel.SetConnected(isConnected);
-            Dispatcher.UIThread.Post(() => UpdateConnectButton(isConnected));
+            Dispatcher.UIThread.Post(() =>
+            {
+                _mainViewModel.SetConnected(isConnected);
+                UpdateConnectButton(isConnected);
+
+                if (!isConnected)
+                {
+                    // Clear mode state so buttons go idle on disconnect
+                    _mainViewModel.SetModeState("", NASA_Lunabotics_Control_Hub.ViewModels.ModeState.Idle);
+                }
+            });
         }
 
         private void OnHeartbeatReceived()
