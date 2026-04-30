@@ -23,7 +23,7 @@ namespace NASA_Lunabotics_Control_Hub.Views
         private DispatcherTimer _keyUpdateTimer;
         private DispatcherTimer? _heartbeatFadeTimer;
         private NetworkModeClient _networkClient;
-        private const bool IgnoreHeartbeatTimeout = true;
+        private const bool IgnoreHeartbeatTimeout = false;
 
         public MainView()
         {
