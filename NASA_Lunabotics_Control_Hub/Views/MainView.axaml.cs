@@ -23,6 +23,7 @@ namespace NASA_Lunabotics_Control_Hub.Views
         private DispatcherTimer _keyUpdateTimer;
         private DispatcherTimer? _heartbeatFadeTimer;
         private NetworkModeClient _networkClient;
+        private const bool IgnoreHeartbeatTimeout = true;
 
         public MainView()
         {
@@ -101,7 +102,7 @@ namespace NASA_Lunabotics_Control_Hub.Views
         private void KeyUpdateTimer_Tick(object? sender, EventArgs e)
         {
             // Disconnect if heartbeat stops arriving (covers rover crash where TCP lingers)
-            if (_networkClient.IsConnected && _networkClient.IsHeartbeatTimeout())
+            if (!IgnoreHeartbeatTimeout && _networkClient.IsConnected && _networkClient.IsHeartbeatTimeout())
                 _networkClient.Disconnect();
 
             var joystick      = this.FindControl<Controls.JoystickControl>("KeyTrackingJoystick");
