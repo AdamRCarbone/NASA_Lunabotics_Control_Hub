@@ -21,6 +21,7 @@ namespace NASA_Lunabotics_Control_Hub.Views
         private MainViewModel _mainViewModel;
         private JoystickViewModel _joystickViewModel;
         private DispatcherTimer _keyUpdateTimer;
+        private DispatcherTimer? _heartbeatFadeTimer;
         private NetworkModeClient _networkClient;
 
         public MainView()
@@ -79,18 +80,30 @@ namespace NASA_Lunabotics_Control_Hub.Views
         private void OnHeartbeatReceived()
         {
             var heartbeatRing = this.FindControl<Border>("HeartbeatRing");
-            if (heartbeatRing != null)
+            if (heartbeatRing == null) return;
+
+            heartbeatRing.Opacity = 1;
+
+            if (_heartbeatFadeTimer == null)
             {
-                heartbeatRing.Opacity = 1;
-                var timer = new System.Threading.Timer(_ =>
+                _heartbeatFadeTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(500) };
+                _heartbeatFadeTimer.Tick += (_, _) =>
                 {
-                    Dispatcher.UIThread.Post(() => heartbeatRing.Opacity = 0);
-                }, null, 500, System.Threading.Timeout.Infinite);
+                    heartbeatRing.Opacity = 0;
+                    _heartbeatFadeTimer.Stop();
+                };
             }
+
+            _heartbeatFadeTimer.Stop();
+            _heartbeatFadeTimer.Start();
         }
 
         private void KeyUpdateTimer_Tick(object? sender, EventArgs e)
         {
+            // Disconnect if heartbeat stops arriving (covers rover crash where TCP lingers)
+            if (_networkClient.IsConnected && _networkClient.IsHeartbeatTimeout())
+                _networkClient.Disconnect();
+
             var joystick      = this.FindControl<Controls.JoystickControl>("KeyTrackingJoystick");
             var manualControl = this.FindControl<ManualControl>("ManualControlCard");
 
