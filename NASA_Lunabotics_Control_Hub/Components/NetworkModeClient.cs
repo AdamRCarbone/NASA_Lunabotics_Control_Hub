@@ -172,6 +172,23 @@ namespace NASA_Lunabotics_Control_Hub.Components
             }
         }
 
+        public async Task SendVideoRequestAsync(byte sourceId, byte variant, byte quality, byte fps)
+        {
+            if (_client == null || !_client.Connected || _stream == null)
+                return;
+            try
+            {
+                var frame = NetworkProtocol.EncodeVideoRequest(sourceId, variant, quality, fps);
+                await _stream.WriteAsync(frame, 0, frame.Length, _cancelSource.Token);
+                await _stream.FlushAsync(_cancelSource.Token);
+                Console.WriteLine($"[NetworkModeClient] Video request: src={sourceId} var={variant:X2} q={quality} fps={fps}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[NetworkModeClient] Video request error: {ex.Message}");
+            }
+        }
+
         private void ReceiveLoop()
         {
             byte[] buffer = new byte[4096];
