@@ -24,6 +24,12 @@ public partial class CameraStatusCard : UserControl
     public static readonly StyledProperty<string> ViewportIdProperty =
         AvaloniaProperty.Register<CameraStatusCard, string>(nameof(ViewportId));
 
+    public static readonly StyledProperty<byte> SourceIdProperty =
+        AvaloniaProperty.Register<CameraStatusCard, byte>(nameof(SourceId));
+
+    public static readonly StyledProperty<bool> IsStreamableProperty =
+        AvaloniaProperty.Register<CameraStatusCard, bool>(nameof(IsStreamable), defaultValue: true);
+
     public CameraStatusCard()
     {
         InitializeComponent();
@@ -58,6 +64,18 @@ public partial class CameraStatusCard : UserControl
     {
         get => GetValue(ViewportIdProperty);
         set => SetValue(ViewportIdProperty, value);
+    }
+
+    public byte SourceId
+    {
+        get => GetValue(SourceIdProperty);
+        set => SetValue(SourceIdProperty, value);
+    }
+
+    public bool IsStreamable
+    {
+        get => GetValue(IsStreamableProperty);
+        set => SetValue(IsStreamableProperty, value);
     }
 
     private void UpdateVisualState()
@@ -106,11 +124,11 @@ public partial class CameraStatusCard : UserControl
 
     private void RootBorder_PointerPressed(object? sender, PointerPressedEventArgs e)
     {
-        // Notify ViewModel when camera is clicked
-        var dataContext = this.DataContext;
-        if (dataContext is MainViewModel vm)
+        if (DataContext is MainViewModel vm)
         {
             vm.OnViewportSelected(ViewportId);
+            if (IsStreamable)
+                vm.RequestVideoStream(SourceId);
         }
     }
 }
