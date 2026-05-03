@@ -3,50 +3,142 @@
              xmlns:vm="clr-namespace:NASA_Lunabotics_Control_Hub.ViewModels"
              x:Class="NASA_Lunabotics_Control_Hub.Controls.Video.VideoPanel"
              x:DataType="vm:MainViewModel">
+
+  <UserControl.Styles>
+
+    <!-- Segmented toggle: hides the radio circle, renders as a flat pill button -->
+    <Style Selector="RadioButton.segment">
+      <Setter Property="Cursor" Value="Hand"/>
+      <Setter Property="Margin" Value="0"/>
+      <Setter Property="Padding" Value="12,0"/>
+      <Setter Property="Height" Value="24"/>
+      <Setter Property="MinHeight" Value="0"/>
+      <Setter Property="FontSize" Value="10"/>
+      <Setter Property="FontFamily" Value="Consolas"/>
+      <Setter Property="FontWeight" Value="Bold"/>
+      <Setter Property="Foreground" Value="#505050"/>
+      <Setter Property="Background" Value="Transparent"/>
+      <Setter Property="Template">
+        <ControlTemplate>
+          <Border Background="{TemplateBinding Background}"
+                  CornerRadius="3"
+                  Padding="{TemplateBinding Padding}">
+            <ContentPresenter Content="{TemplateBinding Content}"
+                              HorizontalAlignment="Center"
+                              VerticalAlignment="Center"
+                              FontSize="{TemplateBinding FontSize}"
+                              FontFamily="{TemplateBinding FontFamily}"
+                              FontWeight="{TemplateBinding FontWeight}"
+                              TextElement.Foreground="{TemplateBinding Foreground}"/>
+          </Border>
+        </ControlTemplate>
+      </Setter>
+    </Style>
+    <Style Selector="RadioButton.segment:checked">
+      <Setter Property="Background" Value="#00643C"/>
+      <Setter Property="Foreground" Value="White"/>
+    </Style>
+    <Style Selector="RadioButton.segment:pointerover">
+      <Setter Property="Background" Value="#252525"/>
+      <Setter Property="Foreground" Value="#A0A0A0"/>
+    </Style>
+    <Style Selector="RadioButton.segment:checked:pointerover">
+      <Setter Property="Background" Value="#007A4A"/>
+      <Setter Property="Foreground" Value="White"/>
+    </Style>
+
+    <!-- Slider: accent color + compact thumb -->
+    <Style Selector="Slider.video-slider">
+      <Setter Property="Foreground" Value="#00643C"/>
+    </Style>
+    <Style Selector="Slider.video-slider /template/ Thumb">
+      <Setter Property="Width" Value="14"/>
+      <Setter Property="Height" Value="14"/>
+    </Style>
+
+    <!-- Stop button: force content to truly center -->
+    <Style Selector="Button.stop-btn">
+      <Setter Property="HorizontalContentAlignment" Value="Center"/>
+      <Setter Property="VerticalContentAlignment" Value="Center"/>
+      <Setter Property="Height" Value="24"/>
+      <Setter Property="Padding" Value="8,0"/>
+      <Setter Property="FontSize" Value="10"/>
+      <Setter Property="FontFamily" Value="Consolas"/>
+      <Setter Property="FontWeight" Value="Bold"/>
+      <Setter Property="Background" Value="#2D1414"/>
+      <Setter Property="Foreground" Value="#DC2626"/>
+      <Setter Property="CornerRadius" Value="4"/>
+      <Setter Property="Cursor" Value="Hand"/>
+    </Style>
+    <Style Selector="Button.stop-btn:pointerover">
+      <Setter Property="Background" Value="#3D1A1A"/>
+    </Style>
+
+  </UserControl.Styles>
+
   <Grid RowDefinitions="Auto,*">
 
-    <!-- Header bar: viewport name + stream controls -->
-    <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,8">
-      <TextBlock Grid.Column="0"
-                 Text="{Binding ActiveViewport, Converter={StaticResource ViewportIdToDisplayName}}"
-                 Classes="section-header" VerticalAlignment="Center"/>
-      <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+    <!-- Header bar -->
+    <Border Grid.Row="0" Background="#141414" BorderBrush="#2A2A2A" BorderThickness="1"
+            CornerRadius="6" Padding="10,6" Margin="0,0,0,8">
+      <Grid ColumnDefinitions="*,Auto">
 
-        <!-- RGB / Depth segmented toggle -->
-        <Border Background="#1A1A1A" BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="2">
-          <StackPanel Orientation="Horizontal" Spacing="2">
-            <RadioButton x:Name="RgbButton" Content="RGB" GroupName="StreamVariant"
-                         IsChecked="True" Checked="OnVariantChanged"
-                         Padding="8,2" FontSize="10" FontFamily="Consolas" FontWeight="Bold"/>
-            <RadioButton x:Name="DepthButton" Content="DEPTH" GroupName="StreamVariant"
-                         Checked="OnVariantChanged"
-                         Padding="8,2" FontSize="10" FontFamily="Consolas" FontWeight="Bold"/>
+        <TextBlock Grid.Column="0"
+                   Text="{Binding ActiveViewport, Converter={StaticResource ViewportIdToDisplayName}}"
+                   Classes="section-header" VerticalAlignment="Center" Margin="0"/>
+
+        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+
+          <!-- RGB / Depth segmented toggle -->
+          <Border Background="#0D0D0D" BorderBrush="#333333" BorderThickness="1"
+                  CornerRadius="4" Padding="2" VerticalAlignment="Center">
+            <StackPanel Orientation="Horizontal" Spacing="2">
+              <RadioButton x:Name="RgbButton" Content="RGB" Classes="segment"
+                           GroupName="StreamVariant" IsChecked="True" Checked="OnVariantChanged"/>
+              <RadioButton x:Name="DepthButton" Content="DEPTH" Classes="segment"
+                           GroupName="StreamVariant" Checked="OnVariantChanged"/>
+            </StackPanel>
+          </Border>
+
+          <!-- Divider -->
+          <Border Width="1" Height="16" Background="#2A2A2A" VerticalAlignment="Center"/>
+
+          <!-- Quality -->
+          <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+            <TextBlock Text="Q" Foreground="#404040" FontSize="9" FontFamily="Consolas"
+                       FontWeight="Bold" VerticalAlignment="Center"/>
+            <Slider x:Name="QualitySlider" Classes="video-slider"
+                    Minimum="1" Maximum="100" Value="70" Width="75"
+                    VerticalAlignment="Center" ValueChanged="OnQualityChanged"/>
+            <TextBlock x:Name="QualityLabel" Text="70" Foreground="#808080" FontSize="10"
+                       FontFamily="Consolas" VerticalAlignment="Center" Width="20"
+                       TextAlignment="Right"/>
           </StackPanel>
-        </Border>
 
-        <!-- Quality slider -->
-        <TextBlock Text="Quality" Foreground="#606060" FontSize="10" FontFamily="Consolas"
-                   VerticalAlignment="Center"/>
-        <Slider x:Name="QualitySlider" Minimum="1" Maximum="100" Value="70" Width="80"
-                VerticalAlignment="Center" ValueChanged="OnQualityChanged"/>
-        <TextBlock x:Name="QualityLabel" Text="70" Foreground="#C0C0C0" FontSize="10"
-                   FontFamily="Consolas" VerticalAlignment="Center" Width="24"/>
+          <!-- FPS -->
+          <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+            <TextBlock Text="FPS" Foreground="#404040" FontSize="9" FontFamily="Consolas"
+                       FontWeight="Bold" VerticalAlignment="Center"/>
+            <Slider x:Name="FpsSlider" Classes="video-slider"
+                    Minimum="1" Maximum="30" Value="10" Width="55"
+                    VerticalAlignment="Center" ValueChanged="OnFpsChanged"/>
+            <TextBlock x:Name="FpsLabel" Text="10" Foreground="#808080" FontSize="10"
+                       FontFamily="Consolas" VerticalAlignment="Center" Width="20"
+                       TextAlignment="Right"/>
+          </StackPanel>
 
-        <!-- FPS slider -->
-        <TextBlock Text="FPS" Foreground="#606060" FontSize="10" FontFamily="Consolas"
-                   VerticalAlignment="Center"/>
-        <Slider x:Name="FpsSlider" Minimum="1" Maximum="30" Value="10" Width="60"
-                VerticalAlignment="Center" ValueChanged="OnFpsChanged"/>
-        <TextBlock x:Name="FpsLabel" Text="10" Foreground="#C0C0C0" FontSize="10"
-                   FontFamily="Consolas" VerticalAlignment="Center" Width="24"/>
+          <!-- Stop -->
+          <Button Classes="stop-btn" Click="OnStopClicked">
+            <StackPanel Orientation="Horizontal" Spacing="5">
+              <TextBlock Text="&#x25A0;" FontSize="8" VerticalAlignment="Center"/>
+              <TextBlock Text="STOP" FontSize="10" FontFamily="Consolas"
+                         FontWeight="Bold" VerticalAlignment="Center"/>
+            </StackPanel>
+          </Button>
 
-        <!-- Stop All -->
-        <Button Content="&#x25A0; STOP" Click="OnStopClicked"
-                Background="#2D1414" Foreground="#DC2626"
-                Padding="8,4" FontSize="10" FontFamily="Consolas" FontWeight="Bold"
-                CornerRadius="4"/>
-      </StackPanel>
-    </Grid>
+        </StackPanel>
+      </Grid>
+    </Border>
 
     <!-- Video area -->
     <Border Grid.Row="1" Background="#0F0F0F" BorderBrush="#333333" BorderThickness="1">
