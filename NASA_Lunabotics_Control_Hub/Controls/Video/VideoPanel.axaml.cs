@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Threading;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Interactivity;
@@ -23,6 +24,9 @@ public partial class VideoPanel : UserControl
     private int _fps = 10;
     private int _frameCount;
     private DateTime _fpsWindowStart = DateTime.UtcNow;
+
+    private volatile byte[]? _latestJpeg;
+    private int _uiFramePending;
 
     public NetworkModeClient? NetworkClient
     {
@@ -64,13 +68,23 @@ public partial class VideoPanel : UserControl
 
     private void OnFrameDecoded(byte[] jpeg)
     {
+        // Always overwrite with the newest frame; if a UI dispatch is already pending
+        // it will pick up this latest buffer instead of queuing another one.
+        _latestJpeg = jpeg;
+        if (Interlocked.CompareExchange(ref _uiFramePending, 1, 0) == 1) return;
+
         Dispatcher.UIThread.Post(() =>
         {
-            if (_vm == null) return;
+            Interlocked.Exchange(ref _uiFramePending, 0);
+            var jpegToShow = _latestJpeg;
+            if (_vm == null || jpegToShow == null) return;
+
+            _networkClient?.BumpHeartbeat();
+
             try
             {
                 var oldFrame = _vm.CurrentFrame;
-                _vm.CurrentFrame = new Bitmap(new MemoryStream(jpeg));
+                _vm.CurrentFrame = new Bitmap(new MemoryStream(jpegToShow));
                 oldFrame?.Dispose();
 
                 _frameCount++;
@@ -107,8 +121,7 @@ public partial class VideoPanel : UserControl
 
     private void OnVariantChanged(object? sender, RoutedEventArgs e)
     {
-        var depthBtn = this.FindControl<RadioButton>("DepthButton");
-        _variant = depthBtn?.IsChecked == true
+        _variant = (sender as RadioButton)?.Name == "DepthButton"
             ? NetworkProtocol.VARIANT_DEPTH
             : NetworkProtocol.VARIANT_RGB;
         ScheduleResend();

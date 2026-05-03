@@ -86,6 +86,7 @@ namespace NASA_Lunabotics_Control_Hub.Views
                 }
                 else
                 {
+                    if (videoPanel != null) videoPanel.NetworkClient = null;
                     // Clear mode state so buttons go idle on disconnect
                     _mainViewModel.SetModeState("", NASA_Lunabotics_Control_Hub.ViewModels.ModeState.Idle);
                     videoPanel?.ClearStream();

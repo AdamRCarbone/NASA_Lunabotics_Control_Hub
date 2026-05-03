@@ -46,12 +46,16 @@ public class VideoStreamClient : IDisposable
 
     private async Task ReceiveLoop()
     {
-        while (!_cts.IsCancellationRequested)
+        // Capture fields at loop entry so a concurrent Stop()+Start() can't make this
+        // loop "come back to life" reading the new socket and racing with the next loop.
+        var cts = _cts;
+        var udp = _udp;
+        while (!cts.IsCancellationRequested)
         {
             try
             {
-                if (_udp == null) break;
-                var result = await _udp.ReceiveAsync(_cts.Token);
+                if (udp == null) break;
+                var result = await udp.ReceiveAsync(cts.Token);
                 ProcessPacket(result.Buffer);
             }
             catch (OperationCanceledException) { break; }

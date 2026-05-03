@@ -118,6 +118,10 @@ namespace NASA_Lunabotics_Control_Hub.Components
             return (DateTime.UtcNow - LastHeartbeat).TotalSeconds > timeoutSeconds;
         }
 
+        // Call when any rover-originated traffic arrives (e.g. video frames) to suppress
+        // heartbeat timeout while the rover is clearly alive but CPU-loaded.
+        public void BumpHeartbeat() => LastHeartbeat = DateTime.UtcNow;
+
         /// <summary>
         /// Send mode command to rover using binary protocol
         /// </summary>
