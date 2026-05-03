@@ -42,6 +42,11 @@ namespace NASA_Lunabotics_Control_Hub.Views
 
             // Populate network selector with available interfaces
             PopulateNetworkSelector();
+            NetworkSelector.DropDownOpened += (_, _) =>
+            {
+                string? current = (NetworkSelector.SelectedItem as ComboBoxItem)?.Tag as string;
+                PopulateNetworkSelector(current);
+            };
 
 
             // Setup key update timer for manual control
@@ -185,12 +190,13 @@ namespace NASA_Lunabotics_Control_Hub.Views
                 dataUsageGraph.SetNetworkInterface(tag);
         }
 
-        private void PopulateNetworkSelector()
+        private void PopulateNetworkSelector(string? preferredInterface = null)
         {
             NetworkSelector.Items.Clear();
 
             var interfaces = NetworkHelper.GetNetworkInterfaces();
             string? primaryName = NetworkHelper.GetPrimaryInterfaceName();
+            string? target = preferredInterface ?? primaryName;
 
             int defaultIndex = 0;
             foreach (var (displayName, interfaceName) in interfaces)
@@ -201,12 +207,12 @@ namespace NASA_Lunabotics_Control_Hub.Views
                     Content = displayName,
                     Tag = interfaceName
                 });
-                if (interfaceName == primaryName)
+                if (interfaceName == target)
                     defaultIndex = idx;
             }
 
             NetworkSelector.SelectedIndex = interfaces.Count > 0 ? defaultIndex : -1;
-            Console.WriteLine($"[MainView] Network selector: {interfaces.Count} adapter(s), default={primaryName}");
+            Console.WriteLine($"[MainView] Network selector: {interfaces.Count} adapter(s), selected={target}");
 
             UpdateDataUsageGraphInterface();
         }
