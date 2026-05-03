@@ -1,0 +1,86 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:NASA_Lunabotics_Control_Hub.ViewModels"
+             x:Class="NASA_Lunabotics_Control_Hub.Controls.Video.VideoPanel"
+             x:DataType="vm:MainViewModel">
+  <Grid RowDefinitions="Auto,*">
+
+    <!-- Header bar: viewport name + stream controls -->
+    <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,8">
+      <TextBlock Grid.Column="0"
+                 Text="{Binding ActiveViewport, Converter={StaticResource ViewportIdToDisplayName}}"
+                 Classes="section-header" VerticalAlignment="Center"/>
+      <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+
+        <!-- RGB / Depth segmented toggle -->
+        <Border Background="#1A1A1A" BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="2">
+          <StackPanel Orientation="Horizontal" Spacing="2">
+            <RadioButton x:Name="RgbButton" Content="RGB" GroupName="StreamVariant"
+                         IsChecked="True" Checked="OnVariantChanged"
+                         Padding="8,2" FontSize="10" FontFamily="Consolas" FontWeight="Bold"/>
+            <RadioButton x:Name="DepthButton" Content="DEPTH" GroupName="StreamVariant"
+                         Checked="OnVariantChanged"
+                         Padding="8,2" FontSize="10" FontFamily="Consolas" FontWeight="Bold"/>
+          </StackPanel>
+        </Border>
+
+        <!-- Quality slider -->
+        <TextBlock Text="Quality" Foreground="#606060" FontSize="10" FontFamily="Consolas"
+                   VerticalAlignment="Center"/>
+        <Slider x:Name="QualitySlider" Minimum="1" Maximum="100" Value="70" Width="80"
+                VerticalAlignment="Center" ValueChanged="OnQualityChanged"/>
+        <TextBlock x:Name="QualityLabel" Text="70" Foreground="#C0C0C0" FontSize="10"
+                   FontFamily="Consolas" VerticalAlignment="Center" Width="24"/>
+
+        <!-- FPS slider -->
+        <TextBlock Text="FPS" Foreground="#606060" FontSize="10" FontFamily="Consolas"
+                   VerticalAlignment="Center"/>
+        <Slider x:Name="FpsSlider" Minimum="1" Maximum="30" Value="10" Width="60"
+                VerticalAlignment="Center" ValueChanged="OnFpsChanged"/>
+        <TextBlock x:Name="FpsLabel" Text="10" Foreground="#C0C0C0" FontSize="10"
+                   FontFamily="Consolas" VerticalAlignment="Center" Width="24"/>
+
+        <!-- Stop All -->
+        <Button Content="&#x25A0; STOP" Click="OnStopClicked"
+                Background="#2D1414" Foreground="#DC2626"
+                Padding="8,4" FontSize="10" FontFamily="Consolas" FontWeight="Bold"
+                CornerRadius="4"/>
+      </StackPanel>
+    </Grid>
+
+    <!-- Video area -->
+    <Border Grid.Row="1" Background="#0F0F0F" BorderBrush="#333333" BorderThickness="1">
+      <Grid>
+        <!-- Placeholder shown when no stream is active -->
+        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center"
+                    IsVisible="{Binding !HasActiveStream}">
+          <TextBlock
+            Text="{Binding ActiveViewport, Converter={StaticResource ViewportIdToDisplayName}, StringFormat='{}{0} Feed'}"
+            Foreground="#606060" FontSize="20" FontWeight="Bold" Margin="0,24,0,0"
+            HorizontalAlignment="Center"/>
+          <TextBlock
+            Text="{Binding ActiveViewport, Converter={StaticResource ViewportIdToDisplayName}, StringFormat='Waiting for {0}'}"
+            Foreground="#404040" FontSize="14" HorizontalAlignment="Center"/>
+        </StackPanel>
+
+        <!-- Live video frame -->
+        <Image Source="{Binding CurrentFrame}" Stretch="Uniform"
+               IsVisible="{Binding HasActiveStream}"/>
+
+        <!-- Stream status overlay (top-left) -->
+        <Border Background="#1A1A1A80" BorderBrush="#333333" BorderThickness="1"
+                CornerRadius="6" Padding="10" Margin="12"
+                HorizontalAlignment="Left" VerticalAlignment="Top">
+          <StackPanel Spacing="3">
+            <TextBlock x:Name="StreamStatusText" Text="STOPPED"
+                       Foreground="#DC2626" FontSize="10"
+                       FontFamily="Consolas" FontWeight="Bold"/>
+            <TextBlock Text="{Binding ActiveViewport, StringFormat='source: {0}'}"
+                       Foreground="#606060" FontSize="9" FontFamily="Consolas"/>
+          </StackPanel>
+        </Border>
+      </Grid>
+    </Border>
+
+  </Grid>
+</UserControl>
