@@ -6,6 +6,7 @@
              xmlns:vm="clr-namespace:NASA_Lunabotics_Control_Hub.ViewModels"
              xmlns:telemetry="clr-namespace:NASA_Lunabotics_Control_Hub.Controls.Telemetry"
              xmlns:cameras="clr-namespace:NASA_Lunabotics_Control_Hub.Controls.Cameras"
+             xmlns:video="clr-namespace:NASA_Lunabotics_Control_Hub.Controls.Video"
              xmlns:sensors="clr-namespace:NASA_Lunabotics_Control_Hub.Controls.Sensors"
              xmlns:ctrl="clr-namespace:NASA_Lunabotics_Control_Hub.Controls.Controls"
              xmlns:manual="clr-namespace:NASA_Lunabotics_Control_Hub.Controls.Manual"
@@ -194,45 +195,7 @@
 
       <!-- CENTER VIEWPORT -->
       <Border Grid.Column="1" Margin="4" Classes="card-primary">
-        <Grid>
-          <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-          </Grid.RowDefinitions>
-
-          <!-- Viewport Header -->
-          <TextBlock Grid.Row="0"
-                     Text="{Binding ActiveViewport, Converter={StaticResource ViewportIdToDisplayName}}"
-                     Classes="section-header" HorizontalAlignment="Center" Margin="0,0,0,8" />
-
-          <!-- Viewport Content -->
-          <Border Grid.Row="1" Background="#0F0F0F" BorderBrush="#333333" BorderThickness="1">
-            <Grid>
-              <!-- Single placeholder that shows what's active -->
-              <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                <TextBlock
-                  Text="{Binding ActiveViewport, Converter={StaticResource ViewportIdToDisplayName}, StringFormat='{}{0} Feed'}"
-                  Foreground="#606060" FontSize="20" FontWeight="Bold" Margin="0,24,0,0"
-                  HorizontalAlignment="Center" />
-                <TextBlock
-                  Text="{Binding ActiveViewport, Converter={StaticResource ViewportIdToDisplayName}, StringFormat='Waiting for {0}'}"
-                  Foreground="#404040" FontSize="14" HorizontalAlignment="Center" />
-              </StackPanel>
-            </Grid>
-          </Border>
-
-          <!-- Viewport stats overlay -->
-          <Border Background="#1A1A1A80" BorderBrush="#333333" BorderThickness="1"
-                  CornerRadius="6" Padding="10" Margin="12" HorizontalAlignment="Left"
-                  VerticalAlignment="Top">
-            <StackPanel Spacing="3">
-              <TextBlock Text="DISCONNECTED" Foreground="#DC2626" FontSize="10"
-                         FontFamily="Consolas" FontWeight="Bold" />
-              <TextBlock Text="Coverage: -- m²" Foreground="#606060" FontSize="9"
-                         FontFamily="Consolas" />
-            </StackPanel>
-          </Border>
-        </Grid>
+        <video:VideoPanel x:Name="VideoPanel" Margin="12"/>
       </Border>
 
       <!-- RIGHT PANEL -->
@@ -249,25 +212,29 @@
           <!-- Near Cameras -->
           <Grid Grid.Row="2" RowDefinitions="Auto,*">
             <TextBlock Grid.Row="0" Text="Near Cameras" Classes="section-header"/>
-            <Grid Grid.Row="1" ColumnDefinitions="*,3,*" RowDefinitions="*,3,*,3,*">
+            <Grid Grid.Row="1" ColumnDefinitions="*,3,*" RowDefinitions="*,3,*,3,*,3,Auto">
               <cameras:CameraStatusCard Grid.Row="0" Grid.Column="0" CameraName="Depth Camera" CameraType="Depth"
-                                        StatusText="No Data" ViewportId="depth_cam"
+                                        StatusText="No Data" ViewportId="depth_cam" SourceId="0"
                                         IsActive="{Binding ActiveViewport, Converter={StaticResource ViewportIdToIsActive}, ConverterParameter=depth_cam}"/>
               <cameras:CameraStatusCard Grid.Row="0" Grid.Column="2" CameraName="Left Side" CameraType="RGB"
-                                        StatusText="No Data" ViewportId="left_side"
+                                        StatusText="No Data" ViewportId="left_side" SourceId="1"
                                         IsActive="{Binding ActiveViewport, Converter={StaticResource ViewportIdToIsActive}, ConverterParameter=left_side}"/>
               <cameras:CameraStatusCard Grid.Row="2" Grid.Column="0" CameraName="Left Front" CameraType="RGB"
-                                        StatusText="No Data" ViewportId="left_front"
+                                        StatusText="No Data" ViewportId="left_front" SourceId="2"
                                         IsActive="{Binding ActiveViewport, Converter={StaticResource ViewportIdToIsActive}, ConverterParameter=left_front}"/>
               <cameras:CameraStatusCard Grid.Row="2" Grid.Column="2" CameraName="Right Side" CameraType="RGB"
-                                        StatusText="No Data" ViewportId="right_side"
+                                        StatusText="No Data" ViewportId="right_side" SourceId="3"
                                         IsActive="{Binding ActiveViewport, Converter={StaticResource ViewportIdToIsActive}, ConverterParameter=right_side}"/>
               <cameras:CameraStatusCard Grid.Row="4" Grid.Column="0" CameraName="Right Front" CameraType="RGB"
-                                        StatusText="No Data" ViewportId="right_front"
+                                        StatusText="No Data" ViewportId="right_front" SourceId="4"
                                         IsActive="{Binding ActiveViewport, Converter={StaticResource ViewportIdToIsActive}, ConverterParameter=right_front}"/>
               <cameras:CameraStatusCard Grid.Row="4" Grid.Column="2" CameraName="Back Rear" CameraType="RGB"
-                                        StatusText="No Data" ViewportId="back_rear"
+                                        StatusText="No Data" ViewportId="back_rear" SourceId="5"
                                         IsActive="{Binding ActiveViewport, Converter={StaticResource ViewportIdToIsActive}, ConverterParameter=back_rear}"/>
+              <cameras:CameraStatusCard Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2"
+                                        CameraName="Mosaic" CameraType="All"
+                                        StatusText="All Cameras" ViewportId="mosaic" SourceId="6"
+                                        IsActive="{Binding ActiveViewport, Converter={StaticResource ViewportIdToIsActive}, ConverterParameter=mosaic}"/>
             </Grid>
           </Grid>
 
@@ -276,16 +243,16 @@
             <TextBlock Grid.Row="0" Text="Far Cameras (April Tags)" Classes="section-header"/>
             <Grid Grid.Row="1" ColumnDefinitions="*,3,*" RowDefinitions="*,3,*">
               <cameras:CameraStatusCard Grid.Row="0" Grid.Column="0" CameraName="Front" CameraType="AprilTag"
-                                        StatusText="No Tag" ViewportId="far_front"
+                                        StatusText="No Tag" ViewportId="far_front" IsStreamable="False"
                                         IsActive="{Binding ActiveViewport, Converter={StaticResource ViewportIdToIsActive}, ConverterParameter=far_front}"/>
               <cameras:CameraStatusCard Grid.Row="0" Grid.Column="2" CameraName="Right" CameraType="AprilTag"
-                                        StatusText="No Tag" ViewportId="far_right"
+                                        StatusText="No Tag" ViewportId="far_right" IsStreamable="False"
                                         IsActive="{Binding ActiveViewport, Converter={StaticResource ViewportIdToIsActive}, ConverterParameter=far_right}"/>
               <cameras:CameraStatusCard Grid.Row="2" Grid.Column="0" CameraName="Back" CameraType="AprilTag"
-                                        StatusText="No Tag" ViewportId="far_back"
+                                        StatusText="No Tag" ViewportId="far_back" IsStreamable="False"
                                         IsActive="{Binding ActiveViewport, Converter={StaticResource ViewportIdToIsActive}, ConverterParameter=far_back}"/>
               <cameras:CameraStatusCard Grid.Row="2" Grid.Column="2" CameraName="Left" CameraType="AprilTag"
-                                        StatusText="No Tag" ViewportId="far_left"
+                                        StatusText="No Tag" ViewportId="far_left" IsStreamable="False"
                                         IsActive="{Binding ActiveViewport, Converter={StaticResource ViewportIdToIsActive}, ConverterParameter=far_left}"/>
             </Grid>
           </Grid>
