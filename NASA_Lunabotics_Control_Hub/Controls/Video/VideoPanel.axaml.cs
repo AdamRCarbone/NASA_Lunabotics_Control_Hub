@@ -68,7 +68,9 @@ public partial class VideoPanel : UserControl
             if (_vm == null) return;
             try
             {
+                var oldFrame = _vm.CurrentFrame;
                 _vm.CurrentFrame = new Bitmap(new MemoryStream(jpeg));
+                oldFrame?.Dispose();
 
                 _frameCount++;
                 var elapsed = (DateTime.UtcNow - _fpsWindowStart).TotalSeconds;
@@ -129,6 +131,7 @@ public partial class VideoPanel : UserControl
 
     private void ScheduleResend()
     {
+        if (_vm?.ActiveStreamSourceId == null) return;
         _debounce.Stop();
         _debounce.Start();
     }
