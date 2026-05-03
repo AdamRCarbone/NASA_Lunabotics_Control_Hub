@@ -4,6 +4,7 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 using NASA_Lunabotics_Control_Hub.Components;
 using ReactiveUI;
@@ -22,6 +23,8 @@ namespace NASA_Lunabotics_Control_Hub.ViewModels
         private ModeState _faultResetStatus = ModeState.Idle;
         private bool _isTransitioning = false;
         private string _activeViewport = "map";
+        private byte? _activeStreamSourceId;
+        private Bitmap? _currentFrame;
 
         public void SetConnected(bool connected) { IsConnected = connected; }
         public void SetCurrentMode(string mode) { CurrentMode = mode; }
@@ -46,6 +49,26 @@ namespace NASA_Lunabotics_Control_Hub.ViewModels
             get => _activeViewport;
             private set => this.RaiseAndSetIfChanged(ref _activeViewport, value);
         }
+
+        public byte? ActiveStreamSourceId
+        {
+            get => _activeStreamSourceId;
+            private set => this.RaiseAndSetIfChanged(ref _activeStreamSourceId, value);
+        }
+
+        public Bitmap? CurrentFrame
+        {
+            get => _currentFrame;
+            set
+            {
+                this.RaiseAndSetIfChanged(ref _currentFrame, value);
+                this.RaisePropertyChanged(nameof(HasActiveStream));
+            }
+        }
+
+        public bool HasActiveStream => _currentFrame != null;
+
+        public event Action<byte>? VideoStreamRequested;
 
         public MainViewModel()
         {
@@ -130,6 +153,18 @@ namespace NASA_Lunabotics_Control_Hub.ViewModels
         public void OnViewportSelected(string viewportId)
         {
             ActiveViewport = viewportId;
+        }
+
+        public void RequestVideoStream(byte sourceId)
+        {
+            ActiveStreamSourceId = sourceId;
+            VideoStreamRequested?.Invoke(sourceId);
+        }
+
+        public void StopStream()
+        {
+            ActiveStreamSourceId = null;
+            CurrentFrame = null;
         }
     }
 
