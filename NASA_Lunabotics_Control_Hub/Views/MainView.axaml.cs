@@ -79,10 +79,16 @@ namespace NASA_Lunabotics_Control_Hub.Views
                 _mainViewModel.SetConnected(isConnected);
                 UpdateConnectButton(isConnected);
 
-                if (!isConnected)
+                var videoPanel = this.FindControl<Controls.Video.VideoPanel>("VideoPanel");
+                if (isConnected)
+                {
+                    if (videoPanel != null) videoPanel.NetworkClient = _networkClient;
+                }
+                else
                 {
                     // Clear mode state so buttons go idle on disconnect
                     _mainViewModel.SetModeState("", NASA_Lunabotics_Control_Hub.ViewModels.ModeState.Idle);
+                    videoPanel?.ClearStream();
                 }
             });
         }
