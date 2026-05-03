@@ -20,6 +20,10 @@ namespace NASA_Lunabotics_Control_Hub.Components
         public const byte TYPE_ACK = 0x41;          // 'A'
         public const byte TYPE_FAULT = 0x46;        // 'F'
         public const byte TYPE_MANIPULATOR = 0x4D;  // 'M'
+        public const byte TYPE_VIDEO = 0x56;        // 'V'
+        public const byte VARIANT_RGB = 0x52;       // 'R'
+        public const byte VARIANT_DEPTH = 0x44;     // 'D'
+        public const byte VIDEO_SOURCE_STOP = 0xFF;
 
         // State/Mode codes
         public const byte STATE_STANDBY = 0x30; // '0'
@@ -89,6 +93,24 @@ namespace NASA_Lunabotics_Control_Hub.Components
             frame[2] = 1;
             frame[3] = keyBitfield;
             frame[4] = CalcCrc8(frame, 4);
+            return frame;
+        }
+
+        /// <summary>
+        /// Encode a video stream request (Ground → Rover)
+        /// Format: [O][V][4][source_id][variant][quality][fps][CRC8] — 8 bytes
+        /// </summary>
+        public static byte[] EncodeVideoRequest(byte sourceId, byte variant, byte quality, byte fps)
+        {
+            var frame = new byte[8];
+            frame[0] = MAGIC;
+            frame[1] = TYPE_VIDEO;
+            frame[2] = 0x04;
+            frame[3] = sourceId;
+            frame[4] = variant;
+            frame[5] = quality;
+            frame[6] = fps;
+            frame[7] = CalcCrc8(frame, 7);
             return frame;
         }
 

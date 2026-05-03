@@ -25,6 +25,7 @@ public class ViewportIdToDisplayNameConverter : IValueConverter
                 "far_right" => "Far Right Camera",
                 "far_back" => "Far Back Camera",
                 "far_left" => "Far Left Camera",
+                "mosaic" => "Mosaic (All Cameras)",
                 _ => "Viewport"
             };
         }
