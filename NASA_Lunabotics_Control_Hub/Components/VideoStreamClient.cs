@@ -15,6 +15,7 @@ public class VideoStreamClient : IDisposable
     private ushort _currentSeq;
     private bool _hasCurrentSeq;
     private readonly Dictionary<ushort, FrameBuffer> _pending = new();
+    private readonly object _pendingLock = new();
 
     public event Action<byte[]>? FrameDecoded;
 
@@ -27,6 +28,8 @@ public class VideoStreamClient : IDisposable
 
     public void Start()
     {
+        lock (_pendingLock) { _pending.Clear(); }
+        _hasCurrentSeq = false;
         _cts = new CancellationTokenSource();
         _udp = new UdpClient(new IPEndPoint(IPAddress.Any, 5002));
         Task.Run(ReceiveLoop, _cts.Token);
@@ -38,7 +41,6 @@ public class VideoStreamClient : IDisposable
         _udp?.Close();
         _udp?.Dispose();
         _udp = null;
-        _pending.Clear();
         _hasCurrentSeq = false;
     }
 
@@ -74,46 +76,48 @@ public class VideoStreamClient : IDisposable
 
         if (jpegLen <= 0 || chunkIdx >= chunkTotal || chunkTotal == 0) return;
 
-        // New seq while a different one is in-flight — discard the incomplete frame
-        if (_hasCurrentSeq && seq != _currentSeq)
+        byte[]? jpeg = null;
+        lock (_pendingLock)
         {
-            _pending.Remove(_currentSeq);
-        }
-        _currentSeq = seq;
-        _hasCurrentSeq = true;
+            // New seq while a different one is in-flight — discard the incomplete frame
+            if (_hasCurrentSeq && seq != _currentSeq)
+                _pending.Remove(_currentSeq);
+            _currentSeq = seq;
+            _hasCurrentSeq = true;
 
-        if (!_pending.TryGetValue(seq, out var buf))
-        {
-            buf = new FrameBuffer
+            if (!_pending.TryGetValue(seq, out var buf))
             {
-                Chunks = new byte[chunkTotal][],
-                Total = chunkTotal,
-                Received = 0
-            };
-        }
+                buf = new FrameBuffer
+                {
+                    Chunks = new byte[chunkTotal][],
+                    Total = chunkTotal,
+                    Received = 0
+                };
+            }
 
-        if (buf.Chunks[chunkIdx] != null) return; // duplicate chunk, skip
+            if (buf.Chunks[chunkIdx] != null) return; // duplicate chunk, skip
 
-        var chunk = new byte[jpegLen];
-        Array.Copy(data, 8, chunk, 0, jpegLen);
-        buf.Chunks[chunkIdx] = chunk;
-        buf.Received++;
-        _pending[seq] = buf;
+            var chunk = new byte[jpegLen];
+            Array.Copy(data, 8, chunk, 0, jpegLen);
+            buf.Chunks[chunkIdx] = chunk;
+            buf.Received++;
+            _pending[seq] = buf;
 
-        if (buf.Received < buf.Total) return;
+            if (buf.Received < buf.Total) return;
 
-        // Frame complete — concatenate and fire
-        _pending.Remove(seq);
-        _hasCurrentSeq = false;
+            // Frame complete — concatenate and fire outside the lock
+            _pending.Remove(seq);
+            _hasCurrentSeq = false;
 
-        int totalLen = 0;
-        foreach (var c in buf.Chunks) totalLen += c.Length;
-        var jpeg = new byte[totalLen];
-        int offset = 0;
-        foreach (var c in buf.Chunks)
-        {
-            Array.Copy(c, 0, jpeg, offset, c.Length);
-            offset += c.Length;
+            int totalLen = 0;
+            foreach (var c in buf.Chunks) totalLen += c.Length;
+            jpeg = new byte[totalLen];
+            int offset = 0;
+            foreach (var c in buf.Chunks)
+            {
+                Array.Copy(c, 0, jpeg, offset, c.Length);
+                offset += c.Length;
+            }
         }
         FrameDecoded?.Invoke(jpeg);
     }

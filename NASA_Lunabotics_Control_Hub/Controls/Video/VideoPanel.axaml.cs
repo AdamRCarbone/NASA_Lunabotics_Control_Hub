@@ -56,6 +56,7 @@ public partial class VideoPanel : UserControl
     private void HandleVideoStreamRequested(byte sourceId)
     {
         if (_networkClient == null) return;
+        _videoClient.Stop();
         _videoClient.Start();
         _ = _networkClient.SendVideoRequestAsync(sourceId, _variant, (byte)_quality, (byte)_fps);
         UpdateStatusText("CONNECTING...", Brushes.Orange);
