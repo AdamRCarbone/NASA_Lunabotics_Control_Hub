@@ -368,19 +368,24 @@ git commit -m "feat: add stream state and VideoStreamRequested event to MainView
 
 ---
 
-## Task 5: CameraStatusCard — add SourceId, update click handler
+## Task 5: CameraStatusCard — add SourceId + IsStreamable, update click handler
 
 **Files:**
 - Modify: `NASA_Lunabotics_Control_Hub/Controls/Cameras/CameraStatusCard.axaml.cs`
+
+Far cameras (AprilTag detection) must remain clickable as viewport selectors but must NOT trigger video stream requests — the rover protocol doesn't support streaming from them yet. The `IsStreamable` property controls this. It defaults to `true` so existing near cameras and Mosaic work without extra markup; far cameras get `IsStreamable="False"` in XAML.
 
 - [ ] **Step 1: Add SourceId StyledProperty after the ViewportIdProperty declaration (after line 25)**
 
 ```csharp
 public static readonly StyledProperty<byte> SourceIdProperty =
     AvaloniaProperty.Register<CameraStatusCard, byte>(nameof(SourceId));
+
+public static readonly StyledProperty<bool> IsStreamableProperty =
+    AvaloniaProperty.Register<CameraStatusCard, bool>(nameof(IsStreamable), defaultValue: true);
 ```
 
-- [ ] **Step 2: Add SourceId CLR property after the `ViewportId` property (after line 61)**
+- [ ] **Step 2: Add SourceId and IsStreamable CLR properties after the `ViewportId` property (after line 61)**
 
 ```csharp
 public byte SourceId
@@ -388,9 +393,15 @@ public byte SourceId
     get => GetValue(SourceIdProperty);
     set => SetValue(SourceIdProperty, value);
 }
+
+public bool IsStreamable
+{
+    get => GetValue(IsStreamableProperty);
+    set => SetValue(IsStreamableProperty, value);
+}
 ```
 
-- [ ] **Step 3: Update RootBorder_PointerPressed to also call RequestVideoStream**
+- [ ] **Step 3: Update RootBorder_PointerPressed to guard with IsStreamable**
 
 Replace the existing `RootBorder_PointerPressed` method (lines 107-115) with:
 
@@ -400,7 +411,8 @@ private void RootBorder_PointerPressed(object? sender, PointerPressedEventArgs e
     if (DataContext is MainViewModel vm)
     {
         vm.OnViewportSelected(ViewportId);
-        vm.RequestVideoStream(SourceId);
+        if (IsStreamable)
+            vm.RequestVideoStream(SourceId);
     }
 }
 ```
@@ -415,7 +427,7 @@ dotnet build NASA_Lunabotics_Control_Hub/NASA_Lunabotics_Control_Hub.csproj
 
 ```bash
 git add NASA_Lunabotics_Control_Hub/Controls/Cameras/CameraStatusCard.axaml.cs
-git commit -m "feat: add SourceId to CameraStatusCard and wire RequestVideoStream on click"
+git commit -m "feat: add SourceId and IsStreamable to CameraStatusCard; guard stream request"
 ```
 
 ---
@@ -762,17 +774,41 @@ The Near Cameras `<Grid>` currently has `RowDefinitions="*,3,*,3,*"`. Change it 
 
 Note: `CameraType="All"` will hit the `else` branch of `UpdateVisualState()` and show grey styling (neutral). That's fine for now.
 
-- [ ] **Step 5: Build and confirm no errors**
+- [ ] **Step 5: Add IsStreamable="False" to the four far camera cards**
+
+The far cameras (AprilTag detection) remain fully clickable as viewport selectors but skip stream requests. Find the Far Cameras section in `MainView.axaml` and add `IsStreamable="False"` to each card:
+
+```xml
+<cameras:CameraStatusCard Grid.Row="0" Grid.Column="0" CameraName="Front" CameraType="AprilTag"
+                           StatusText="No Tag" ViewportId="far_front" IsStreamable="False"
+                           IsActive="{Binding ActiveViewport, Converter={StaticResource ViewportIdToIsActive}, ConverterParameter=far_front}"/>
+
+<cameras:CameraStatusCard Grid.Row="0" Grid.Column="2" CameraName="Right" CameraType="AprilTag"
+                           StatusText="No Tag" ViewportId="far_right" IsStreamable="False"
+                           IsActive="{Binding ActiveViewport, Converter={StaticResource ViewportIdToIsActive}, ConverterParameter=far_right}"/>
+
+<cameras:CameraStatusCard Grid.Row="2" Grid.Column="0" CameraName="Back" CameraType="AprilTag"
+                           StatusText="No Tag" ViewportId="far_back" IsStreamable="False"
+                           IsActive="{Binding ActiveViewport, Converter={StaticResource ViewportIdToIsActive}, ConverterParameter=far_back}"/>
+
+<cameras:CameraStatusCard Grid.Row="2" Grid.Column="2" CameraName="Left" CameraType="AprilTag"
+                           StatusText="No Tag" ViewportId="far_left" IsStreamable="False"
+                           IsActive="{Binding ActiveViewport, Converter={StaticResource ViewportIdToIsActive}, ConverterParameter=far_left}"/>
+```
+
+No `SourceId` needed on these — they'll never trigger a stream request.
+
+- [ ] **Step 6: Build and confirm no errors**
 
 ```
 dotnet build NASA_Lunabotics_Control_Hub/NASA_Lunabotics_Control_Hub.csproj
 ```
 
-- [ ] **Step 6: Commit**
+- [ ] **Step 7: Commit**
 
 ```bash
 git add NASA_Lunabotics_Control_Hub/Views/MainView.axaml
-git commit -m "feat: replace viewport placeholder with VideoPanel; add Mosaic camera card"
+git commit -m "feat: replace viewport placeholder with VideoPanel; add Mosaic card; disable stream on far cameras"
 ```
 
 ---
@@ -861,41 +897,4 @@ git commit -m "feat: inject VideoPanel.NetworkClient on connect; clear stream on
 
 - **Spec coverage:** All protocol requirements covered (variant, quality, fps, CRC, stop-all). UDP reassembly matches spec (discard incomplete on new seq). Debounce 300ms. No auto-start on launch. Sliders pre-configurable before first click. ✓
 - **Type consistency:** `byte sourceId` used throughout (Protocol → NetworkModeClient → VideoPanel → CameraStatusCard → MainViewModel). `byte? ActiveStreamSourceId` nullable. `Bitmap?` for nullable frame. ✓
-- **Far cameras** (far_front, far_right, far_back, far_left) do NOT have SourceId set in this plan because they are April Tag detection cameras and clicking them should NOT send a video stream request. Their `RootBorder_PointerPressed` will call `vm.RequestVideoStream(0)` (default byte value) — which would accidentally start an orbbec stream. **Fix:** either set a sentinel SourceId or skip the `RequestVideoStream` call for these cards. See note below.
-
-### ⚠️ Fix Required — Far Cameras Should Not Trigger Streams
-
-The far cameras use AprilTag detection, not JPEG streaming. Their CameraStatusCard click must not call `RequestVideoStream`. Two options:
-
-**Option A (recommended):** Add a `bool IsStreamable` StyledProperty to `CameraStatusCard` defaulting to `true`. Check it in `RootBorder_PointerPressed` before calling `RequestVideoStream`.
-
-**Option B:** Set `SourceId="255"` on far cameras. Since 255 = stop-all, clicking them would accidentally stop the stream. Bad.
-
-Use Option A. Add this before Task 8 commits:
-
-In `CameraStatusCard.axaml.cs`, add:
-```csharp
-public static readonly StyledProperty<bool> IsStreamableProperty =
-    AvaloniaProperty.Register<CameraStatusCard, bool>(nameof(IsStreamable), defaultValue: true);
-
-public bool IsStreamable
-{
-    get => GetValue(IsStreamableProperty);
-    set => SetValue(IsStreamableProperty, value);
-}
-```
-
-Update `RootBorder_PointerPressed`:
-```csharp
-private void RootBorder_PointerPressed(object? sender, PointerPressedEventArgs e)
-{
-    if (DataContext is MainViewModel vm)
-    {
-        vm.OnViewportSelected(ViewportId);
-        if (IsStreamable)
-            vm.RequestVideoStream(SourceId);
-    }
-}
-```
-
-Set `IsStreamable="False"` on all four far camera cards in `MainView.axaml`.
+- **Far cameras** (far_front, far_right, far_back, far_left): remain clickable as viewport selectors; `IsStreamable="False"` prevents stream requests until the protocol supports them. Handled in Task 5 + Task 7. ✓
