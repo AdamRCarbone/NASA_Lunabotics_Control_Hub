@@ -38,7 +38,6 @@ public partial class VideoPanel : UserControl
         _debounce.Tick += OnDebounce;
 
         _videoClient.FrameDecoded += OnFrameDecoded;
-        _videoClient.Start();
 
         DataContextChanged += OnDataContextChanged;
     }
@@ -57,6 +56,7 @@ public partial class VideoPanel : UserControl
     private void HandleVideoStreamRequested(byte sourceId)
     {
         if (_networkClient == null) return;
+        _videoClient.Start();
         _ = _networkClient.SendVideoRequestAsync(sourceId, _variant, (byte)_quality, (byte)_fps);
         UpdateStatusText("CONNECTING...", Brushes.Orange);
     }
@@ -89,6 +89,7 @@ public partial class VideoPanel : UserControl
 
     public void ClearStream()
     {
+        _videoClient.Stop();
         _vm?.StopStream();
         UpdateStatusText("STOPPED", Brushes.Red);
     }
