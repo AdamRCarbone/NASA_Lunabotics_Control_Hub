@@ -1,0 +1,35 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             x:Class="NASA_Lunabotics_Control_Hub.Controls.Cameras.CameraStatusCard"
+             mc:Ignorable="d" d:DesignWidth="300" d:DesignHeight="60">
+    <Border x:Name="RootBorder" Classes="camera-status" Classes.active="{Binding IsActive, RelativeSource={RelativeSource AncestorType=UserControl}}" Padding="8" Margin="0,4" BorderBrush="#333333" BorderThickness="1" Background="#1A1A1A" PointerPressed="RootBorder_PointerPressed">
+        <Grid VerticalAlignment="Center">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                <TextBlock Text="{Binding CameraName, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                           Foreground="#C0C0C0" FontSize="12" FontWeight="Bold"/>
+                <TextBlock Text="{Binding CameraType, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                           Foreground="#606060" FontSize="8"/>
+            </StackPanel>
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                <Border Name="TypeBadge" Background="#00643C" Padding="6,3" CornerRadius="3">
+                    <TextBlock Name="TypeText"
+                               Text="{Binding CameraType, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                               Foreground="White" FontSize="8" FontWeight="Bold"/>
+                </Border>
+                <Border Name="StatusBadge" Background="#2D2D2D" Padding="6,3" CornerRadius="3">
+                    <TextBlock Name="StatusTextBlock"
+                               Text="{Binding StatusText, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                               Foreground="#606060" FontSize="8" FontWeight="Bold"/>
+                </Border>
+                <Border Name="Indicator" Width="8" Height="8" CornerRadius="4" Background="#606060"/>
+            </StackPanel>
+        </Grid>
+    </Border>
+</UserControl>

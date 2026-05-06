@@ -1,4 +1,4 @@
-﻿using Avalonia.Controls;
+using Avalonia.Controls;
 using Avalonia.Input;
 using NASA_Lunabotics_Control_Hub.Controls;
 using NASA_Lunabotics_Control_Hub.Views;
@@ -12,9 +12,12 @@ namespace NASA_Lunabotics_Control_Hub.Views
         public MainWindow()
         {
             InitializeComponent();
+            WindowState = WindowState.Maximized;
+            MinWidth = 1024;
+            MinHeight = 600;
             _mainView = Content as MainView;
-            this.KeyDown += MainWindow_KeyDown;
-            this.KeyUp += MainWindow_KeyUp;
+            this.AddHandler(InputElement.KeyDownEvent, MainWindow_KeyDown, Avalonia.Interactivity.RoutingStrategies.Tunnel);
+            this.AddHandler(InputElement.KeyUpEvent, MainWindow_KeyUp, Avalonia.Interactivity.RoutingStrategies.Tunnel);
         }
 
         private void InitializeComponent()
@@ -26,26 +29,34 @@ namespace NASA_Lunabotics_Control_Hub.Views
         {
             if (_mainView != null)
             {
+                _mainView.HandleKeyDown(e.Key);
+
                 var joystick1 = _mainView.FindControl<JoystickControl>("Joystick1");
                 var joystick2 = _mainView.FindControl<JoystickControl>("Joystick2");
 
                 joystick1?.HandleKeyDown(e.Key);
                 joystick2?.HandleKeyDown(e.Key);
             }
-            e.Handled = true;
+            if (e.Key is Key.W or Key.A or Key.S or Key.D
+                      or Key.Up or Key.Down or Key.Left or Key.Right)
+                e.Handled = true;
         }
 
         private void MainWindow_KeyUp(object sender, KeyEventArgs e)
         {
             if (_mainView != null)
             {
+                _mainView.HandleKeyUp(e.Key);
+
                 var joystick1 = _mainView.FindControl<JoystickControl>("Joystick1");
                 var joystick2 = _mainView.FindControl<JoystickControl>("Joystick2");
 
                 joystick1?.HandleKeyUp(e.Key);
                 joystick2?.HandleKeyUp(e.Key);
             }
-            e.Handled = true;
+            if (e.Key is Key.W or Key.A or Key.S or Key.D
+                      or Key.Up or Key.Down or Key.Left or Key.Right)
+                e.Handled = true;
         }
     }
 }

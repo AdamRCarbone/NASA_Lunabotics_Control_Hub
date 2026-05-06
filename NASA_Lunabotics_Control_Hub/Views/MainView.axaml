@@ -1,203 +1,373 @@
-<UserControl
-    x:Class="NASA_Lunabotics_Control_Hub.Views.MainView"
-    xmlns="https://github.com/avaloniaui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:controls="clr-namespace:NASA_Lunabotics_Control_Hub.Controls"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:vm="clr-namespace:NASA_Lunabotics_Control_Hub.ViewModels"
-    d:DesignHeight="1080"
-    d:DesignWidth="1920"
-    x:DataType="vm:MainViewModel"
-    mc:Ignorable="d">
+<UserControl x:Class="NASA_Lunabotics_Control_Hub.Views.MainView"
+             xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:NASA_Lunabotics_Control_Hub.ViewModels"
+             xmlns:telemetry="clr-namespace:NASA_Lunabotics_Control_Hub.Controls.Telemetry"
+             xmlns:cameras="clr-namespace:NASA_Lunabotics_Control_Hub.Controls.Cameras"
+             xmlns:video="clr-namespace:NASA_Lunabotics_Control_Hub.Controls.Video"
+             xmlns:sensors="clr-namespace:NASA_Lunabotics_Control_Hub.Controls.Sensors"
+             xmlns:ctrl="clr-namespace:NASA_Lunabotics_Control_Hub.Controls.Controls"
+             xmlns:manual="clr-namespace:NASA_Lunabotics_Control_Hub.Controls.Manual"
+             xmlns:converters="clr-namespace:NASA_Lunabotics_Control_Hub.Converters"
+             xmlns:joy="clr-namespace:NASA_Lunabotics_Control_Hub.Controls"
+             mc:Ignorable="d" d:DesignWidth="1920" d:DesignHeight="1080"
+             x:DataType="vm:MainViewModel">
+  <Design.DataContext>
+    <vm:MainViewModel />
+  </Design.DataContext>
+  <Grid Background="#121212">
+    <!-- Hidden JoystickControl for key tracking -->
+    <joy:JoystickControl x:Name="KeyTrackingJoystick" IsVisible="False"
+                         UpKey="W" DownKey="S" LeftKey="A" RightKey="D" />
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="*" />
+      <RowDefinition Height="Auto" />
+    </Grid.RowDefinitions>
 
-    <Design.DataContext>
-        <vm:MainViewModel />
-    </Design.DataContext>
+    <!-- TOP HEADER -->
+    <Border Background="#1A1A1A" Padding="12,8" BorderBrush="#00643C" BorderThickness="0,0,0,2">
+      <Grid VerticalAlignment="Center">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="*" />
+          <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
 
-    <Grid Background="Black">
+        <!-- Left panel: Logo, Connection Status, Network Selector -->
+        <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+          <!-- OCTANE Logo - styled as a badge -->
+          <Border Background="#00643C" CornerRadius="3" Padding="10,4">
+            <TextBlock Text="OCTANE" Foreground="White" FontSize="13" FontWeight="Bold" VerticalAlignment="Center"
+                       FontFamily="Arial Rounded MT Bold" 
+                       TextAlignment="Center"/>
+          </Border>
 
-
-        <Border Classes="OutlineBorder">
+          <!-- Connection status with heartbeat pulse ring -->
+          <Border Name="ConnectionBorder" Background="#1A1F16" BorderBrush="#333333"
+                  BorderThickness="1" Padding="6,4" CornerRadius="7" VerticalAlignment="Center">
             <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <!--  Header  -->
-                    <RowDefinition Height="*" />
-                    <!--  Main Content  -->
-                </Grid.RowDefinitions>
-
-                <!--  Header Section  -->
-                <Border Grid.Row="0" Classes="OutlineBorder">
-                    <TextBlock Text="Test" />
-                </Border>
-
-                <!--  Main Content Grid  -->
-                <Grid Grid.Row="1">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="1.25*" />
-                        <ColumnDefinition Width="0.5*" />
-                        <ColumnDefinition Width="0.5*" />
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="0.375*" />
-                        <RowDefinition Height="0.375*" />
-                        <RowDefinition Height="*" />
-                    </Grid.RowDefinitions>
-
-                    <!--  Placeholder Panels  -->
-                    <Border
-                        Grid.Row="0"
-                        Grid.RowSpan="2"
-                        Grid.Column="0"
-                        Classes="OutlineBorder" />
-                    <Border
-                        Grid.Row="0"
-                        Grid.RowSpan="2"
-                        Grid.Column="1"
-                        Classes="OutlineBorder" />
-                    <Border
-                        Grid.Row="0"
-                        Grid.RowSpan="2"
-                        Grid.Column="2"
-                        Classes="OutlineBorder" />
-                    <Border
-                        Grid.Row="0"
-                        Grid.RowSpan="2"
-                        Grid.Column="3"
-                        Classes="OutlineBorder" />
-
-                    <!--  Bottom Row Panels  -->
-                    <Border
-                        Grid.Row="2"
-                        Grid.Column="0"
-                        Classes="OutlineBorder" />
-                    <Border
-                        Grid.Row="2"
-                        Grid.Column="1"
-                        Classes="OutlineBorder">
-
-                        <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="2*" />
-                                <RowDefinition Height="*" />
-                            </Grid.RowDefinitions>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
-
-                            <!--  Left Joystick (WASD)  -->
-                            <controls:JoystickControl
-                                x:Name="Joystick1"
-                                Grid.Row="0"
-                                Grid.Column="0"
-                                Margin="20"
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center"
-                                BoundBackground="LightGray"
-                                BoundBorderBrush="Gray"
-                                BoundBorderThickness="8"
-                                BoundSize="200"
-                                Decay="0.25"
-                                DownKey="S"
-                                KnobBorderSize="8"
-                                KnobFill="DarkGray"
-                                KnobSize="60"
-                                KnobStroke="Black"
-                                LeftKey="A"
-                                MaxSpeed="0.5"
-                                RightKey="D"
-                                Softening="0.5"
-                                UpKey="W" />
-
-                            <!--  Right Joystick (Arrow Keys)  -->
-                            <controls:JoystickControl
-                                x:Name="Joystick2"
-                                Grid.Row="0"
-                                Grid.Column="1"
-                                Margin="20"
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center"
-                                BoundBackground="LightGray"
-                                BoundBorderBrush="Gray"
-                                BoundBorderThickness="8"
-                                BoundSize="200"
-                                Decay="0.25"
-                                DownKey="Down"
-                                KnobBorderSize="8"
-                                KnobFill="DarkGray"
-                                KnobSize="60"
-                                KnobStroke="Black"
-                                LeftKey="Left"
-                                MaxSpeed="0.5"
-                                RightKey="Right"
-                                Softening="0.5"
-                                UpKey="Up" />
-
-                            <!--  Coordinate Display for Joystick1  -->
-                            <StackPanel
-                                Grid.Row="1"
-                                Grid.Column="0"
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center"
-                                Orientation="Horizontal"
-                                Spacing="20">
-                                <TextBlock Classes="DataText" Text="X:" />
-                                <TextBlock
-                                    Classes="DataText"
-                                    FontWeight="Bold"
-                                    Text="{Binding ElementName=Joystick1, Path=Position.X}" />
-                                <TextBlock Classes="DataText" Text="Y:" />
-                                <TextBlock
-                                    Classes="DataText"
-                                    FontWeight="Bold"
-                                    Text="{Binding ElementName=Joystick1, Path=Position.Y}" />
-                            </StackPanel>
-
-                            <!--  Coordinate Display for Joystick2  -->
-                            <StackPanel
-                                Grid.Row="1"
-                                Grid.Column="1"
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center"
-                                Orientation="Horizontal"
-                                Spacing="20">
-                                <TextBlock Classes="DataText" Text="X:" />
-                                <TextBlock
-                                    Classes="DataText"
-                                    FontWeight="Bold"
-                                    Text="{Binding ElementName=Joystick2, Path=Position.X}" />
-                                <TextBlock Classes="DataText" Text="Y:" />
-                                <TextBlock
-                                    Classes="DataText"
-                                    FontWeight="Bold"
-                                    Text="{Binding ElementName=Joystick2, Path=Position.Y}" />
-                                <TextBlock
-                                    Classes="DataText"
-                                    FontWeight="Bold"
-                                    Text="{Binding SendString}" />
-                            </StackPanel>
-                        </Grid>
-
-
-                    </Border>
-
-                    <Border
-                        Grid.Row="2"
-                        Grid.Column="2"
-                        Grid.ColumnSpan="2"
-                        Classes="OutlineBorder" />
-                </Grid>
+              <!-- Outer ring for heartbeat pulse (simplified, no animation in XAML) -->
+              <Border Name="HeartbeatRing" BorderBrush="Orange" BorderThickness="3"
+                      CornerRadius="9" Opacity="0" Margin="-3,-3,-3,-3" />
+              <StackPanel Orientation="Horizontal" Spacing="4">
+                <Border Width="10" Height="10" CornerRadius="5"
+                        Background="{Binding ConnectionColor}" />
+                <TextBlock Text="{Binding ConnectionStatusText}"
+                           Foreground="{Binding ConnectionColor}" FontSize="10"
+                           FontWeight="Bold" FontFamily="Arial Rounded MT Bold"
+                           VerticalAlignment="Center" />
+              </StackPanel>
             </Grid>
+          </Border>
+
+          <!-- Network selector - same style as connection status -->
+          <Border Background="#1A1F16" BorderBrush="#333333" BorderThickness="1"
+                  Padding="6,4" CornerRadius="7" VerticalAlignment="Center">
+            <StackPanel Orientation="Horizontal" Spacing="4">
+              <TextBlock Text="Network:" Foreground="#808080" FontSize="10"
+                         FontWeight="Bold" FontFamily="Arial Rounded MT Bold"
+                         VerticalAlignment="Center" />
+              <ComboBox Name="NetworkSelector" Width="140" Height="18"
+                        SelectionChanged="OnNetworkSelected"
+                        Background="#2D2D2D" BorderBrush="#333333"
+                        Focusable="False" IsTabStop="False" />
+            </StackPanel>
+          </Border>
+
+          <!-- Rover address input -->
+          <Border Background="#1A1F16" BorderBrush="#333333" BorderThickness="1"
+                  Padding="6,4" CornerRadius="7" VerticalAlignment="Center">
+            <StackPanel Orientation="Horizontal" Spacing="4">
+              <TextBlock Text="Rover:" Foreground="#808080" FontSize="10"
+                         FontWeight="Bold" FontFamily="Arial Rounded MT Bold"
+                         VerticalAlignment="Center" />
+              <TextBox x:Name="RoverAddressInput" Width="140" Height="22"
+                       Text="octane.local"
+                       Background="#2D2D2D" BorderBrush="#333333"
+                       FontSize="10" FontFamily="Consolas"
+                       Foreground="White" VerticalContentAlignment="Center"
+                       Focusable="True" IsTabStop="True" />
+            </StackPanel>
+          </Border>
+
+          <!-- Connect / Disconnect button -->
+          <Button x:Name="ConnectButton" Padding="14,0" Height="28"
+                  Click="ConnectButton_Click"
+                  Background="#00643C" Foreground="White"
+                  FontSize="11" FontWeight="Bold" FontFamily="Arial Rounded MT Bold"
+                  CornerRadius="6" VerticalAlignment="Center" HorizontalContentAlignment="Center"
+                  VerticalContentAlignment="Center" Content="Connect"/>
+        </StackPanel>
+
+        <!-- Mode Selection with LED indicators -->
+        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10"
+                    HorizontalAlignment="Center" VerticalAlignment="Center">
+          <Button Width="130" Height="40" Classes="btn-secondary" Background="#2D2D2D"
+                  Click="StandbyButton_Click"
+                  Foreground="{Binding StandbyStatus, Converter={StaticResource ModeStateToBrush}, ConverterParameter=text}">
+            <Grid>
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="12" />
+              </Grid.ColumnDefinitions>
+              <TextBlock Grid.Column="0" Text="Standby" TextAlignment="Center"
+                         VerticalAlignment="Center" />
+              <Border Grid.Column="1" Width="12" Height="12" CornerRadius="6"
+                      Background="{Binding StandbyStatus, Converter={StaticResource ModeStateToBrush}}" />
+            </Grid>
+          </Button>
+          <Button Width="130" Height="40" Classes="btn-secondary" Background="#2D2D2D"
+                  Click="ManualButton_Click"
+                  Foreground="{Binding ManualStatus, Converter={StaticResource ModeStateToBrush}, ConverterParameter=text}">
+            <Grid>
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="12" />
+              </Grid.ColumnDefinitions>
+              <TextBlock Grid.Column="0" Text="Manual" TextAlignment="Center"
+                         VerticalAlignment="Center" />
+              <Border Grid.Column="1" Width="12" Height="12" CornerRadius="6"
+                      Background="{Binding ManualStatus, Converter={StaticResource ModeStateToBrush}}" />
+            </Grid>
+          </Button>
+          <Button Width="130" Height="40" Classes="btn-secondary" Background="#2D2D2D"
+                  Click="AutonomousButton_Click"
+                  Foreground="{Binding AutonomousStatus, Converter={StaticResource ModeStateToBrush}, ConverterParameter=text}">
+            <Grid>
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="12" />
+              </Grid.ColumnDefinitions>
+              <TextBlock Grid.Column="0" Text="Autonomous" TextAlignment="Center"
+                         VerticalAlignment="Center" />
+              <Border Grid.Column="1" Width="12" Height="12" CornerRadius="6"
+                      Background="{Binding AutonomousStatus, Converter={StaticResource ModeStateToBrush}}" />
+            </Grid>
+          </Button>
+          <Button Width="130" Height="40" Classes="btn-secondary" Background="#2D2D2D"
+                  Click="FaultResetButton_Click"
+                  Foreground="{Binding FaultResetStatus, Converter={StaticResource ModeStateToBrush}, ConverterParameter=text}">
+            <Grid>
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="12" />
+              </Grid.ColumnDefinitions>
+              <TextBlock Grid.Column="0" Text="Fault Reset" TextAlignment="Center"
+                         VerticalAlignment="Center" />
+              <Border Grid.Column="1" Width="12" Height="12" CornerRadius="6"
+                      Background="{Binding FaultResetStatus, Converter={StaticResource ModeStateToBrush}}" />
+            </Grid>
+          </Button>
+        </StackPanel>
+
+        <Border Grid.Column="2" VerticalAlignment="Center">
+          <Button Classes="btn-danger" Height="40">
+            <TextBlock Text="E-Suggestion" TextAlignment="Center" VerticalAlignment="Center" />
+          </Button>
         </Border>
+      </Grid>
+    </Border>
 
+    <!-- MIDDLE -->
+    <Grid Grid.Row="1">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="1.5*" MinWidth="300"/>
+        <ColumnDefinition Width="3*"   MinWidth="400"/>
+        <ColumnDefinition Width="1.5*" MinWidth="300"/>
+      </Grid.ColumnDefinitions>
 
+      <!-- LEFT PANEL -->
+      <Border Grid.Column="0" Margin="4" Classes="card-primary">
+        <Grid Margin="12" RowDefinitions="Auto,6,1.2*,6,*">
+          <Border Grid.Row="0" Classes="card-secondary" Padding="12">
+            <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center">
+              <TextBlock Text="USB-VNC-SSH:" Foreground="#808080" FontSize="14" FontWeight="Bold" FontFamily="Arial Rounded MT Bold" VerticalAlignment="Center" Margin="0,0,0,1" />
+              <TextBlock Text="192.168.55.1:5900" Foreground="#00643C" FontSize="14" FontWeight="Bold" FontFamily="Consolas" Margin="0,4,0,0" />
+            </StackPanel>
+          </Border>
+          <manual:ManualControl Grid.Row="2" x:Name="ManualControlCard" />
+          <telemetry:DataUsageGraph Grid.Row="4" x:Name="DataUsageGraph" />
+        </Grid>
+      </Border>
 
+      <!-- CENTER VIEWPORT -->
+      <Border Grid.Column="1" Margin="4" Classes="card-primary">
+        <video:VideoPanel x:Name="VideoPanel" Margin="12"/>
+      </Border>
+
+      <!-- RIGHT PANEL -->
+      <Border Grid.Column="2" Margin="4" Classes="card-primary">
+        <Grid Margin="12" RowDefinitions="*, 6, 2*, 6, 1.5*, 6, 1.5*">
+
+          <!-- 3D Map -->
+          <Grid Grid.Row="0" RowDefinitions="Auto,*">
+            <TextBlock Grid.Row="0" Text="3D Map" Classes="section-header"/>
+            <sensors:ViewportCard Grid.Row="1" Label="3D Map" ViewportId="map"
+                                  IsActive="{Binding ActiveViewport, Converter={StaticResource ViewportIdToIsActive}, ConverterParameter=map}"/>
+          </Grid>
+
+          <!-- Near Cameras -->
+          <Grid Grid.Row="2" RowDefinitions="Auto,*">
+            <TextBlock Grid.Row="0" Text="Near Cameras" Classes="section-header"/>
+            <Grid Grid.Row="1" ColumnDefinitions="*,3,*" RowDefinitions="*,3,*,3,*,3,Auto">
+              <cameras:CameraStatusCard Grid.Row="0" Grid.Column="0" CameraName="Depth Camera" CameraType="Depth"
+                                        StatusText="No Data" ViewportId="depth_cam" SourceId="0"
+                                        IsActive="{Binding ActiveViewport, Converter={StaticResource ViewportIdToIsActive}, ConverterParameter=depth_cam}"/>
+              <cameras:CameraStatusCard Grid.Row="0" Grid.Column="2" CameraName="Left Side" CameraType="RGB"
+                                        StatusText="No Data" ViewportId="left_side" SourceId="1"
+                                        IsActive="{Binding ActiveViewport, Converter={StaticResource ViewportIdToIsActive}, ConverterParameter=left_side}"/>
+              <cameras:CameraStatusCard Grid.Row="2" Grid.Column="0" CameraName="Left Front" CameraType="RGB"
+                                        StatusText="No Data" ViewportId="left_front" SourceId="2"
+                                        IsActive="{Binding ActiveViewport, Converter={StaticResource ViewportIdToIsActive}, ConverterParameter=left_front}"/>
+              <cameras:CameraStatusCard Grid.Row="2" Grid.Column="2" CameraName="Right Side" CameraType="RGB"
+                                        StatusText="No Data" ViewportId="right_side" SourceId="3"
+                                        IsActive="{Binding ActiveViewport, Converter={StaticResource ViewportIdToIsActive}, ConverterParameter=right_side}"/>
+              <cameras:CameraStatusCard Grid.Row="4" Grid.Column="0" CameraName="Right Front" CameraType="RGB"
+                                        StatusText="No Data" ViewportId="right_front" SourceId="4"
+                                        IsActive="{Binding ActiveViewport, Converter={StaticResource ViewportIdToIsActive}, ConverterParameter=right_front}"/>
+              <cameras:CameraStatusCard Grid.Row="4" Grid.Column="2" CameraName="Back Rear" CameraType="RGB"
+                                        StatusText="No Data" ViewportId="back_rear" SourceId="5"
+                                        IsActive="{Binding ActiveViewport, Converter={StaticResource ViewportIdToIsActive}, ConverterParameter=back_rear}"/>
+              <cameras:CameraStatusCard Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2"
+                                        CameraName="Mosaic" CameraType="All"
+                                        StatusText="All Cameras" ViewportId="mosaic" SourceId="6"
+                                        IsActive="{Binding ActiveViewport, Converter={StaticResource ViewportIdToIsActive}, ConverterParameter=mosaic}"/>
+            </Grid>
+          </Grid>
+
+          <!-- Far Cameras -->
+          <Grid Grid.Row="4" RowDefinitions="Auto,*">
+            <TextBlock Grid.Row="0" Text="Far Cameras (April Tags)" Classes="section-header"/>
+            <Grid Grid.Row="1" ColumnDefinitions="*,3,*" RowDefinitions="*,3,*">
+              <cameras:CameraStatusCard Grid.Row="0" Grid.Column="0" CameraName="Front" CameraType="AprilTag"
+                                        StatusText="No Tag" ViewportId="far_front" IsStreamable="False"
+                                        IsActive="{Binding ActiveViewport, Converter={StaticResource ViewportIdToIsActive}, ConverterParameter=far_front}"/>
+              <cameras:CameraStatusCard Grid.Row="0" Grid.Column="2" CameraName="Right" CameraType="AprilTag"
+                                        StatusText="No Tag" ViewportId="far_right" IsStreamable="False"
+                                        IsActive="{Binding ActiveViewport, Converter={StaticResource ViewportIdToIsActive}, ConverterParameter=far_right}"/>
+              <cameras:CameraStatusCard Grid.Row="2" Grid.Column="0" CameraName="Back" CameraType="AprilTag"
+                                        StatusText="No Tag" ViewportId="far_back" IsStreamable="False"
+                                        IsActive="{Binding ActiveViewport, Converter={StaticResource ViewportIdToIsActive}, ConverterParameter=far_back}"/>
+              <cameras:CameraStatusCard Grid.Row="2" Grid.Column="2" CameraName="Left" CameraType="AprilTag"
+                                        StatusText="No Tag" ViewportId="far_left" IsStreamable="False"
+                                        IsActive="{Binding ActiveViewport, Converter={StaticResource ViewportIdToIsActive}, ConverterParameter=far_left}"/>
+            </Grid>
+          </Grid>
+
+          <!-- Fault Console -->
+          <Grid Grid.Row="6" RowDefinitions="Auto,*">
+            <TextBlock Grid.Row="0" Text="Fault Console" Classes="section-header"/>
+            <telemetry:FaultConsole Grid.Row="1"/>
+          </Grid>
+
+        </Grid>
+      </Border>
     </Grid>
 
+    <!-- BOTTOM TELEMETRY -->
+    <Border Grid.Row="2" Background="#1A1A1A" Padding="12,8" BorderBrush="#00643C"
+            BorderThickness="0,1,0,0">
+      <Grid VerticalAlignment="Center">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="2*" />
+          <ColumnDefinition Width="16" />
+          <ColumnDefinition Width="3*" />
+          <ColumnDefinition Width="16" />
+          <ColumnDefinition Width="2*" />
+        </Grid.ColumnDefinitions>
+
+        <!-- Left: Power/Battery Telemetry -->
+        <Grid Grid.Column="0">
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="10" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="10" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="10" />
+            <ColumnDefinition Width="*" />
+          </Grid.ColumnDefinitions>
+          <telemetry:DataCard Grid.Column="0" Label="Battery" Value="--" SubValue="--"
+                              Unit="V" />
+          <telemetry:DataCard Grid.Column="2" Label="Current" Value="--" SubValue="--"
+                              Unit="A" />
+          <telemetry:DataCard Grid.Column="4" Label="Power" Value="--" SubValue="--"
+                              Unit="W" />
+          <telemetry:DataCard Grid.Column="6" Label="Temp" Value="--" SubValue="--"
+                              Unit="°C" />
+        </Grid>
+
+        <!-- Center: Motor Side Cards with full wheel telemetry -->
+        <Grid Grid.Column="2" Margin="10,0">
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="16" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="16" />
+            <ColumnDefinition Width="*" />
+          </Grid.ColumnDefinitions>
+          <telemetry:MotorSideCard Grid.Column="0" SideName="LEFT" W1Name="W1"
+                                   W1AngularVel="--" W1Position="--" W1Torque="--"
+                                   W1Current="--" W1Voltage="--" W2Name="W2"
+                                   W2AngularVel="--" W2Position="--" W2Torque="--"
+                                   W2Current="--" W2Voltage="--" W3Name="W3"
+                                   W3AngularVel="--" W3Position="--" W3Torque="--"
+                                   W3Current="--" W3Voltage="--" />
+          <Border Grid.Column="2" Background="#0D1F16" BorderBrush="#00643C"
+                  BorderThickness="1" CornerRadius="8" Padding="16,12"
+                  VerticalAlignment="Center">
+            <TextBlock Text="Latency: -- ms" Foreground="#606060" FontSize="10"
+                       FontWeight="Bold" FontFamily="Consolas" />
+          </Border>
+          <telemetry:MotorSideCard Grid.Column="4" SideName="RIGHT" W1Name="W4"
+                                   W1AngularVel="--" W1Position="--" W1Torque="--"
+                                   W1Current="--" W1Voltage="--" W2Name="W5"
+                                   W2AngularVel="--" W2Position="--" W2Torque="--"
+                                   W2Current="--" W2Voltage="--" W3Name="W6"
+                                   W3AngularVel="--" W3Position="--" W3Torque="--"
+                                   W3Current="--" W3Voltage="--" />
+        </Grid>
+
+        <!-- Right: IMU -->
+        <Grid Grid.Column="4" RowDefinitions="Auto,3,Auto,3,Auto">
+
+          <!-- Accel X / Y / Z -->
+          <Grid Grid.Row="0" ColumnDefinitions="*,8,*,8,*">
+            <telemetry:DataCard Grid.Column="0" Label="Accel X"
+                                Value="{Binding AccelXText}" Unit="m/s&#xB2;"/>
+            <telemetry:DataCard Grid.Column="2" Label="Accel Y"
+                                Value="{Binding AccelYText}" Unit="m/s&#xB2;"/>
+            <telemetry:DataCard Grid.Column="4" Label="Accel Z"
+                                Value="{Binding AccelZText}" Unit="m/s&#xB2;"/>
+          </Grid>
+
+          <!-- Vel X / Y / Z + reset button -->
+          <Grid Grid.Row="2" ColumnDefinitions="*,8,*,8,*,8,Auto">
+            <telemetry:DataCard Grid.Column="0" Label="Vel X"
+                                Value="{Binding VelXText}" Unit="m/s"/>
+            <telemetry:DataCard Grid.Column="2" Label="Vel Y"
+                                Value="{Binding VelYText}" Unit="m/s"/>
+            <telemetry:DataCard Grid.Column="4" Label="Vel Z"
+                                Value="{Binding VelZText}" Unit="m/s"/>
+            <Button Grid.Column="6" Content="&#x21BA;" Click="ResetImuButton_Click"
+                    Height="24" Width="28" Padding="0" FontSize="14"
+                    Background="#2D2D2D" Foreground="#606060" CornerRadius="4"
+                    HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+                    ToolTip.Tip="Reset velocity"/>
+          </Grid>
+
+          <!-- Roll / Pitch / Yaw (april tag derived — future) -->
+          <Grid Grid.Row="4" ColumnDefinitions="*,8,*,8,*">
+            <telemetry:DataCard Grid.Column="0" Label="Roll"  Value="--" SubValue="--" Unit="&#xB0;"/>
+            <telemetry:DataCard Grid.Column="2" Label="Pitch" Value="--" SubValue="--" Unit="&#xB0;"/>
+            <telemetry:DataCard Grid.Column="4" Label="Yaw"   Value="--" SubValue="--" Unit="&#xB0;"/>
+          </Grid>
+
+        </Grid>
+      </Grid>
+    </Border>
+  </Grid>
 </UserControl>

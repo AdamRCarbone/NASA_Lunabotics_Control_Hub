@@ -1,0 +1,28 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:controls="clr-namespace:NASA_Lunabotics_Control_Hub.Controls"
+             mc:Ignorable="d" d:DesignWidth="280"
+             x:Class="NASA_Lunabotics_Control_Hub.Controls.ModeButton"
+             x:DataType="controls:ModeButton">
+
+    <Button Classes="mode-btn"
+            HorizontalAlignment="Stretch"
+            DataContext="{Binding #self}">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0"
+                       Text="{Binding ModeName}"
+                       VerticalAlignment="Center"/>
+            <Ellipse Grid.Column="1"
+                     Width="8"
+                     Height="8"
+                     Fill="{Binding StatusIndicatorColor}"
+                     Margin="0,0,4,0"/>
+        </Grid>
+    </Button>
+</UserControl>

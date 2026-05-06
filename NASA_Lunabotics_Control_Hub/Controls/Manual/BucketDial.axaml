@@ -1,0 +1,41 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:manual="clr-namespace:NASA_Lunabotics_Control_Hub.Controls.Manual"
+             x:Class="NASA_Lunabotics_Control_Hub.Controls.Manual.BucketDial"
+             mc:Ignorable="d" d:DesignWidth="100" d:DesignHeight="140">
+    <StackPanel HorizontalAlignment="Center" Spacing="6">
+
+        <!-- Rotary dial canvas -->
+        <Canvas Width="80" Height="80" HorizontalAlignment="Center">
+            <!-- Dial ring -->
+            <Ellipse Width="80" Height="80"
+                     Fill="#1A1A1A" Stroke="#00643C" StrokeThickness="2"/>
+            <!-- Pointer: zero-size pivot canvas at dial center (40,40), rotates around its own origin -->
+            <Canvas x:Name="DialPointer"
+                    Canvas.Left="40" Canvas.Top="40"
+                    Width="0" Height="0"
+                    RenderTransformOrigin="0,0">
+                <Canvas.RenderTransform>
+                    <RotateTransform Angle="0"/>
+                </Canvas.RenderTransform>
+                <Rectangle Width="3" Height="28" Fill="#00643C"
+                           Canvas.Left="-1.5" Canvas.Top="-28"/>
+            </Canvas>
+            <!-- Center dot -->
+            <Ellipse Width="8" Height="8" Fill="#00643C"
+                     Canvas.Left="36" Canvas.Top="36"/>
+            <!-- Neutral tick at top -->
+            <Rectangle Width="2" Height="6" Fill="#606060"
+                       Canvas.Left="39" Canvas.Top="2"/>
+        </Canvas>
+
+        <!-- Left/Right key buttons -->
+        <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center">
+            <manual:KeyButton x:Name="LeftBtn"  KeyLabel="←"/>
+            <manual:KeyButton x:Name="RightBtn" KeyLabel="→"/>
+        </StackPanel>
+
+    </StackPanel>
+</UserControl>
