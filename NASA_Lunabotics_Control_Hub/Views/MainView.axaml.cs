@@ -37,6 +37,7 @@ namespace NASA_Lunabotics_Control_Hub.Views
             _networkClient.StateChanged += OnRosStateReceived;
             _networkClient.ConnectionChanged += OnConnectionChanged;
             _networkClient.HeartbeatReceived += OnHeartbeatReceived;
+            _networkClient.AccelReceived += (ax, ay, az) => _mainViewModel.UpdateAccel(ax, ay, az);
 
             DataContext = _mainViewModel;
 
@@ -92,9 +93,9 @@ namespace NASA_Lunabotics_Control_Hub.Views
                 else
                 {
                     if (videoPanel != null) videoPanel.NetworkClient = null;
-                    // Clear mode state so buttons go idle on disconnect
                     _mainViewModel.SetModeState("", NASA_Lunabotics_Control_Hub.ViewModels.ModeState.Idle);
                     videoPanel?.ClearStream();
+                    _mainViewModel.ResetImu();
                 }
             });
         }
@@ -254,6 +255,11 @@ namespace NASA_Lunabotics_Control_Hub.Views
                 ConnectButton.IsEnabled = true;
                 ConnectButton.Background = Avalonia.Media.Brush.Parse("#00643C");
             }
+        }
+
+        private void ResetImuButton_Click(object? sender, RoutedEventArgs e)
+        {
+            _mainViewModel.ResetImu();
         }
 
         public void HandleKeyDown(Key key)

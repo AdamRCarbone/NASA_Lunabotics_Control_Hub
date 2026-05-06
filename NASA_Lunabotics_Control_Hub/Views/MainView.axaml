@@ -331,28 +331,41 @@
                                    W3Current="--" W3Voltage="--" />
         </Grid>
 
-        <!-- Right: IMU + System Status -->
-        <Grid Grid.Column="4">
-          <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="10" />
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="10" />
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="10" />
-            <ColumnDefinition Width="Auto" />
-          </Grid.ColumnDefinitions>
-          <telemetry:DataCard Grid.Column="0" Label="Roll" Value="--" SubValue="--"
-                              Unit="°" />
-          <telemetry:DataCard Grid.Column="2" Label="Pitch" Value="--" SubValue="--"
-                              Unit="°" />
-          <telemetry:DataCard Grid.Column="4" Label="Yaw" Value="--" SubValue="--"
-                              Unit="°" />
-          <Border Grid.Column="6" Background="#0D1F16" BorderBrush="#DC2626"
-                  BorderThickness="1" Padding="14,10" CornerRadius="8">
-            <TextBlock Text="NO DATA" Foreground="#606060" FontSize="12"
-                       FontWeight="Bold" />
-          </Border>
+        <!-- Right: IMU -->
+        <Grid Grid.Column="4" RowDefinitions="Auto,3,Auto,3,Auto">
+
+          <!-- Accel X / Y / Z -->
+          <Grid Grid.Row="0" ColumnDefinitions="*,8,*,8,*">
+            <telemetry:DataCard Grid.Column="0" Label="Accel X"
+                                Value="{Binding AccelXText}" Unit="m/s&#xB2;"/>
+            <telemetry:DataCard Grid.Column="2" Label="Accel Y"
+                                Value="{Binding AccelYText}" Unit="m/s&#xB2;"/>
+            <telemetry:DataCard Grid.Column="4" Label="Accel Z"
+                                Value="{Binding AccelZText}" Unit="m/s&#xB2;"/>
+          </Grid>
+
+          <!-- Vel X / Y / Z + reset button -->
+          <Grid Grid.Row="2" ColumnDefinitions="*,8,*,8,*,8,Auto">
+            <telemetry:DataCard Grid.Column="0" Label="Vel X"
+                                Value="{Binding VelXText}" Unit="m/s"/>
+            <telemetry:DataCard Grid.Column="2" Label="Vel Y"
+                                Value="{Binding VelYText}" Unit="m/s"/>
+            <telemetry:DataCard Grid.Column="4" Label="Vel Z"
+                                Value="{Binding VelZText}" Unit="m/s"/>
+            <Button Grid.Column="6" Content="&#x21BA;" Click="ResetImuButton_Click"
+                    Height="24" Width="28" Padding="0" FontSize="14"
+                    Background="#2D2D2D" Foreground="#606060" CornerRadius="4"
+                    HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+                    ToolTip.Tip="Reset velocity"/>
+          </Grid>
+
+          <!-- Roll / Pitch / Yaw (april tag derived — future) -->
+          <Grid Grid.Row="4" ColumnDefinitions="*,8,*,8,*">
+            <telemetry:DataCard Grid.Column="0" Label="Roll"  Value="--" SubValue="--" Unit="&#xB0;"/>
+            <telemetry:DataCard Grid.Column="2" Label="Pitch" Value="--" SubValue="--" Unit="&#xB0;"/>
+            <telemetry:DataCard Grid.Column="4" Label="Yaw"   Value="--" SubValue="--" Unit="&#xB0;"/>
+          </Grid>
+
         </Grid>
       </Grid>
     </Border>

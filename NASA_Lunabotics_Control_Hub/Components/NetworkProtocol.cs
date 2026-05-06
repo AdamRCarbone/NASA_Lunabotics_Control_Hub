@@ -230,11 +230,26 @@ namespace NASA_Lunabotics_Control_Hub.Components
                 case TYPE_TELEMETRY:
                     if (payloadLen >= 1)
                     {
-                        return new DecodedMessage
+                        var tmsg = new DecodedMessage { Type = "telemetry", State = payload[0] };
+                        int idx = 1;
+                        while (idx < payloadLen)
                         {
-                            Type = "telemetry",
-                            State = payload[0]
-                        };
+                            byte marker = payload[idx];
+                            if (marker == 0x42 && idx + 5 <= payloadLen)       // 'B' battery float32
+                                idx += 5;
+                            else if (marker == 0x46 && idx + 2 <= payloadLen)  // 'F' fault char
+                                idx += 2;
+                            else if (marker == 0x49 && idx + 13 <= payloadLen) // 'I' accel 3×float32 LE
+                            {
+                                tmsg.AccelX = BitConverter.ToSingle(payload, idx + 1);
+                                tmsg.AccelY = BitConverter.ToSingle(payload, idx + 5);
+                                tmsg.AccelZ = BitConverter.ToSingle(payload, idx + 9);
+                                tmsg.HasAccel = true;
+                                idx += 13;
+                            }
+                            else break;
+                        }
+                        return tmsg;
                     }
                     break;
 
@@ -311,5 +326,9 @@ namespace NASA_Lunabotics_Control_Hub.Components
         public bool Success { get; set; }
         public byte Severity { get; set; }
         public char FaultChar { get; set; }
+        public bool HasAccel { get; set; }
+        public float AccelX { get; set; }
+        public float AccelY { get; set; }
+        public float AccelZ { get; set; }
     }
 }

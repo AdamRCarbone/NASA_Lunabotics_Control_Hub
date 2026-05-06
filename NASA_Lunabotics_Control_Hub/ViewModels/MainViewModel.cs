@@ -26,6 +26,51 @@ namespace NASA_Lunabotics_Control_Hub.ViewModels
         private byte? _activeStreamSourceId;
         private Bitmap? _currentFrame;
 
+        // IMU
+        private float _velX, _velY, _velZ;
+        private DateTime _lastAccelTime = DateTime.MinValue;
+        private string _accelXText = "--";
+        private string _accelYText = "--";
+        private string _accelZText = "--";
+        private string _velXText = "--";
+        private string _velYText = "--";
+        private string _velZText = "--";
+
+        public string AccelXText { get => _accelXText; private set => this.RaiseAndSetIfChanged(ref _accelXText, value); }
+        public string AccelYText { get => _accelYText; private set => this.RaiseAndSetIfChanged(ref _accelYText, value); }
+        public string AccelZText { get => _accelZText; private set => this.RaiseAndSetIfChanged(ref _accelZText, value); }
+        public string VelXText  { get => _velXText;  private set => this.RaiseAndSetIfChanged(ref _velXText,  value); }
+        public string VelYText  { get => _velYText;  private set => this.RaiseAndSetIfChanged(ref _velYText,  value); }
+        public string VelZText  { get => _velZText;  private set => this.RaiseAndSetIfChanged(ref _velZText,  value); }
+
+        public void UpdateAccel(float ax, float ay, float az)
+        {
+            var now = DateTime.UtcNow;
+            if (_lastAccelTime != DateTime.MinValue)
+            {
+                float dt = (float)(now - _lastAccelTime).TotalSeconds;
+                _velX += ax * dt;
+                _velY += ay * dt;
+                _velZ += az * dt;
+            }
+            _lastAccelTime = now;
+
+            AccelXText = $"{ax:+0.000;-0.000}";
+            AccelYText = $"{ay:+0.000;-0.000}";
+            AccelZText = $"{az:+0.000;-0.000}";
+            VelXText   = $"{_velX:+0.000;-0.000}";
+            VelYText   = $"{_velY:+0.000;-0.000}";
+            VelZText   = $"{_velZ:+0.000;-0.000}";
+        }
+
+        public void ResetImu()
+        {
+            _velX = _velY = _velZ = 0;
+            _lastAccelTime = DateTime.MinValue;
+            AccelXText = "--"; AccelYText = "--"; AccelZText = "--";
+            VelXText   = "--"; VelYText   = "--"; VelZText   = "--";
+        }
+
         public void SetConnected(bool connected) { IsConnected = connected; }
         public void SetCurrentMode(string mode) { CurrentMode = mode; }
 

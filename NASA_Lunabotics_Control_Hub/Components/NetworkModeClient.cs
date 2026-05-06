@@ -33,7 +33,8 @@ namespace NASA_Lunabotics_Control_Hub.Components
         // Events
         public event Action<string>? StateChanged;
         public event Action<bool>? ConnectionChanged;
-        public event Action? HeartbeatReceived; // Triggered when heartbeat arrives
+        public event Action? HeartbeatReceived;
+        public event Action<float, float, float>? AccelReceived;
 
         public NetworkModeClient()
         {
@@ -290,7 +291,6 @@ namespace NASA_Lunabotics_Control_Hub.Components
                         break;
 
                     case "telemetry":
-                        // Map state code to string
                         string state = msg.State switch
                         {
                             (byte)'0' => "STANDBY",
@@ -304,11 +304,14 @@ namespace NASA_Lunabotics_Control_Hub.Components
                         {
                             string previousState = CurrentState;
                             CurrentState = state;
-
                             Console.WriteLine($"[NetworkModeClient] Received state update: {state} (was {previousState})");
-
-                            // Raise event on UI thread
                             Dispatcher.UIThread.Post(() => StateChanged?.Invoke(state));
+                        }
+
+                        if (msg.HasAccel)
+                        {
+                            float ax = msg.AccelX, ay = msg.AccelY, az = msg.AccelZ;
+                            Dispatcher.UIThread.Post(() => AccelReceived?.Invoke(ax, ay, az));
                         }
                         break;
 
