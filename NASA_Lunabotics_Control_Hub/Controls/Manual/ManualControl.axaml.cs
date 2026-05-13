@@ -19,9 +19,7 @@ public partial class ManualControl : UserControl
     private KeyButton _wKey = null!, _aKey = null!, _sKey = null!, _dKey = null!;
     private ArmSlider _armSlider = null!;
     private BucketDial _bucketDial = null!;
-    private Slider _speedSlider = null!;
     private NumericUpDown _speedInput = null!;
-    private bool _syncingSpeed = false;
 
     public bool IsActive
     {
@@ -29,7 +27,7 @@ public partial class ManualControl : UserControl
         set => SetValue(IsActiveProperty, value);
     }
 
-    public ushort SpeedModifier => (ushort)Math.Clamp(_speedSlider.Value, 0, 100);
+    public ushort SpeedModifier => (ushort)Math.Clamp((double)(_speedInput.Value ?? 100m), 0, 100);
 
     public ManualControl()
     {
@@ -46,24 +44,7 @@ public partial class ManualControl : UserControl
         _dKey            = this.FindControl<KeyButton>("DKey")!;
         _armSlider       = this.FindControl<ArmSlider>("ArmSliderWidget")!;
         _bucketDial      = this.FindControl<BucketDial>("BucketDialWidget")!;
-        _speedSlider     = this.FindControl<Slider>("SpeedSlider")!;
         _speedInput      = this.FindControl<NumericUpDown>("SpeedInput")!;
-
-        _speedSlider.GetObservable(Slider.ValueProperty).Subscribe(val =>
-        {
-            if (_syncingSpeed) return;
-            _syncingSpeed = true;
-            _speedInput.Value = (decimal)val;
-            _syncingSpeed = false;
-        });
-
-        _speedInput.ValueChanged += (_, e) =>
-        {
-            if (_syncingSpeed) return;
-            _syncingSpeed = true;
-            _speedSlider.Value = (double)(e.NewValue ?? 100m);
-            _syncingSpeed = false;
-        };
 
         this.GetObservable(IsActiveProperty).Subscribe(active =>
         {

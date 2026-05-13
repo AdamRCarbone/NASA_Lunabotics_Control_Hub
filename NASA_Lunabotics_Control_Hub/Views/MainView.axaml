@@ -268,7 +268,7 @@
     </Grid>
 
     <!-- BOTTOM TELEMETRY -->
-    <Border Grid.Row="2" Background="#1A1A1A" Padding="12,8" BorderBrush="#00643C"
+    <Border Grid.Row="2" Background="#1A1A1A" Padding="12,3" BorderBrush="#00643C"
             BorderThickness="0,1,0,0">
       <Grid VerticalAlignment="Center">
         <Grid.ColumnDefinitions>
