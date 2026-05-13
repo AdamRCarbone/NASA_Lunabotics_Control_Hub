@@ -7,7 +7,7 @@
              mc:Ignorable="d" d:DesignWidth="268" d:DesignHeight="360">
 
     <Border x:Name="ContainerBorder" Classes="card-secondary" Padding="12">
-        <Grid RowDefinitions="Auto,8,Auto,8,*" ColumnDefinitions="*,8,*">
+        <Grid RowDefinitions="Auto,8,Auto,8,*,8,Auto" ColumnDefinitions="*,8,*">
 
             <!-- Header spans full width -->
             <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3"
@@ -35,17 +35,6 @@
                         <manual:KeyButton Grid.Row="1" Grid.Column="1" x:Name="SKey" KeyLabel="S"/>
                         <manual:KeyButton Grid.Row="1" Grid.Column="2" x:Name="DKey" KeyLabel="D"/>
                     </Grid>
-                    <TextBlock Text="SPEED" Classes="sub-header" HorizontalAlignment="Center"/>
-                    <Slider x:Name="SpeedSlider"
-                            Minimum="0" Maximum="100" Value="100"
-                            Width="80" HorizontalAlignment="Center"/>
-                    <TextBlock HorizontalAlignment="Center">
-                        <TextBlock.Text>
-                            <MultiBinding StringFormat="{}{0:0}%">
-                                <Binding ElementName="SpeedSlider" Path="Value"/>
-                            </MultiBinding>
-                        </TextBlock.Text>
-                    </TextBlock>
                 </StackPanel>
             </Border>
 
@@ -56,6 +45,32 @@
                     <manual:BucketDial Grid.Row="1" x:Name="BucketDialWidget"
                                        HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 </Grid>
+            </Border>
+
+            <!-- SPEED — full-width row below ARM and DRIVE/BUCKET -->
+            <Border Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="3"
+                    Classes="card-secondary" Padding="10">
+                <StackPanel Spacing="6">
+                    <TextBlock Text="SPEED" Classes="sub-header" HorizontalAlignment="Center"/>
+                    <Grid ColumnDefinitions="*,8,64">
+                        <Slider Grid.Column="0" x:Name="SpeedSlider"
+                                Minimum="0" Maximum="100" Value="100"
+                                IsSnapToTickEnabled="True" TickFrequency="5"
+                                Foreground="#00643C" Background="#333333"
+                                HorizontalAlignment="Stretch" VerticalAlignment="Center">
+                            <Slider.Resources>
+                                <SolidColorBrush x:Key="SliderThumbBackground" Color="#00643C"/>
+                                <SolidColorBrush x:Key="SliderThumbBackgroundPointerOver" Color="#007A4A"/>
+                                <SolidColorBrush x:Key="SliderThumbBackgroundPressed" Color="#005030"/>
+                                <SolidColorBrush x:Key="SliderTrackValueFillBrush" Color="#00643C"/>
+                            </Slider.Resources>
+                        </Slider>
+                        <NumericUpDown Grid.Column="2" x:Name="SpeedInput"
+                                       Minimum="0" Maximum="100" Value="100"
+                                       Increment="5" FormatString="0"
+                                       VerticalAlignment="Center"/>
+                    </Grid>
+                </StackPanel>
             </Border>
 
         </Grid>

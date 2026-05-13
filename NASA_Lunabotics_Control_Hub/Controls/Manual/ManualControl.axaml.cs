@@ -20,6 +20,8 @@ public partial class ManualControl : UserControl
     private ArmSlider _armSlider = null!;
     private BucketDial _bucketDial = null!;
     private Slider _speedSlider = null!;
+    private NumericUpDown _speedInput = null!;
+    private bool _syncingSpeed = false;
 
     public bool IsActive
     {
@@ -45,6 +47,23 @@ public partial class ManualControl : UserControl
         _armSlider       = this.FindControl<ArmSlider>("ArmSliderWidget")!;
         _bucketDial      = this.FindControl<BucketDial>("BucketDialWidget")!;
         _speedSlider     = this.FindControl<Slider>("SpeedSlider")!;
+        _speedInput      = this.FindControl<NumericUpDown>("SpeedInput")!;
+
+        _speedSlider.GetObservable(Slider.ValueProperty).Subscribe(val =>
+        {
+            if (_syncingSpeed) return;
+            _syncingSpeed = true;
+            _speedInput.Value = (decimal)val;
+            _syncingSpeed = false;
+        });
+
+        _speedInput.ValueChanged += (_, e) =>
+        {
+            if (_syncingSpeed) return;
+            _syncingSpeed = true;
+            _speedSlider.Value = (double)(e.NewValue ?? 100m);
+            _syncingSpeed = false;
+        };
 
         this.GetObservable(IsActiveProperty).Subscribe(active =>
         {
