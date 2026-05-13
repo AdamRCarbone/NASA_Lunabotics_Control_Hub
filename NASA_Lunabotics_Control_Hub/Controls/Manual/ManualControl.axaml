@@ -37,7 +37,7 @@
                     </Grid>
                     <TextBlock Text="SPEED %" Classes="sub-header" HorizontalAlignment="Center"/>
                     <NumericUpDown x:Name="SpeedInput"
-                                   Minimum="0" Maximum="100" Value="100"
+                                   Minimum="0" Maximum="500" Value="100"
                                    Increment="5" FormatString="0"
                                    HorizontalAlignment="Stretch"/>
                 </StackPanel>

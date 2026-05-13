@@ -87,7 +87,7 @@ namespace NASA_Lunabotics_Control_Hub.Components
         /// </summary>
         public static byte[] EncodeManipulator(byte keyBitfield, ushort speedModifier = 100)
         {
-            ushort speed = Math.Clamp(speedModifier, (ushort)0, (ushort)100);
+            ushort speed = Math.Clamp(speedModifier, (ushort)0, (ushort)500);
             var frame = new byte[7];
             frame[0] = MAGIC;
             frame[1] = TYPE_MANIPULATOR;

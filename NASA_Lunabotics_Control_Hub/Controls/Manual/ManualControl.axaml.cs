@@ -20,6 +20,7 @@ public partial class ManualControl : UserControl
     private ArmSlider _armSlider = null!;
     private BucketDial _bucketDial = null!;
     private NumericUpDown _speedInput = null!;
+    private bool _lastSpeedChangedWasSpin = false;
 
     public bool IsActive
     {
@@ -27,7 +28,7 @@ public partial class ManualControl : UserControl
         set => SetValue(IsActiveProperty, value);
     }
 
-    public ushort SpeedModifier => (ushort)Math.Clamp((double)(_speedInput.Value ?? 100m), 0, 100);
+    public ushort SpeedModifier => (ushort)Math.Clamp((double)(_speedInput.Value ?? 100m), 0, 500);
 
     public ManualControl()
     {
@@ -45,6 +46,17 @@ public partial class ManualControl : UserControl
         _armSlider       = this.FindControl<ArmSlider>("ArmSliderWidget")!;
         _bucketDial      = this.FindControl<BucketDial>("BucketDialWidget")!;
         _speedInput      = this.FindControl<NumericUpDown>("SpeedInput")!;
+
+        // Arrow buttons cap at 100; typing can reach up to 500.
+        // Spinned fires before ValueChanged so the flag is set when we need it.
+        _speedInput.Spinned += (_, _) => _lastSpeedChangedWasSpin = true;
+        _speedInput.ValueChanged += (_, e) =>
+        {
+            bool wasSpin = _lastSpeedChangedWasSpin;
+            _lastSpeedChangedWasSpin = false;
+            if (wasSpin && e.NewValue > 100m)
+                _speedInput.Value = 100m;
+        };
 
         this.GetObservable(IsActiveProperty).Subscribe(active =>
         {
