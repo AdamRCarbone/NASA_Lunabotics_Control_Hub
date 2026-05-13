@@ -13,9 +13,13 @@ public partial class ManualControl : UserControl
     public static readonly StyledProperty<bool> IsActiveProperty =
         AvaloniaProperty.Register<ManualControl, bool>(nameof(IsActive), false);
 
+    public static readonly StyledProperty<bool> IsLiveProperty =
+        AvaloniaProperty.Register<ManualControl, bool>(nameof(IsLive), false);
+
     private readonly ManipulatorInputState _state = new();
 
     private Border _containerBorder = null!;
+    private Border _speedLiveDot = null!;
     private KeyButton _wKey = null!, _aKey = null!, _sKey = null!, _dKey = null!;
     private ArmSlider _armSlider = null!;
     private BucketDial _bucketDial = null!;
@@ -26,6 +30,12 @@ public partial class ManualControl : UserControl
     {
         get => GetValue(IsActiveProperty);
         set => SetValue(IsActiveProperty, value);
+    }
+
+    public bool IsLive
+    {
+        get => GetValue(IsLiveProperty);
+        set => SetValue(IsLiveProperty, value);
     }
 
     public ushort SpeedModifier => (ushort)Math.Clamp((double)(_speedInput.Value ?? 100m), 0, 500);
@@ -39,6 +49,7 @@ public partial class ManualControl : UserControl
     {
         AvaloniaXamlLoader.Load(this);
         _containerBorder = this.FindControl<Border>("ContainerBorder")!;
+        _speedLiveDot    = this.FindControl<Border>("SpeedLiveDot")!;
         _wKey            = this.FindControl<KeyButton>("WKey")!;
         _aKey            = this.FindControl<KeyButton>("AKey")!;
         _sKey            = this.FindControl<KeyButton>("SKey")!;
@@ -63,6 +74,11 @@ public partial class ManualControl : UserControl
             _containerBorder.Opacity          = active ? 1.0 : 0.4;
             _containerBorder.IsHitTestVisible = active;
         });
+
+        this.GetObservable(IsLiveProperty).Subscribe(live =>
+            _speedLiveDot.Background = new Avalonia.Media.SolidColorBrush(
+                live ? Avalonia.Media.Color.Parse("#4ade80")
+                     : Avalonia.Media.Color.Parse("#606060")));
     }
 
     public void HandleKeyDown(Key key) => _state.HandleKeyDown(key);

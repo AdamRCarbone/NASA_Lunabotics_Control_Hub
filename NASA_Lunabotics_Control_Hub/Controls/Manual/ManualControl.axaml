@@ -35,7 +35,11 @@
                         <manual:KeyButton Grid.Row="1" Grid.Column="1" x:Name="SKey" KeyLabel="S"/>
                         <manual:KeyButton Grid.Row="1" Grid.Column="2" x:Name="DKey" KeyLabel="D"/>
                     </Grid>
-                    <TextBlock Text="SPEED %" Classes="sub-header" HorizontalAlignment="Center"/>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="5">
+                        <TextBlock Text="SPEED %" Classes="sub-header" VerticalAlignment="Center"/>
+                        <Border x:Name="SpeedLiveDot" Width="8" Height="8" CornerRadius="4"
+                                Background="#606060" VerticalAlignment="Center"/>
+                    </StackPanel>
                     <NumericUpDown x:Name="SpeedInput"
                                    Minimum="0" Maximum="500" Value="100"
                                    Increment="5" FormatString="0"

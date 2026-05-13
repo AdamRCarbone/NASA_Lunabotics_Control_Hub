@@ -133,12 +133,13 @@ namespace NASA_Lunabotics_Control_Hub.Views
             if (joystick == null || manualControl == null) return;
 
             manualControl.IsActive = (_mainViewModel.ManualStatus != NASA_Lunabotics_Control_Hub.ViewModels.ModeState.Idle);
+            manualControl.IsLive   = manualControl.IsActive && _networkClient.IsConnected;
 
             var activeKeys = joystick.GetActiveKeys();
             manualControl.UpdateFromJoystick(activeKeys);
             manualControl.Tick(0.050);
 
-            if (manualControl.IsActive && _networkClient.IsConnected)
+            if (manualControl.IsLive)
             {
                 byte bitfield = manualControl.GetKeyBitfield(activeKeys);
                 _ = _networkClient.SendManipulatorCommandAsync(bitfield, manualControl.SpeedModifier);
