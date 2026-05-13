@@ -81,18 +81,21 @@ namespace NASA_Lunabotics_Control_Hub.Components
 
         /// <summary>
         /// Encode a Manipulator frame (Ground → Rover)
-        /// Format: [O][M][1][bitfield][crc] — 5 bytes
+        /// Format: [O][M][3][bitfield][speed_hi][speed_lo][crc] — 7 bytes
         /// Bitfield: bit0=W, bit1=A, bit2=S, bit3=D, bit4=↑, bit5=↓, bit6=←, bit7=→
-        /// TODO: un-comment WriteAsync in NetworkModeClient once ROS parser is confirmed.
+        /// speedModifier: 0–100 (percentage; 100 = 20% motor cap, the normal operating speed)
         /// </summary>
-        public static byte[] EncodeManipulator(byte keyBitfield)
+        public static byte[] EncodeManipulator(byte keyBitfield, ushort speedModifier = 100)
         {
-            var frame = new byte[5];
+            ushort speed = Math.Clamp(speedModifier, (ushort)0, (ushort)100);
+            var frame = new byte[7];
             frame[0] = MAGIC;
             frame[1] = TYPE_MANIPULATOR;
-            frame[2] = 1;
+            frame[2] = 3;
             frame[3] = keyBitfield;
-            frame[4] = CalcCrc8(frame, 4);
+            frame[4] = (byte)(speed >> 8);
+            frame[5] = (byte)(speed & 0xFF);
+            frame[6] = CalcCrc8(frame, 6);
             return frame;
         }
 

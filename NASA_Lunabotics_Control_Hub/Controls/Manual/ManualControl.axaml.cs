@@ -19,12 +19,15 @@ public partial class ManualControl : UserControl
     private KeyButton _wKey = null!, _aKey = null!, _sKey = null!, _dKey = null!;
     private ArmSlider _armSlider = null!;
     private BucketDial _bucketDial = null!;
+    private Slider _speedSlider = null!;
 
     public bool IsActive
     {
         get => GetValue(IsActiveProperty);
         set => SetValue(IsActiveProperty, value);
     }
+
+    public ushort SpeedModifier => (ushort)Math.Clamp(_speedSlider.Value, 0, 100);
 
     public ManualControl()
     {
@@ -41,6 +44,7 @@ public partial class ManualControl : UserControl
         _dKey            = this.FindControl<KeyButton>("DKey")!;
         _armSlider       = this.FindControl<ArmSlider>("ArmSliderWidget")!;
         _bucketDial      = this.FindControl<BucketDial>("BucketDialWidget")!;
+        _speedSlider     = this.FindControl<Slider>("SpeedSlider")!;
 
         this.GetObservable(IsActiveProperty).Subscribe(active =>
         {
