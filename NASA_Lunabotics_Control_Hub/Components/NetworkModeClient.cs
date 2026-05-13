@@ -161,13 +161,13 @@ namespace NASA_Lunabotics_Control_Hub.Components
             }
         }
 
-        public async Task SendManipulatorCommandAsync(byte keyBitfield)
+        public async Task SendManipulatorCommandAsync(byte keyBitfield, ushort speedModifier = 100)
         {
             if (_client == null || !_client.Connected || _stream == null)
                 return;
             try
             {
-                var frame = NetworkProtocol.EncodeManipulator(keyBitfield);
+                var frame = NetworkProtocol.EncodeManipulator(keyBitfield, speedModifier);
                 await _stream.WriteAsync(frame, 0, frame.Length, _cancelSource.Token);
                 await _stream.FlushAsync(_cancelSource.Token);
             }

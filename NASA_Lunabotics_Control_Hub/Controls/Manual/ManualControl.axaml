@@ -35,6 +35,17 @@
                         <manual:KeyButton Grid.Row="1" Grid.Column="1" x:Name="SKey" KeyLabel="S"/>
                         <manual:KeyButton Grid.Row="1" Grid.Column="2" x:Name="DKey" KeyLabel="D"/>
                     </Grid>
+                    <TextBlock Text="SPEED" Classes="sub-header" HorizontalAlignment="Center"/>
+                    <Slider x:Name="SpeedSlider"
+                            Minimum="0" Maximum="100" Value="100"
+                            Width="80" HorizontalAlignment="Center"/>
+                    <TextBlock HorizontalAlignment="Center">
+                        <TextBlock.Text>
+                            <MultiBinding StringFormat="{}{0:0}%">
+                                <Binding ElementName="SpeedSlider" Path="Value"/>
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
                 </StackPanel>
             </Border>
 

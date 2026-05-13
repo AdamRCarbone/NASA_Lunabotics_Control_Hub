@@ -141,7 +141,7 @@ namespace NASA_Lunabotics_Control_Hub.Views
             if (manualControl.IsActive && _networkClient.IsConnected)
             {
                 byte bitfield = manualControl.GetKeyBitfield(activeKeys);
-                _ = _networkClient.SendManipulatorCommandAsync(bitfield);
+                _ = _networkClient.SendManipulatorCommandAsync(bitfield, manualControl.SpeedModifier);
             }
         }
 
