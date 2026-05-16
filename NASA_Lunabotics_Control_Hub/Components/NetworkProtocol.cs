@@ -246,17 +246,46 @@ namespace NASA_Lunabotics_Control_Hub.Components
                         while (idx < payloadLen)
                         {
                             byte marker = payload[idx];
-                            if (marker == 0x42 && idx + 5 <= payloadLen)       // 'B' battery float32
+                            if (marker == 0x42 && idx + 5 <= payloadLen)        // 'B' battery float32
                                 idx += 5;
-                            else if (marker == 0x46 && idx + 2 <= payloadLen)  // 'F' fault char
+                            else if (marker == 0x46 && idx + 2 <= payloadLen)   // 'F' fault char
                                 idx += 2;
-                            else if (marker == 0x49 && idx + 13 <= payloadLen) // 'I' accel 3×float32 LE
+                            else if (marker == 0x49 && idx + 13 <= payloadLen)  // 'I' accel 3×float32 LE
                             {
-                                tmsg.AccelX = BitConverter.ToSingle(payload, idx + 1);
-                                tmsg.AccelY = BitConverter.ToSingle(payload, idx + 5);
-                                tmsg.AccelZ = BitConverter.ToSingle(payload, idx + 9);
+                                tmsg.AccelX   = BitConverter.ToSingle(payload, idx + 1);
+                                tmsg.AccelY   = BitConverter.ToSingle(payload, idx + 5);
+                                tmsg.AccelZ   = BitConverter.ToSingle(payload, idx + 9);
                                 tmsg.HasAccel = true;
                                 idx += 13;
+                            }
+                            else if (marker == 0x4C && idx + 13 <= payloadLen)  // 'L' localization pose
+                            {
+                                tmsg.PoseX     = BitConverter.ToSingle(payload, idx + 1);
+                                tmsg.PoseY     = BitConverter.ToSingle(payload, idx + 5);
+                                tmsg.PoseTheta = BitConverter.ToSingle(payload, idx + 9);
+                                tmsg.HasPose   = true;
+                                idx += 13;
+                            }
+                            else if (marker == 0x47 && idx + 2 <= payloadLen)   // 'G' AprilTag observations
+                            {
+                                byte count  = Math.Min(payload[idx + 1], (byte)3);
+                                int  needed = 2 + count * 9;
+                                if (idx + needed <= payloadLen)
+                                {
+                                    tmsg.TagCount  = count;
+                                    tmsg.TagIds    = new byte[count];
+                                    tmsg.TagDists  = new float[count];
+                                    tmsg.TagAngles = new float[count];
+                                    for (int t = 0; t < count; t++)
+                                    {
+                                        int o = idx + 2 + t * 9;
+                                        tmsg.TagIds[t]    = payload[o];
+                                        tmsg.TagDists[t]  = BitConverter.ToSingle(payload, o + 1);
+                                        tmsg.TagAngles[t] = BitConverter.ToSingle(payload, o + 5);
+                                    }
+                                    idx += needed;
+                                }
+                                else break;
                             }
                             else break;
                         }
@@ -341,5 +370,17 @@ namespace NASA_Lunabotics_Control_Hub.Components
         public float AccelX { get; set; }
         public float AccelY { get; set; }
         public float AccelZ { get; set; }
+
+        // Localization pose (marker 'L')
+        public bool HasPose    { get; set; }
+        public float PoseX     { get; set; }
+        public float PoseY     { get; set; }
+        public float PoseTheta { get; set; }
+
+        // AprilTag observations (marker 'G')
+        public byte    TagCount  { get; set; }
+        public byte[]?  TagIds    { get; set; }
+        public float[]? TagDists  { get; set; }
+        public float[]? TagAngles { get; set; }
     }
 }

@@ -34,6 +34,8 @@ namespace NASA_Lunabotics_Control_Hub.Components
         public event Action<bool>?   ConnectionChanged;
         public event Action?         HeartbeatReceived;
         public event Action<float, float, float>? AccelReceived;
+        public event Action<float, float, float>? PoseReceived;   // x, y, theta
+        public event Action<byte, byte[], float[], float[]>? TagsReceived; // count, ids, dists, angles
 
         // ── UDP shared dispatcher ─────────────────────────────────────────────
         private UdpClient? _udp;
@@ -326,6 +328,19 @@ namespace NASA_Lunabotics_Control_Hub.Components
                         {
                             float ax = msg.AccelX, ay = msg.AccelY, az = msg.AccelZ;
                             Dispatcher.UIThread.Post(() => AccelReceived?.Invoke(ax, ay, az));
+                        }
+                        if (msg.HasPose)
+                        {
+                            float px = msg.PoseX, py = msg.PoseY, pt = msg.PoseTheta;
+                            Dispatcher.UIThread.Post(() => PoseReceived?.Invoke(px, py, pt));
+                        }
+                        if (msg.TagCount > 0)
+                        {
+                            byte   tc = msg.TagCount;
+                            byte[]   ids    = msg.TagIds!;
+                            float[]  dists  = msg.TagDists!;
+                            float[]  angles = msg.TagAngles!;
+                            Dispatcher.UIThread.Post(() => TagsReceived?.Invoke(tc, ids, dists, angles));
                         }
                         break;
 
