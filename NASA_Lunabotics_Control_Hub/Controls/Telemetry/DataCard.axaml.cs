@@ -18,6 +18,12 @@ public partial class DataCard : UserControl
     public static readonly StyledProperty<string> UnitProperty =
         AvaloniaProperty.Register<DataCard, string>(nameof(Unit));
 
+    public static readonly StyledProperty<double> ValueFontSizeProperty =
+        AvaloniaProperty.Register<DataCard, double>(nameof(ValueFontSize), defaultValue: 16.0);
+
+    public static readonly StyledProperty<string> ValueForegroundProperty =
+        AvaloniaProperty.Register<DataCard, string>(nameof(ValueForeground), defaultValue: "#606060");
+
     public DataCard()
     {
         InitializeComponent();
@@ -45,5 +51,17 @@ public partial class DataCard : UserControl
     {
         get => GetValue(UnitProperty);
         set => SetValue(UnitProperty, value);
+    }
+
+    public double ValueFontSize
+    {
+        get => GetValue(ValueFontSizeProperty);
+        set => SetValue(ValueFontSizeProperty, value);
+    }
+
+    public string ValueForeground
+    {
+        get => GetValue(ValueForegroundProperty);
+        set => SetValue(ValueForegroundProperty, value);
     }
 }

@@ -91,13 +91,16 @@ namespace NASA_Lunabotics_Control_Hub.ViewModels
         }
 
         // AprilTag observations (marker G)
-        private string _tag1Text = ""; private bool _tag1Visible = false;
-        private string _tag2Text = ""; private bool _tag2Visible = false;
-        private string _tag3Text = ""; private bool _tag3Visible = false;
+        private string _tag1Label = ""; private string _tag1Stats = ""; private bool _tag1Visible = false;
+        private string _tag2Label = ""; private string _tag2Stats = ""; private bool _tag2Visible = false;
+        private string _tag3Label = ""; private string _tag3Stats = ""; private bool _tag3Visible = false;
 
-        public string Tag1Text    { get => _tag1Text;    private set => this.RaiseAndSetIfChanged(ref _tag1Text,    value); }
-        public string Tag2Text    { get => _tag2Text;    private set => this.RaiseAndSetIfChanged(ref _tag2Text,    value); }
-        public string Tag3Text    { get => _tag3Text;    private set => this.RaiseAndSetIfChanged(ref _tag3Text,    value); }
+        public string Tag1Label   { get => _tag1Label;   private set => this.RaiseAndSetIfChanged(ref _tag1Label,   value); }
+        public string Tag1Stats   { get => _tag1Stats;   private set => this.RaiseAndSetIfChanged(ref _tag1Stats,   value); }
+        public string Tag2Label   { get => _tag2Label;   private set => this.RaiseAndSetIfChanged(ref _tag2Label,   value); }
+        public string Tag2Stats   { get => _tag2Stats;   private set => this.RaiseAndSetIfChanged(ref _tag2Stats,   value); }
+        public string Tag3Label   { get => _tag3Label;   private set => this.RaiseAndSetIfChanged(ref _tag3Label,   value); }
+        public string Tag3Stats   { get => _tag3Stats;   private set => this.RaiseAndSetIfChanged(ref _tag3Stats,   value); }
         public bool   Tag1Visible { get => _tag1Visible; private set { this.RaiseAndSetIfChanged(ref _tag1Visible, value); this.RaisePropertyChanged(nameof(NoTagsVisible)); } }
         public bool   Tag2Visible { get => _tag2Visible; private set { this.RaiseAndSetIfChanged(ref _tag2Visible, value); this.RaisePropertyChanged(nameof(NoTagsVisible)); } }
         public bool   Tag3Visible { get => _tag3Visible; private set { this.RaiseAndSetIfChanged(ref _tag3Visible, value); this.RaisePropertyChanged(nameof(NoTagsVisible)); } }
@@ -108,9 +111,9 @@ namespace NASA_Lunabotics_Control_Hub.ViewModels
             Tag1Visible = count >= 1;
             Tag2Visible = count >= 2;
             Tag3Visible = count >= 3;
-            if (count >= 1) Tag1Text = $"#{ids[0]} {dists[0]:F1}m {angles[0]:F0}°";
-            if (count >= 2) Tag2Text = $"#{ids[1]} {dists[1]:F1}m {angles[1]:F0}°";
-            if (count >= 3) Tag3Text = $"#{ids[2]} {dists[2]:F1}m {angles[2]:F0}°";
+            if (count >= 1) { Tag1Label = $"TAG #{ids[0]}"; Tag1Stats = $"{dists[0]:F2}m   {angles[0]:F1}°"; }
+            if (count >= 2) { Tag2Label = $"TAG #{ids[1]}"; Tag2Stats = $"{dists[1]:F2}m   {angles[1]:F1}°"; }
+            if (count >= 3) { Tag3Label = $"TAG #{ids[2]}"; Tag3Stats = $"{dists[2]:F2}m   {angles[2]:F1}°"; }
         }
 
         public void ResetLocalization()

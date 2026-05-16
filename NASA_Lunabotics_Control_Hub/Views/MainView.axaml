@@ -338,13 +338,13 @@
                      FontWeight="Bold" FontFamily="Arial Rounded MT Bold"/>
 
           <!-- Pose X / Y / θ -->
-          <Grid Grid.Row="2" ColumnDefinitions="*,8,*,8,*">
+          <Grid Grid.Row="2" ColumnDefinitions="*,6,*,6,*">
             <telemetry:DataCard Grid.Column="0" Label="X"
-                                Value="{Binding PoseXText}" Unit="m"/>
+                                Value="{Binding PoseXText}" Unit="m" ValueFontSize="13"/>
             <telemetry:DataCard Grid.Column="2" Label="Y"
-                                Value="{Binding PoseYText}" Unit="m"/>
+                                Value="{Binding PoseYText}" Unit="m" ValueFontSize="13"/>
             <telemetry:DataCard Grid.Column="4" Label="&#x3B8;"
-                                Value="{Binding PoseThetaText}" Unit="rad"/>
+                                Value="{Binding PoseThetaText}" Unit="rad" ValueFontSize="13"/>
           </Grid>
 
           <!-- APRIL TAGS header -->
@@ -352,24 +352,36 @@
                      FontWeight="Bold" FontFamily="Arial Rounded MT Bold"/>
 
           <!-- Tag badges -->
-          <StackPanel Grid.Row="6" Orientation="Horizontal" Spacing="5" VerticalAlignment="Center">
-            <TextBlock Text="None visible" Foreground="#404040" FontSize="9"
-                       FontFamily="Consolas" VerticalAlignment="Center"
+          <StackPanel Grid.Row="6" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+            <TextBlock Text="None visible" Foreground="#3A3A3A" FontSize="10"
+                       FontFamily="Consolas" FontStyle="Italic" VerticalAlignment="Center"
                        IsVisible="{Binding NoTagsVisible}"/>
-            <Border Background="#1A2A1A" BorderBrush="#4ade80" BorderThickness="1"
-                    CornerRadius="4" Padding="6,2" IsVisible="{Binding Tag1Visible}">
-              <TextBlock Text="{Binding Tag1Text}" Foreground="#4ade80"
-                         FontSize="9" FontFamily="Consolas"/>
+            <Border Background="#0B1A0B" BorderBrush="#4ade80" BorderThickness="1"
+                    CornerRadius="6" Padding="10,5" IsVisible="{Binding Tag1Visible}">
+              <StackPanel Spacing="2">
+                <TextBlock Text="{Binding Tag1Label}" Foreground="#4ade80"
+                           FontSize="11" FontWeight="Bold" FontFamily="Consolas"/>
+                <TextBlock Text="{Binding Tag1Stats}" Foreground="#2eb85c"
+                           FontSize="10" FontFamily="Consolas"/>
+              </StackPanel>
             </Border>
-            <Border Background="#1A2A1A" BorderBrush="#4ade80" BorderThickness="1"
-                    CornerRadius="4" Padding="6,2" IsVisible="{Binding Tag2Visible}">
-              <TextBlock Text="{Binding Tag2Text}" Foreground="#4ade80"
-                         FontSize="9" FontFamily="Consolas"/>
+            <Border Background="#0B1A0B" BorderBrush="#4ade80" BorderThickness="1"
+                    CornerRadius="6" Padding="10,5" IsVisible="{Binding Tag2Visible}">
+              <StackPanel Spacing="2">
+                <TextBlock Text="{Binding Tag2Label}" Foreground="#4ade80"
+                           FontSize="11" FontWeight="Bold" FontFamily="Consolas"/>
+                <TextBlock Text="{Binding Tag2Stats}" Foreground="#2eb85c"
+                           FontSize="10" FontFamily="Consolas"/>
+              </StackPanel>
             </Border>
-            <Border Background="#1A2A1A" BorderBrush="#4ade80" BorderThickness="1"
-                    CornerRadius="4" Padding="6,2" IsVisible="{Binding Tag3Visible}">
-              <TextBlock Text="{Binding Tag3Text}" Foreground="#4ade80"
-                         FontSize="9" FontFamily="Consolas"/>
+            <Border Background="#0B1A0B" BorderBrush="#4ade80" BorderThickness="1"
+                    CornerRadius="6" Padding="10,5" IsVisible="{Binding Tag3Visible}">
+              <StackPanel Spacing="2">
+                <TextBlock Text="{Binding Tag3Label}" Foreground="#4ade80"
+                           FontSize="11" FontWeight="Bold" FontFamily="Consolas"/>
+                <TextBlock Text="{Binding Tag3Stats}" Foreground="#2eb85c"
+                           FontSize="10" FontFamily="Consolas"/>
+              </StackPanel>
             </Border>
           </StackPanel>
 
