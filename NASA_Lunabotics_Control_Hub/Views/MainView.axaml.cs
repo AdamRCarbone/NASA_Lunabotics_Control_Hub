@@ -42,6 +42,13 @@ namespace NASA_Lunabotics_Control_Hub.Views
 
             DataContext = _mainViewModel;
 
+            // Watch for viewport selection changes to toggle terrain / video panels
+            _mainViewModel.PropertyChanged += (_, e) =>
+            {
+                if (e.PropertyName == nameof(MainViewModel.ActiveViewport))
+                    OnActiveViewportChanged();
+            };
+
             // Populate network selector with available interfaces
             PopulateNetworkSelector();
             NetworkSelector.DropDownOpened += (_, _) =>
@@ -90,17 +97,51 @@ namespace NASA_Lunabotics_Control_Hub.Views
                 var terrainPanel = this.FindControl<TerrainMapPanel>("TerrainPanel");
                 if (isConnected)
                 {
-                    if (videoPanel   != null) videoPanel.NetworkClient   = _networkClient;
-                    if (terrainPanel != null) terrainPanel.NetworkClient = _networkClient;
+                    if (videoPanel != null) videoPanel.NetworkClient = _networkClient;
+                    // Terrain panel gets its NetworkClient only when user selects "map" viewport.
+                    if (terrainPanel != null)
+                        terrainPanel.TerrainStopped += OnTerrainStopped;
                 }
                 else
                 {
                     if (videoPanel   != null) videoPanel.NetworkClient   = null;
-                    if (terrainPanel != null) terrainPanel.NetworkClient = null;
+                    if (terrainPanel != null)
+                    {
+                        terrainPanel.NetworkClient  = null;
+                        terrainPanel.TerrainStopped -= OnTerrainStopped;
+                        terrainPanel.IsVisible       = false;
+                        videoPanel!.IsVisible        = true;
+                    }
                     _mainViewModel.SetModeState("", NASA_Lunabotics_Control_Hub.ViewModels.ModeState.Idle);
                     videoPanel?.ClearStream();
                     _mainViewModel.ResetImu();
                 }
+            });
+        }
+
+        private void OnTerrainStopped()
+        {
+            // User clicked STOP on the terrain panel — switch back to the video viewport.
+            _mainViewModel.OnViewportSelected("");
+            var terrainPanel = this.FindControl<TerrainMapPanel>("TerrainPanel");
+            var videoPanel   = this.FindControl<Controls.Video.VideoPanel>("VideoPanel");
+            if (terrainPanel != null) terrainPanel.IsVisible = false;
+            if (videoPanel   != null) videoPanel.IsVisible   = true;
+        }
+
+        private void OnActiveViewportChanged()
+        {
+            Dispatcher.UIThread.Post(() =>
+            {
+                bool isMap       = _mainViewModel.ActiveViewport == "map";
+                var terrainPanel = this.FindControl<TerrainMapPanel>("TerrainPanel");
+                var videoPanel   = this.FindControl<Controls.Video.VideoPanel>("VideoPanel");
+
+                if (terrainPanel != null) terrainPanel.IsVisible = isMap;
+                if (videoPanel   != null) videoPanel.IsVisible   = !isMap;
+
+                if (isMap && _networkClient.IsConnected && terrainPanel != null)
+                    terrainPanel.NetworkClient = _networkClient;
             });
         }
 
