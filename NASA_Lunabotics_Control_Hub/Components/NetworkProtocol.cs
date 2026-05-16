@@ -27,6 +27,12 @@ namespace NASA_Lunabotics_Control_Hub.Components
         public const byte SOURCE_TERRAIN       = 0x07; // source_id for terrain UDP stream
         public const byte VARIANT_TERRAIN      = 0x54; // 'T' — terrain grid variant
 
+        // Far ESP32 camera source IDs (RGB only, JPEG reassembly identical to IDs 0–5)
+        public const byte SOURCE_FAR_FRONT     = 0x08;
+        public const byte SOURCE_FAR_RIGHT     = 0x09;
+        public const byte SOURCE_FAR_BACK      = 0x0A;
+        public const byte SOURCE_FAR_LEFT      = 0x0B;
+
         // State/Mode codes
         public const byte STATE_STANDBY = 0x30; // '0'
         public const byte STATE_MANUAL = 0x31; // '1'

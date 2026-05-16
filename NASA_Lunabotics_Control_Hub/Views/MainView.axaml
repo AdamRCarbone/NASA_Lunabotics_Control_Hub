@@ -241,21 +241,21 @@
             </Grid>
           </Grid>
 
-          <!-- Far Cameras -->
+          <!-- Far Cameras (ESP32, RGB only) -->
           <Grid Grid.Row="4" RowDefinitions="Auto,*">
-            <TextBlock Grid.Row="0" Text="Far Cameras (April Tags)" Classes="section-header"/>
+            <TextBlock Grid.Row="0" Text="Far Cameras (ESP32)" Classes="section-header"/>
             <Grid Grid.Row="1" ColumnDefinitions="*,3,*" RowDefinitions="*,3,*">
-              <cameras:CameraStatusCard Grid.Row="0" Grid.Column="0" CameraName="Front" CameraType="AprilTag"
-                                        StatusText="No Tag" ViewportId="far_front" IsStreamable="False"
+              <cameras:CameraStatusCard Grid.Row="0" Grid.Column="0" CameraName="Front" CameraType="RGB"
+                                        StatusText="No Data" ViewportId="far_front" SourceId="8"
                                         IsActive="{Binding ActiveViewport, Converter={StaticResource ViewportIdToIsActive}, ConverterParameter=far_front}"/>
-              <cameras:CameraStatusCard Grid.Row="0" Grid.Column="2" CameraName="Right" CameraType="AprilTag"
-                                        StatusText="No Tag" ViewportId="far_right" IsStreamable="False"
+              <cameras:CameraStatusCard Grid.Row="0" Grid.Column="2" CameraName="Right" CameraType="RGB"
+                                        StatusText="No Data" ViewportId="far_right" SourceId="9"
                                         IsActive="{Binding ActiveViewport, Converter={StaticResource ViewportIdToIsActive}, ConverterParameter=far_right}"/>
-              <cameras:CameraStatusCard Grid.Row="2" Grid.Column="0" CameraName="Back" CameraType="AprilTag"
-                                        StatusText="No Tag" ViewportId="far_back" IsStreamable="False"
+              <cameras:CameraStatusCard Grid.Row="2" Grid.Column="0" CameraName="Back" CameraType="RGB"
+                                        StatusText="No Data" ViewportId="far_back" SourceId="10"
                                         IsActive="{Binding ActiveViewport, Converter={StaticResource ViewportIdToIsActive}, ConverterParameter=far_back}"/>
-              <cameras:CameraStatusCard Grid.Row="2" Grid.Column="2" CameraName="Left" CameraType="AprilTag"
-                                        StatusText="No Tag" ViewportId="far_left" IsStreamable="False"
+              <cameras:CameraStatusCard Grid.Row="2" Grid.Column="2" CameraName="Left" CameraType="RGB"
+                                        StatusText="No Data" ViewportId="far_left" SourceId="11"
                                         IsActive="{Binding ActiveViewport, Converter={StaticResource ViewportIdToIsActive}, ConverterParameter=far_left}"/>
             </Grid>
           </Grid>

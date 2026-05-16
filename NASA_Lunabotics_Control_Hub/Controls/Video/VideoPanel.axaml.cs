@@ -68,7 +68,9 @@ public partial class VideoPanel : UserControl
         if (_networkClient == null) return;
         _videoClient.Stop();
         _videoClient.Start();
-        _ = _networkClient.SendVideoRequestAsync(sourceId, _variant, (byte)_quality, (byte)_fps);
+        // Far ESP32 cameras (source IDs 8–11) are RGB only — ignore the depth toggle.
+        byte variant = sourceId >= 8 ? NetworkProtocol.VARIANT_RGB : _variant;
+        _ = _networkClient.SendVideoRequestAsync(sourceId, variant, (byte)_quality, (byte)_fps);
         UpdateStatusText("CONNECTING...", Brushes.Orange);
     }
 
