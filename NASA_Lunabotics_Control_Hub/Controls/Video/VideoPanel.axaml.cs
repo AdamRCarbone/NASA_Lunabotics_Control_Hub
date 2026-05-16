@@ -31,7 +31,13 @@ public partial class VideoPanel : UserControl
     public NetworkModeClient? NetworkClient
     {
         get => _networkClient;
-        set => _networkClient = value;
+        set
+        {
+            if (_networkClient == value) return;
+            _networkClient?.UnregisterUdpHandler(_videoClient.ProcessPacket);
+            _networkClient = value;
+            _networkClient?.RegisterUdpHandler(_videoClient.ProcessPacket);
+        }
     }
 
     public VideoPanel()
