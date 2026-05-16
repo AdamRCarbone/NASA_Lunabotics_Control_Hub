@@ -332,7 +332,6 @@ namespace NASA_Lunabotics_Control_Hub.Components
                         }
                         if (msg.HasPose)
                         {
-                            Console.WriteLine($"[NetworkModeClient] Pose: x={msg.PoseX:F3} y={msg.PoseY:F3} θ={msg.PoseTheta:F3}");
                             float px = msg.PoseX, py = msg.PoseY, pt = msg.PoseTheta;
                             Dispatcher.UIThread.Post(() => PoseReceived?.Invoke(px, py, pt));
                         }
@@ -342,8 +341,6 @@ namespace NASA_Lunabotics_Control_Hub.Components
                             byte[]   ids    = msg.TagIds!;
                             float[]  dists  = msg.TagDists!;
                             float[]  angles = msg.TagAngles!;
-                            Console.WriteLine($"[NetworkModeClient] Tags: {tc} visible — " +
-                                string.Join(", ", Enumerable.Range(0, tc).Select(i => $"#{ids[i]} {dists[i]:F2}m {angles[i]:F1}°")));
                             Dispatcher.UIThread.Post(() => TagsReceived?.Invoke(tc, ids, dists, angles));
                         }
                         break;

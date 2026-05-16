@@ -72,6 +72,7 @@ namespace NASA_Lunabotics_Control_Hub.ViewModels
         }
 
         // Localization (marker L)
+        private DateTime _lastPoseTime = DateTime.MinValue;
         private string _poseXText = "--";
         private string _poseYText = "--";
         private string _poseThetaText = "--";
@@ -84,10 +85,22 @@ namespace NASA_Lunabotics_Control_Hub.ViewModels
 
         public void UpdatePose(float x, float y, float theta)
         {
+            _lastPoseTime = DateTime.UtcNow;
             PoseXText     = $"{x:F2}";
             PoseYText     = $"{y:F2}";
             PoseThetaText = $"{theta:F3}";
             HasPose       = true;
+        }
+
+        public void ClearPoseIfStale(double timeoutSeconds = 3.0)
+        {
+            if (_lastPoseTime == DateTime.MinValue) return;
+            if ((DateTime.UtcNow - _lastPoseTime).TotalSeconds > timeoutSeconds)
+            {
+                _lastPoseTime = DateTime.MinValue;
+                PoseXText = "--"; PoseYText = "--"; PoseThetaText = "--";
+                HasPose = false;
+            }
         }
 
         // AprilTag observations (marker G)
@@ -130,6 +143,7 @@ namespace NASA_Lunabotics_Control_Hub.ViewModels
 
         public void ResetLocalization()
         {
+            _lastPoseTime = DateTime.MinValue;
             PoseXText = "--"; PoseYText = "--"; PoseThetaText = "--";
             HasPose = false;
             _lastTagTime = DateTime.MinValue;

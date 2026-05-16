@@ -176,6 +176,7 @@ namespace NASA_Lunabotics_Control_Hub.Views
                 _networkClient.Disconnect();
 
             _mainViewModel.ClearTagsIfStale();
+            _mainViewModel.ClearPoseIfStale();
 
             var joystick      = this.FindControl<Controls.JoystickControl>("KeyTrackingJoystick");
             var manualControl = this.FindControl<ManualControl>("ManualControlCard");

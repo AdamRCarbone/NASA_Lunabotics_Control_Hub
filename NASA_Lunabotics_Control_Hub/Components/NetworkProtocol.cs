@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using System.Text;
 
 namespace NASA_Lunabotics_Control_Hub.Components
@@ -13,16 +12,6 @@ namespace NASA_Lunabotics_Control_Hub.Components
     /// </summary>
     public static class NetworkProtocol
     {
-        private static readonly string _logPath = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "octane_telemetry.log");
-
-        private static void DebugLog(string msg)
-        {
-            string line = $"[{DateTime.Now:HH:mm:ss.fff}] {msg}";
-            Console.WriteLine(line);
-            try { File.AppendAllText(_logPath, line + "\n"); } catch { }
-        }
-
         // Constants
         public const byte MAGIC = 0x4F; // 'O' for OCTANE
         public const byte TYPE_TELEMETRY = 0x54;    // 'T'
@@ -252,13 +241,11 @@ namespace NASA_Lunabotics_Control_Hub.Components
                 case TYPE_TELEMETRY:
                     if (payloadLen >= 1)
                     {
-                        DebugLog($"Telemetry payload ({payloadLen}b): {BitConverter.ToString(payload)}");
                         var tmsg = new DecodedMessage { Type = "telemetry", State = payload[0] };
                         int idx = 1;
                         while (idx < payloadLen)
                         {
                             byte marker = payload[idx];
-                            DebugLog($"  idx={idx} marker=0x{marker:X2} ('{(char)marker}') remaining={payloadLen - idx}");
                             if (marker == 0x42 && idx + 5 <= payloadLen)        // 'B' battery float32
                                 idx += 5;
                             else if (marker == 0x46 && idx + 2 <= payloadLen)   // 'F' fault char
