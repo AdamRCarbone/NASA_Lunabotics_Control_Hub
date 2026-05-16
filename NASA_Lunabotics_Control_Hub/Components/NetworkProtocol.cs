@@ -241,11 +241,13 @@ namespace NASA_Lunabotics_Control_Hub.Components
                 case TYPE_TELEMETRY:
                     if (payloadLen >= 1)
                     {
+                        Console.WriteLine($"[NetworkProtocol] Telemetry payload ({payloadLen}b): {BitConverter.ToString(payload)}");
                         var tmsg = new DecodedMessage { Type = "telemetry", State = payload[0] };
                         int idx = 1;
                         while (idx < payloadLen)
                         {
                             byte marker = payload[idx];
+                            Console.WriteLine($"[NetworkProtocol]   idx={idx} marker=0x{marker:X2} ('{(char)marker}') remaining={payloadLen - idx}");
                             if (marker == 0x42 && idx + 5 <= payloadLen)        // 'B' battery float32
                                 idx += 5;
                             else if (marker == 0x46 && idx + 2 <= payloadLen)   // 'F' fault char
