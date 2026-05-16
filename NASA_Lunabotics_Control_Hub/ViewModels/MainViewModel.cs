@@ -91,6 +91,7 @@ namespace NASA_Lunabotics_Control_Hub.ViewModels
         }
 
         // AprilTag observations (marker G)
+        private DateTime _lastTagTime = DateTime.MinValue;
         private string _tag1Label = ""; private string _tag1Stats = ""; private bool _tag1Visible = false;
         private string _tag2Label = ""; private string _tag2Stats = ""; private bool _tag2Visible = false;
         private string _tag3Label = ""; private string _tag3Stats = ""; private bool _tag3Visible = false;
@@ -108,6 +109,7 @@ namespace NASA_Lunabotics_Control_Hub.ViewModels
 
         public void UpdateTags(byte count, byte[] ids, float[] dists, float[] angles)
         {
+            _lastTagTime = DateTime.UtcNow;
             Tag1Visible = count >= 1;
             Tag2Visible = count >= 2;
             Tag3Visible = count >= 3;
@@ -116,10 +118,21 @@ namespace NASA_Lunabotics_Control_Hub.ViewModels
             if (count >= 3) { Tag3Label = $"TAG #{ids[2]}"; Tag3Stats = $"{dists[2]:F2}m   {angles[2]:F1}°"; }
         }
 
+        public void ClearTagsIfStale(double timeoutSeconds = 3.0)
+        {
+            if (_lastTagTime == DateTime.MinValue) return;
+            if ((DateTime.UtcNow - _lastTagTime).TotalSeconds > timeoutSeconds)
+            {
+                _lastTagTime = DateTime.MinValue;
+                Tag1Visible = false; Tag2Visible = false; Tag3Visible = false;
+            }
+        }
+
         public void ResetLocalization()
         {
             PoseXText = "--"; PoseYText = "--"; PoseThetaText = "--";
             HasPose = false;
+            _lastTagTime = DateTime.MinValue;
             Tag1Visible = false; Tag2Visible = false; Tag3Visible = false;
         }
 

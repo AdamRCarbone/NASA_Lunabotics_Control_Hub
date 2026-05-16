@@ -175,6 +175,8 @@ namespace NASA_Lunabotics_Control_Hub.Views
             if (!IgnoreHeartbeatTimeout && _networkClient.IsConnected && _networkClient.IsHeartbeatTimeout())
                 _networkClient.Disconnect();
 
+            _mainViewModel.ClearTagsIfStale();
+
             var joystick      = this.FindControl<Controls.JoystickControl>("KeyTrackingJoystick");
             var manualControl = this.FindControl<ManualControl>("ManualControlCard");
 
