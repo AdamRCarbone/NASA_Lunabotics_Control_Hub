@@ -23,7 +23,9 @@ namespace NASA_Lunabotics_Control_Hub.Components
         public const byte TYPE_VIDEO = 0x56;        // 'V'
         public const byte VARIANT_RGB = 0x52;       // 'R'
         public const byte VARIANT_DEPTH = 0x44;     // 'D'
-        public const byte VIDEO_SOURCE_STOP = 0xFF;
+        public const byte VIDEO_SOURCE_STOP    = 0xFF;
+        public const byte SOURCE_TERRAIN       = 0x07; // source_id for terrain UDP stream
+        public const byte VARIANT_TERRAIN      = 0x54; // 'T' — terrain grid variant
 
         // State/Mode codes
         public const byte STATE_STANDBY = 0x30; // '0'

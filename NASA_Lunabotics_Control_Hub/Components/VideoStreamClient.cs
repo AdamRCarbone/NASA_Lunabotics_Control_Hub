@@ -1,17 +1,12 @@
 using System;
 using System.Collections.Generic;
-using System.Net;
-using System.Net.Sockets;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace NASA_Lunabotics_Control_Hub.Components;
 
+// Pure reassembler — no socket ownership. Feed packets via ProcessPacket().
+// NetworkModeClient owns the UDP socket and routes packets here.
 public class VideoStreamClient : IDisposable
 {
-    private UdpClient? _udp;
-    private CancellationTokenSource _cts = new();
-
     private ushort _currentSeq;
     private bool _hasCurrentSeq;
     private readonly Dictionary<ushort, FrameBuffer> _pending = new();
@@ -30,100 +25,67 @@ public class VideoStreamClient : IDisposable
     {
         lock (_pendingLock) { _pending.Clear(); }
         _hasCurrentSeq = false;
-        _cts = new CancellationTokenSource();
-        _udp = new UdpClient(new IPEndPoint(IPAddress.Any, 5002));
-        Task.Run(ReceiveLoop, _cts.Token);
     }
 
     public void Stop()
     {
-        _cts.Cancel();
-        _udp?.Close();
-        _udp?.Dispose();
-        _udp = null;
+        lock (_pendingLock) { _pending.Clear(); }
         _hasCurrentSeq = false;
     }
 
-    private async Task ReceiveLoop()
+    // Called by the shared UDP dispatcher for every packet that arrives on port 5002.
+    // Skips terrain packets (source_id=7) — those are handled by TerrainStreamClient.
+    public void ProcessPacket(byte[] data)
     {
-        // Capture fields at loop entry so a concurrent Stop()+Start() can't make this
-        // loop "come back to life" reading the new socket and racing with the next loop.
-        var cts = _cts;
-        var udp = _udp;
-        while (!cts.IsCancellationRequested)
-        {
-            try
-            {
-                if (udp == null) break;
-                var result = await udp.ReceiveAsync(cts.Token);
-                ProcessPacket(result.Buffer);
-            }
-            catch (OperationCanceledException) { break; }
-            catch (ObjectDisposedException) { break; }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"[VideoStreamClient] Receive error: {ex.Message}");
-            }
-        }
-    }
-
-    private void ProcessPacket(byte[] data)
-    {
-        // UDP frame header: [magic][type][source_id][variant][seq_hi][seq_lo][chunk_idx][chunk_total][jpeg...]
         if (data.Length < 9) return;
         if (data[0] != 0x4F || data[1] != 0x56) return;
+        if (data[2] == 0x07) return; // terrain source — not ours
 
-        ushort seq = (ushort)((data[4] << 8) | data[5]);
-        byte chunkIdx = data[6];
-        byte chunkTotal = data[7];
-        int jpegLen = data.Length - 8;
+        ushort seq       = (ushort)((data[4] << 8) | data[5]);
+        byte   chunkIdx  = data[6];
+        byte   chunkTotal = data[7];
+        int    payloadLen = data.Length - 8;
 
-        if (jpegLen <= 0 || chunkIdx >= chunkTotal || chunkTotal == 0) return;
+        if (payloadLen <= 0 || chunkIdx >= chunkTotal || chunkTotal == 0) return;
 
-        byte[]? jpeg = null;
+        byte[]? assembled = null;
         lock (_pendingLock)
         {
-            // New seq while a different one is in-flight — discard the incomplete frame
             if (_hasCurrentSeq && seq != _currentSeq)
                 _pending.Remove(_currentSeq);
-            _currentSeq = seq;
+            _currentSeq    = seq;
             _hasCurrentSeq = true;
 
             if (!_pending.TryGetValue(seq, out var buf))
             {
                 buf = new FrameBuffer
                 {
-                    Chunks = new byte[chunkTotal][],
-                    Total = chunkTotal,
+                    Chunks   = new byte[chunkTotal][],
+                    Total    = chunkTotal,
                     Received = 0
                 };
             }
 
-            if (buf.Chunks[chunkIdx] != null) return; // duplicate chunk, skip
+            if (buf.Chunks[chunkIdx] != null) return;
 
-            var chunk = new byte[jpegLen];
-            Array.Copy(data, 8, chunk, 0, jpegLen);
+            var chunk = new byte[payloadLen];
+            Array.Copy(data, 8, chunk, 0, payloadLen);
             buf.Chunks[chunkIdx] = chunk;
             buf.Received++;
             _pending[seq] = buf;
 
             if (buf.Received < buf.Total) return;
 
-            // Frame complete — concatenate and fire outside the lock
             _pending.Remove(seq);
             _hasCurrentSeq = false;
 
-            int totalLen = 0;
-            foreach (var c in buf.Chunks) totalLen += c.Length;
-            jpeg = new byte[totalLen];
-            int offset = 0;
-            foreach (var c in buf.Chunks)
-            {
-                Array.Copy(c, 0, jpeg, offset, c.Length);
-                offset += c.Length;
-            }
+            int total = 0;
+            foreach (var c in buf.Chunks) total += c.Length;
+            assembled = new byte[total];
+            int off = 0;
+            foreach (var c in buf.Chunks) { Array.Copy(c, 0, assembled, off, c.Length); off += c.Length; }
         }
-        FrameDecoded?.Invoke(jpeg);
+        FrameDecoded?.Invoke(assembled);
     }
 
     public void Dispose() => Stop();

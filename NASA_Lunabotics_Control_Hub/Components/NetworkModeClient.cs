@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -10,42 +11,102 @@ using NASA_Lunabotics_Control_Hub.ViewModels;
 namespace NASA_Lunabotics_Control_Hub.Components
 {
     /// <summary>
-    /// Handles mode state communication over TCP with the rover's octane_network package
-    /// Sends mode commands and receives state updates using the lean binary protocol
-    /// Also receives UDP heartbeats for connection health monitoring
+    /// Handles TCP control/telemetry and owns the shared UDP socket on port 5002.
+    /// Video and terrain reassemblers register via RegisterUdpHandler / UnregisterUdpHandler
+    /// so that both streams can coexist on the same port.
     /// </summary>
     public class NetworkModeClient : IDisposable
     {
+        // ── TCP ──────────────────────────────────────────────────────────────
         private TcpClient? _client;
         private NetworkStream? _stream;
         private CancellationTokenSource _cancelSource;
         private Thread? _receiveThread;
 
-        // Configuration - match octane_network settings
-        private string _roverIpAddress = "octane.local"; // Resolved via mDNS — works across network changes
-        private int _tcpPort = 5000; // TCP port for all frames (commands + heartbeat)
+        private string _roverIpAddress = "octane.local";
+        private const int TcpPort = 5000;
 
-        // Current state
         public string CurrentState { get; private set; } = "UNKNOWN";
         public bool IsConnected { get; private set; } = false;
         public DateTime LastHeartbeat { get; private set; }
 
-        // Events
         public event Action<string>? StateChanged;
-        public event Action<bool>? ConnectionChanged;
-        public event Action? HeartbeatReceived;
+        public event Action<bool>?   ConnectionChanged;
+        public event Action?         HeartbeatReceived;
         public event Action<float, float, float>? AccelReceived;
 
+        // ── UDP shared dispatcher ─────────────────────────────────────────────
+        private UdpClient? _udp;
+        private CancellationTokenSource _udpCts = new();
+        private readonly List<Action<byte[]>> _udpHandlers = new();
+        private readonly object _udpLock = new();
+
+        /// <summary>Register a handler to receive raw UDP packets from port 5002.</summary>
+        public void RegisterUdpHandler(Action<byte[]> handler)
+        {
+            lock (_udpLock) _udpHandlers.Add(handler);
+        }
+
+        /// <summary>Unregister a previously registered UDP handler.</summary>
+        public void UnregisterUdpHandler(Action<byte[]> handler)
+        {
+            lock (_udpLock) _udpHandlers.Remove(handler);
+        }
+
+        private void StartUdp()
+        {
+            _udpCts = new CancellationTokenSource();
+            _udp    = new UdpClient(new IPEndPoint(IPAddress.Any, 5002));
+            Task.Run(UdpReceiveLoop, _udpCts.Token);
+        }
+
+        private void StopUdp()
+        {
+            _udpCts.Cancel();
+            _udp?.Close();
+            _udp?.Dispose();
+            _udp = null;
+        }
+
+        private async Task UdpReceiveLoop()
+        {
+            var cts = _udpCts;
+            var udp = _udp;
+            while (!cts.IsCancellationRequested)
+            {
+                try
+                {
+                    if (udp == null) break;
+                    var result = await udp.ReceiveAsync(cts.Token);
+                    DispatchUdpPacket(result.Buffer);
+                }
+                catch (OperationCanceledException) { break; }
+                catch (ObjectDisposedException)    { break; }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"[NetworkModeClient] UDP receive error: {ex.Message}");
+                }
+            }
+        }
+
+        private void DispatchUdpPacket(byte[] data)
+        {
+            Action<byte[]>[] handlers;
+            lock (_udpLock) handlers = [.. _udpHandlers];
+            foreach (var h in handlers)
+            {
+                try { h(data); }
+                catch (Exception ex) { Console.WriteLine($"[NetworkModeClient] UDP handler error: {ex.Message}"); }
+            }
+        }
+
+        // ── Lifecycle ─────────────────────────────────────────────────────────
         public NetworkModeClient()
         {
             _cancelSource = new CancellationTokenSource();
             LastHeartbeat = DateTime.MinValue;
-            Console.WriteLine($"[NetworkModeClient] Initialized - Ready to connect to {_roverIpAddress}:{_tcpPort}");
         }
 
-        /// <summary>
-        /// Connect to the rover (TCP + UDP heartbeat listener)
-        /// </summary>
         public async Task ConnectAsync(string? address = null)
         {
             try
@@ -54,29 +115,24 @@ namespace NASA_Lunabotics_Control_Hub.Components
                     _roverIpAddress = address;
 
                 if (_client != null && _client.Connected)
-                {
-                    Console.WriteLine("[NetworkModeClient] Already connected");
                     return;
-                }
 
-                // Reset cancellation token so reconnect works after a previous disconnect
                 if (_cancelSource.IsCancellationRequested)
                 {
                     _cancelSource.Dispose();
                     _cancelSource = new CancellationTokenSource();
                 }
 
-                // Start TCP connection
                 _client = new TcpClient();
-                await _client.ConnectAsync(_roverIpAddress, _tcpPort);
+                await _client.ConnectAsync(_roverIpAddress, TcpPort);
                 _stream = _client.GetStream();
 
-                _receiveThread = new Thread(ReceiveLoop);
-                _receiveThread.IsBackground = true;
+                StartUdp();
+
+                _receiveThread = new Thread(ReceiveLoop) { IsBackground = true };
                 _receiveThread.Start();
 
-                // IsConnected stays false until first H frame arrives over TCP
-                Console.WriteLine($"[NetworkModeClient] TCP link up to {_roverIpAddress}:{_tcpPort} — waiting for first heartbeat");
+                Console.WriteLine($"[NetworkModeClient] TCP link up to {_roverIpAddress}:{TcpPort} — waiting for heartbeat");
             }
             catch (Exception ex)
             {
@@ -85,74 +141,53 @@ namespace NASA_Lunabotics_Control_Hub.Components
             }
         }
 
-        /// <summary>
-        /// Disconnect from the rover
-        /// </summary>
         public void Disconnect()
         {
             _cancelSource.Cancel();
-
             _receiveThread?.Join(1000);
+
+            StopUdp();
 
             _stream?.Dispose();
             _client?.Close();
             _client?.Dispose();
+            _client        = null;
+            _stream        = null;
+            IsConnected    = false;
+            LastHeartbeat  = DateTime.MinValue;
 
-            _client = null;
-            _stream = null;
-
-            IsConnected = false;
-            LastHeartbeat = DateTime.MinValue;
             ConnectionChanged?.Invoke(false);
-
             Console.WriteLine("[NetworkModeClient] Disconnected");
         }
 
-        /// <summary>
-        /// Check if heartbeat timeout has occurred (call from timer)
-        /// </summary>
         public bool IsHeartbeatTimeout(int timeoutSeconds = 6)
         {
-            if (LastHeartbeat == DateTime.MinValue)
-                return true;
-
+            if (LastHeartbeat == DateTime.MinValue) return true;
             return (DateTime.UtcNow - LastHeartbeat).TotalSeconds > timeoutSeconds;
         }
 
-        // Call when any rover-originated traffic arrives (e.g. video frames) to suppress
-        // heartbeat timeout while the rover is clearly alive but CPU-loaded.
         public void BumpHeartbeat() => LastHeartbeat = DateTime.UtcNow;
 
-        /// <summary>
-        /// Send mode command to rover using binary protocol
-        /// </summary>
+        // ── Send helpers ──────────────────────────────────────────────────────
         public async Task SendModeCommandAsync(string mode)
         {
             try
             {
-                if (_client == null || !_client.Connected || _stream == null)
-                {
-                    Console.WriteLine("[NetworkModeClient] Not connected - cannot send command");
-                    return;
-                }
+                if (_client == null || !_client.Connected || _stream == null) return;
 
-                // Map GUI mode to binary mode code
                 char modeCode = mode.ToLower() switch
                 {
-                    "standby" => '0',
-                    "manual" => '1',
+                    "standby"    => '0',
+                    "manual"     => '1',
                     "autonomous" => '2',
-                    "fault reset" => '3',
+                    "fault reset"=> '3',
                     _ => '0'
                 };
 
-                // Encode command using binary protocol
                 byte[] frame = NetworkProtocol.EncodeCommand(modeCode, estop: false);
-
                 await _stream.WriteAsync(frame, 0, frame.Length, _cancelSource.Token);
                 await _stream.FlushAsync(_cancelSource.Token);
-
-                Console.WriteLine($"[NetworkModeClient] Sent mode command: {mode} (code: {modeCode})");
+                Console.WriteLine($"[NetworkModeClient] Sent mode command: {mode}");
             }
             catch (Exception ex)
             {
@@ -163,8 +198,7 @@ namespace NASA_Lunabotics_Control_Hub.Components
 
         public async Task SendManipulatorCommandAsync(byte keyBitfield, ushort speedModifier = 100)
         {
-            if (_client == null || !_client.Connected || _stream == null)
-                return;
+            if (_client == null || !_client.Connected || _stream == null) return;
             try
             {
                 var frame = NetworkProtocol.EncodeManipulator(keyBitfield, speedModifier);
@@ -179,8 +213,7 @@ namespace NASA_Lunabotics_Control_Hub.Components
 
         public async Task SendVideoRequestAsync(byte sourceId, byte variant, byte quality, byte fps)
         {
-            if (_client == null || !_client.Connected || _stream == null)
-                return;
+            if (_client == null || !_client.Connected || _stream == null) return;
             try
             {
                 var frame = NetworkProtocol.EncodeVideoRequest(sourceId, variant, quality, fps);
@@ -194,67 +227,51 @@ namespace NASA_Lunabotics_Control_Hub.Components
             }
         }
 
+        /// <summary>Request the rover to start streaming terrain data at 1 FPS.</summary>
+        public Task SendTerrainRequestAsync()
+            => SendVideoRequestAsync(NetworkProtocol.SOURCE_TERRAIN, NetworkProtocol.VARIANT_TERRAIN, 0x00, 0x01);
+
+        // ── TCP receive loop ──────────────────────────────────────────────────
         private void ReceiveLoop()
         {
-            byte[] buffer = new byte[4096];
-            byte[] frameBuffer = new byte[4096]; // Buffer for accumulating frames
-            int frameBufferPos = 0;
+            byte[] buffer      = new byte[4096];
+            byte[] frameBuffer = new byte[4096];
+            int    framePos    = 0;
 
             while (!_cancelSource.Token.IsCancellationRequested && _stream != null)
             {
                 try
                 {
-                    int bytesRead = _stream.Read(buffer, 0, buffer.Length);
-                    if (bytesRead == 0)
-                    {
-                        // Connection closed
-                        break;
-                    }
+                    int read = _stream.Read(buffer, 0, buffer.Length);
+                    if (read == 0) break;
 
-                    // Copy to frame buffer
-                    Array.Copy(buffer, 0, frameBuffer, frameBufferPos, bytesRead);
-                    frameBufferPos += bytesRead;
+                    Array.Copy(buffer, 0, frameBuffer, framePos, read);
+                    framePos += read;
 
-                    // Process complete frames
                     int offset = 0;
-                    while (offset < frameBufferPos)
+                    while (offset < framePos)
                     {
-                        // Need at least 3 bytes for header
-                        if (frameBufferPos - offset < 3)
-                            break;
+                        if (framePos - offset < 3) break;
 
-                        // Parse header to get frame length
-                        byte magic = frameBuffer[offset];
-                        byte msgType = frameBuffer[offset + 1];
                         byte payloadLen = frameBuffer[offset + 2];
+                        int  expected   = 3 + payloadLen + 1;
+                        if (framePos - offset < expected) break;
 
-                        // Calculate total frame size
-                        int expectedLen = 3 + payloadLen + 1; // header + payload + crc
-
-                        // Check if we have complete frame
-                        if (frameBufferPos - offset < expectedLen)
-                            break;
-
-                        // Extract frame and decode
-                        byte[] frame = new byte[expectedLen];
-                        Array.Copy(frameBuffer, offset, frame, 0, expectedLen);
+                        byte[] frame = new byte[expected];
+                        Array.Copy(frameBuffer, offset, frame, 0, expected);
 
                         var msg = NetworkProtocol.DecodeFrame(frame);
-                        if (msg != null)
-                        {
-                            ProcessDecodedMessage(msg);
-                        }
+                        if (msg != null) ProcessDecodedMessage(msg);
 
-                        offset += expectedLen;
+                        offset += expected;
                     }
 
-                    // Move remaining bytes to start of buffer
-                    if (offset > 0 && offset < frameBufferPos)
+                    if (offset > 0 && offset < framePos)
                     {
-                        int remaining = frameBufferPos - offset;
+                        int remaining = framePos - offset;
                         Array.Copy(frameBuffer, offset, frameBuffer, 0, remaining);
                     }
-                    frameBufferPos -= offset;
+                    framePos -= offset;
                 }
                 catch (Exception ex) when (ex is ObjectDisposedException || ex is OperationCanceledException)
                 {
@@ -267,10 +284,7 @@ namespace NASA_Lunabotics_Control_Hub.Components
                 }
             }
 
-            if (IsConnected)
-            {
-                Disconnect();
-            }
+            if (IsConnected) Disconnect();
         }
 
         private void ProcessDecodedMessage(DecodedMessage msg)
@@ -284,7 +298,7 @@ namespace NASA_Lunabotics_Control_Hub.Components
                         if (!IsConnected)
                         {
                             IsConnected = true;
-                            Console.WriteLine("[NetworkModeClient] First heartbeat received — connection confirmed");
+                            Console.WriteLine("[NetworkModeClient] First heartbeat — connection confirmed");
                             Dispatcher.UIThread.Post(() => ConnectionChanged?.Invoke(true));
                         }
                         Dispatcher.UIThread.Post(() => HeartbeatReceived?.Invoke());
@@ -302,9 +316,9 @@ namespace NASA_Lunabotics_Control_Hub.Components
 
                         if (state != CurrentState)
                         {
-                            string previousState = CurrentState;
+                            string prev = CurrentState;
                             CurrentState = state;
-                            Console.WriteLine($"[NetworkModeClient] Received state update: {state} (was {previousState})");
+                            Console.WriteLine($"[NetworkModeClient] State: {state} (was {prev})");
                             Dispatcher.UIThread.Post(() => StateChanged?.Invoke(state));
                         }
 
@@ -316,19 +330,18 @@ namespace NASA_Lunabotics_Control_Hub.Components
                         break;
 
                     case "ack":
-                        Console.WriteLine($"[NetworkModeClient] Received ACK: success={msg.Success}");
+                        Console.WriteLine($"[NetworkModeClient] ACK: success={msg.Success}");
                         break;
 
                     case "fault":
-                        char faultChar = msg.FaultChar;
-                        string severity = msg.Severity switch
+                        string sev = msg.Severity switch
                         {
                             (byte)'0' => "info",
                             (byte)'1' => "warning",
                             (byte)'2' => "critical",
                             _ => "unknown"
                         };
-                        Console.WriteLine($"[NetworkModeClient] Received fault alert: {faultChar} ({severity})");
+                        Console.WriteLine($"[NetworkModeClient] Fault: {msg.FaultChar} ({sev})");
                         break;
                 }
             }

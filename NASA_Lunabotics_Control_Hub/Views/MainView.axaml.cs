@@ -5,6 +5,7 @@ using Avalonia.Threading;
 using NASA_Lunabotics_Control_Hub.Components;
 using NASA_Lunabotics_Control_Hub.Controls;
 using NASA_Lunabotics_Control_Hub.Controls.Manual;
+using NASA_Lunabotics_Control_Hub.Controls.Sensors;
 using NASA_Lunabotics_Control_Hub.Controls.Telemetry;
 using NASA_Lunabotics_Control_Hub.Helpers;
 using NASA_Lunabotics_Control_Hub.ViewModels;
@@ -85,14 +86,17 @@ namespace NASA_Lunabotics_Control_Hub.Views
                 _mainViewModel.SetConnected(isConnected);
                 UpdateConnectButton(isConnected);
 
-                var videoPanel = this.FindControl<Controls.Video.VideoPanel>("VideoPanel");
+                var videoPanel   = this.FindControl<Controls.Video.VideoPanel>("VideoPanel");
+                var terrainPanel = this.FindControl<TerrainMapPanel>("TerrainPanel");
                 if (isConnected)
                 {
-                    if (videoPanel != null) videoPanel.NetworkClient = _networkClient;
+                    if (videoPanel   != null) videoPanel.NetworkClient   = _networkClient;
+                    if (terrainPanel != null) terrainPanel.NetworkClient = _networkClient;
                 }
                 else
                 {
-                    if (videoPanel != null) videoPanel.NetworkClient = null;
+                    if (videoPanel   != null) videoPanel.NetworkClient   = null;
+                    if (terrainPanel != null) terrainPanel.NetworkClient = null;
                     _mainViewModel.SetModeState("", NASA_Lunabotics_Control_Hub.ViewModels.ModeState.Idle);
                     videoPanel?.ClearStream();
                     _mainViewModel.ResetImu();
