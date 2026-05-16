@@ -275,18 +275,16 @@
             BorderThickness="0,1,0,0">
       <Grid VerticalAlignment="Center">
         <Grid.ColumnDefinitions>
-          <ColumnDefinition Width="2*" />
+          <ColumnDefinition Width="1.5*" />
           <ColumnDefinition Width="16" />
           <ColumnDefinition Width="3*" />
           <ColumnDefinition Width="16" />
-          <ColumnDefinition Width="2*" />
+          <ColumnDefinition Width="2.5*" />
         </Grid.ColumnDefinitions>
 
         <!-- Left: Power/Battery Telemetry -->
         <Grid Grid.Column="0">
           <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="10" />
             <ColumnDefinition Width="*" />
             <ColumnDefinition Width="10" />
             <ColumnDefinition Width="*" />
@@ -299,8 +297,6 @@
                               Unit="A" />
           <telemetry:DataCard Grid.Column="4" Label="Power" Value="--" SubValue="--"
                               Unit="W" />
-          <telemetry:DataCard Grid.Column="6" Label="Temp" Value="--" SubValue="--"
-                              Unit="°C" />
         </Grid>
 
         <!-- Center: Motor Side Cards with full wheel telemetry -->
@@ -334,40 +330,48 @@
                                    W3Current="--" W3Voltage="--" />
         </Grid>
 
-        <!-- Right: IMU -->
-        <Grid Grid.Column="4" RowDefinitions="Auto,3,Auto,3,Auto">
+        <!-- Right: Localization + AprilTags -->
+        <Grid Grid.Column="4" RowDefinitions="Auto,2,Auto,6,Auto,2,Auto">
 
-          <!-- Accel X / Y / Z -->
-          <Grid Grid.Row="0" ColumnDefinitions="*,8,*,8,*">
-            <telemetry:DataCard Grid.Column="0" Label="Accel X"
-                                Value="{Binding AccelXText}" Unit="m/s&#xB2;"/>
-            <telemetry:DataCard Grid.Column="2" Label="Accel Y"
-                                Value="{Binding AccelYText}" Unit="m/s&#xB2;"/>
-            <telemetry:DataCard Grid.Column="4" Label="Accel Z"
-                                Value="{Binding AccelZText}" Unit="m/s&#xB2;"/>
+          <!-- LOCALIZATION header -->
+          <TextBlock Grid.Row="0" Text="LOCALIZATION" Foreground="#808080" FontSize="9"
+                     FontWeight="Bold" FontFamily="Arial Rounded MT Bold"/>
+
+          <!-- Pose X / Y / θ -->
+          <Grid Grid.Row="2" ColumnDefinitions="*,8,*,8,*">
+            <telemetry:DataCard Grid.Column="0" Label="X"
+                                Value="{Binding PoseXText}" Unit="m"/>
+            <telemetry:DataCard Grid.Column="2" Label="Y"
+                                Value="{Binding PoseYText}" Unit="m"/>
+            <telemetry:DataCard Grid.Column="4" Label="&#x3B8;"
+                                Value="{Binding PoseThetaText}" Unit="rad"/>
           </Grid>
 
-          <!-- Vel X / Y / Z + reset button -->
-          <Grid Grid.Row="2" ColumnDefinitions="*,8,*,8,*,8,Auto">
-            <telemetry:DataCard Grid.Column="0" Label="Vel X"
-                                Value="{Binding VelXText}" Unit="m/s"/>
-            <telemetry:DataCard Grid.Column="2" Label="Vel Y"
-                                Value="{Binding VelYText}" Unit="m/s"/>
-            <telemetry:DataCard Grid.Column="4" Label="Vel Z"
-                                Value="{Binding VelZText}" Unit="m/s"/>
-            <Button Grid.Column="6" Content="&#x21BA;" Click="ResetImuButton_Click"
-                    Height="24" Width="28" Padding="0" FontSize="14"
-                    Background="#2D2D2D" Foreground="#606060" CornerRadius="4"
-                    HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
-                    ToolTip.Tip="Reset velocity"/>
-          </Grid>
+          <!-- APRIL TAGS header -->
+          <TextBlock Grid.Row="4" Text="APRIL TAGS" Foreground="#808080" FontSize="9"
+                     FontWeight="Bold" FontFamily="Arial Rounded MT Bold"/>
 
-          <!-- Roll / Pitch / Yaw (april tag derived — future) -->
-          <Grid Grid.Row="4" ColumnDefinitions="*,8,*,8,*">
-            <telemetry:DataCard Grid.Column="0" Label="Roll"  Value="--" SubValue="--" Unit="&#xB0;"/>
-            <telemetry:DataCard Grid.Column="2" Label="Pitch" Value="--" SubValue="--" Unit="&#xB0;"/>
-            <telemetry:DataCard Grid.Column="4" Label="Yaw"   Value="--" SubValue="--" Unit="&#xB0;"/>
-          </Grid>
+          <!-- Tag badges -->
+          <StackPanel Grid.Row="6" Orientation="Horizontal" Spacing="5" VerticalAlignment="Center">
+            <TextBlock Text="None visible" Foreground="#404040" FontSize="9"
+                       FontFamily="Consolas" VerticalAlignment="Center"
+                       IsVisible="{Binding NoTagsVisible}"/>
+            <Border Background="#1A2A1A" BorderBrush="#4ade80" BorderThickness="1"
+                    CornerRadius="4" Padding="6,2" IsVisible="{Binding Tag1Visible}">
+              <TextBlock Text="{Binding Tag1Text}" Foreground="#4ade80"
+                         FontSize="9" FontFamily="Consolas"/>
+            </Border>
+            <Border Background="#1A2A1A" BorderBrush="#4ade80" BorderThickness="1"
+                    CornerRadius="4" Padding="6,2" IsVisible="{Binding Tag2Visible}">
+              <TextBlock Text="{Binding Tag2Text}" Foreground="#4ade80"
+                         FontSize="9" FontFamily="Consolas"/>
+            </Border>
+            <Border Background="#1A2A1A" BorderBrush="#4ade80" BorderThickness="1"
+                    CornerRadius="4" Padding="6,2" IsVisible="{Binding Tag3Visible}">
+              <TextBlock Text="{Binding Tag3Text}" Foreground="#4ade80"
+                         FontSize="9" FontFamily="Consolas"/>
+            </Border>
+          </StackPanel>
 
         </Grid>
       </Grid>

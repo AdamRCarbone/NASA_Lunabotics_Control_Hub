@@ -39,6 +39,8 @@ namespace NASA_Lunabotics_Control_Hub.Views
             _networkClient.ConnectionChanged += OnConnectionChanged;
             _networkClient.HeartbeatReceived += OnHeartbeatReceived;
             _networkClient.AccelReceived += (ax, ay, az) => _mainViewModel.UpdateAccel(ax, ay, az);
+            _networkClient.PoseReceived += (x, y, theta) => _mainViewModel.UpdatePose(x, y, theta);
+            _networkClient.TagsReceived += (count, ids, dists, angles) => _mainViewModel.UpdateTags(count, ids, dists, angles);
 
             DataContext = _mainViewModel;
 
@@ -115,6 +117,7 @@ namespace NASA_Lunabotics_Control_Hub.Views
                     _mainViewModel.SetModeState("", NASA_Lunabotics_Control_Hub.ViewModels.ModeState.Idle);
                     videoPanel?.ClearStream();
                     _mainViewModel.ResetImu();
+                    _mainViewModel.ResetLocalization();
                 }
             });
         }

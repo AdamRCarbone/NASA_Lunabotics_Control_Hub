@@ -71,6 +71,55 @@ namespace NASA_Lunabotics_Control_Hub.ViewModels
             VelXText   = "--"; VelYText   = "--"; VelZText   = "--";
         }
 
+        // Localization (marker L)
+        private string _poseXText = "--";
+        private string _poseYText = "--";
+        private string _poseThetaText = "--";
+        private bool _hasPose = false;
+
+        public string PoseXText     { get => _poseXText;     private set => this.RaiseAndSetIfChanged(ref _poseXText,     value); }
+        public string PoseYText     { get => _poseYText;     private set => this.RaiseAndSetIfChanged(ref _poseYText,     value); }
+        public string PoseThetaText { get => _poseThetaText; private set => this.RaiseAndSetIfChanged(ref _poseThetaText, value); }
+        public bool   HasPose       { get => _hasPose;       private set => this.RaiseAndSetIfChanged(ref _hasPose,       value); }
+
+        public void UpdatePose(float x, float y, float theta)
+        {
+            PoseXText     = $"{x:F2}";
+            PoseYText     = $"{y:F2}";
+            PoseThetaText = $"{theta:F3}";
+            HasPose       = true;
+        }
+
+        // AprilTag observations (marker G)
+        private string _tag1Text = ""; private bool _tag1Visible = false;
+        private string _tag2Text = ""; private bool _tag2Visible = false;
+        private string _tag3Text = ""; private bool _tag3Visible = false;
+
+        public string Tag1Text    { get => _tag1Text;    private set => this.RaiseAndSetIfChanged(ref _tag1Text,    value); }
+        public string Tag2Text    { get => _tag2Text;    private set => this.RaiseAndSetIfChanged(ref _tag2Text,    value); }
+        public string Tag3Text    { get => _tag3Text;    private set => this.RaiseAndSetIfChanged(ref _tag3Text,    value); }
+        public bool   Tag1Visible { get => _tag1Visible; private set { this.RaiseAndSetIfChanged(ref _tag1Visible, value); this.RaisePropertyChanged(nameof(NoTagsVisible)); } }
+        public bool   Tag2Visible { get => _tag2Visible; private set { this.RaiseAndSetIfChanged(ref _tag2Visible, value); this.RaisePropertyChanged(nameof(NoTagsVisible)); } }
+        public bool   Tag3Visible { get => _tag3Visible; private set { this.RaiseAndSetIfChanged(ref _tag3Visible, value); this.RaisePropertyChanged(nameof(NoTagsVisible)); } }
+        public bool   NoTagsVisible => !_tag1Visible && !_tag2Visible && !_tag3Visible;
+
+        public void UpdateTags(byte count, byte[] ids, float[] dists, float[] angles)
+        {
+            Tag1Visible = count >= 1;
+            Tag2Visible = count >= 2;
+            Tag3Visible = count >= 3;
+            if (count >= 1) Tag1Text = $"#{ids[0]} {dists[0]:F1}m {angles[0]:F0}°";
+            if (count >= 2) Tag2Text = $"#{ids[1]} {dists[1]:F1}m {angles[1]:F0}°";
+            if (count >= 3) Tag3Text = $"#{ids[2]} {dists[2]:F1}m {angles[2]:F0}°";
+        }
+
+        public void ResetLocalization()
+        {
+            PoseXText = "--"; PoseYText = "--"; PoseThetaText = "--";
+            HasPose = false;
+            Tag1Visible = false; Tag2Visible = false; Tag3Visible = false;
+        }
+
         public void SetConnected(bool connected) { IsConnected = connected; }
         public void SetCurrentMode(string mode) { CurrentMode = mode; }
 
