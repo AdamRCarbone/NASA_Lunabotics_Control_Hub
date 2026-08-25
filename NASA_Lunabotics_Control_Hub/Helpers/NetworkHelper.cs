@@ -9,14 +9,26 @@ namespace NASA_Lunabotics_Control_Hub.Helpers
 {
     public static class NetworkHelper
     {
-        private static string? GetSSIDFromNetsh(string interfaceName)
+        // SSID lookup has no cross-platform BCL API, so it shells out to the
+        // per-OS network CLI. Dispatch at runtime so a single build serves both
+        // Windows and macOS; unsupported platforms fall through to null.
+        private static string? GetSSID(string interfaceName)
+        {
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                return GetSSIDFromNetsh(interfaceName);
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                return GetSSIDFromNetworkSetup(interfaceName);
+            return null;
+        }
+
+        private static string? RunCommand(string fileName, string arguments)
         {
             try
             {
                 var startInfo = new ProcessStartInfo
                 {
-                    FileName = "netsh",
-                    Arguments = "wlan show interfaces",
+                    FileName = fileName,
+                    Arguments = arguments,
                     RedirectStandardOutput = true,
                     UseShellExecute = false,
                     CreateNoWindow = true
@@ -27,44 +39,70 @@ namespace NASA_Lunabotics_Control_Hub.Helpers
 
                 string output = process.StandardOutput.ReadToEnd();
                 process.WaitForExit();
-
-                // Find the block for this interface, then extract its SSID
-                bool inBlock = false;
-                foreach (var line in output.Split('\n'))
-                {
-                    string trimmed = line.Trim();
-
-                    if (trimmed.StartsWith("Name") && trimmed.Contains(":"))
-                    {
-                        string blockName = trimmed.Split(new char[] { ':' }, 2)[1].Trim();
-                        inBlock = blockName.Equals(interfaceName, StringComparison.OrdinalIgnoreCase);
-                        continue;
-                    }
-
-                    if (!inBlock) continue;
-
-                    // Match "SSID" but not "BSSID"
-                    if (trimmed.StartsWith("SSID") && !trimmed.StartsWith("BSSID") && trimmed.Contains(":"))
-                    {
-                        string ssid = trimmed.Split(new char[] { ':' }, 2)[1].Trim();
-                        if (!string.IsNullOrEmpty(ssid))
-                            return ssid;
-                        break;
-                    }
-                }
+                return output;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[NetworkHelper] netsh failed: {ex.Message}");
+                Console.WriteLine($"[NetworkHelper] {fileName} failed: {ex.Message}");
+                return null;
+            }
+        }
+
+        private static string? GetSSIDFromNetsh(string interfaceName)
+        {
+            string? output = RunCommand("netsh", "wlan show interfaces");
+            if (output == null) return null;
+
+            // Find the block for this interface, then extract its SSID
+            bool inBlock = false;
+            foreach (var line in output.Split('\n'))
+            {
+                string trimmed = line.Trim();
+
+                if (trimmed.StartsWith("Name") && trimmed.Contains(":"))
+                {
+                    string blockName = trimmed.Split(new char[] { ':' }, 2)[1].Trim();
+                    inBlock = blockName.Equals(interfaceName, StringComparison.OrdinalIgnoreCase);
+                    continue;
+                }
+
+                if (!inBlock) continue;
+
+                // Match "SSID" but not "BSSID"
+                if (trimmed.StartsWith("SSID") && !trimmed.StartsWith("BSSID") && trimmed.Contains(":"))
+                {
+                    string ssid = trimmed.Split(new char[] { ':' }, 2)[1].Trim();
+                    if (!string.IsNullOrEmpty(ssid))
+                        return ssid;
+                    break;
+                }
             }
             return null;
+        }
+
+        // macOS: `airport -I` was removed in recent releases, so query the named
+        // Wi-Fi device directly. Output is "Current Wi-Fi Network: <ssid>", or a
+        // "not associated"/permission message that yields no usable SSID.
+        private static string? GetSSIDFromNetworkSetup(string interfaceName)
+        {
+            string? output = RunCommand("/usr/sbin/networksetup", $"-getairportnetwork {interfaceName}");
+            if (output == null) return null;
+
+            int idx = output.IndexOf(':');
+            if (idx < 0) return null;
+
+            string ssid = output.Substring(idx + 1).Trim();
+            if (string.IsNullOrEmpty(ssid) || ssid.Contains("not associated", StringComparison.OrdinalIgnoreCase))
+                return null;
+
+            return ssid;
         }
 
         public static string GetInterfaceDisplayName(NetworkInterface nic)
         {
             if (nic.NetworkInterfaceType == NetworkInterfaceType.Wireless80211)
             {
-                string? ssid = GetSSIDFromNetsh(nic.Name);
+                string? ssid = GetSSID(nic.Name);
                 if (!string.IsNullOrEmpty(ssid))
                     return ssid;
 
